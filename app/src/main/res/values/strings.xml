@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">StressOverflow</string>
+
+    <string name="add_item_fragment_title_header">Item name</string>
+    <string name="add_item_fragment_make_header">Make &amp; model</string>
+    <string name="add_item_fragment_description_header">Description</string>
+    <string name="add_item_fragment_date_header">Date</string>
+    <string name="add_item_fragment_value_header">Value</string>
+    <string name="add_item_fragment_comment_header">Comments</string>
+    <string name="add_item_fragment_tag_header">Tags</string>
+    <string name="add_item_fragment_picture_header">Pictures</string>
+    <string name="add_item_fragment_serial_header">Serial Number</string>
+    <string name="add_item_fragment_description_button">Scan barcode</string>
+    <string name="add_item_fragment_serial_button">Scan number</string>
+
+    <string name="activity_item_list_edit_button_text">Edit</string>
+    <string name="activity_item_list_filter_button_text">Sort / Filter</string>
 </resources>

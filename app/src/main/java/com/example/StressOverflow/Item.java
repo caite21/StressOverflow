@@ -1,13 +1,22 @@
 /**
  * Represents a single item
  * Should pictures be their own class, or is simply a link to a picture enough?
+ * TODO: Throw more illegal argument exceptions or something
+ * reminder: tags are not hashable, dont make tags or pictures a HashSet (which also might muck
+ * around with mutex's if we require in future)
  */
+package com.example.StressOverflow;
 
-package com.example.myapplication;
+import androidx.annotation.NonNull;
+
+import com.example.StressOverflow.Util;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
+
+import kotlin.NotImplementedError;
 
 public class Item {
 
@@ -15,7 +24,7 @@ public class Item {
     private String make;
     private String model;
     private String description;
-    private Date date;
+    private GregorianCalendar date;
     private Double value;
     private String comments;
     private ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -27,7 +36,7 @@ public class Item {
             String make,
             String model,
             String description,
-            Date date,
+            GregorianCalendar date,
             Double value,
             String comments,
             ArrayList<Tag> tags,
@@ -46,7 +55,7 @@ public class Item {
         this.setSerial(serial);
     }
 
-    public void setName(String name) {
+    public void setName(String name) throws IllegalArgumentException {
         if (name.equals("")) {
             throw new IllegalArgumentException("empty name not allowed");
         } else if (name.length() > Util.MAX_ITEM_NAME_LENGTH) {
@@ -64,7 +73,7 @@ public class Item {
     }
 
     public String getModel() {
-        return this.getModel();
+        return this.model;
     }
 
     public String getDescription() {
@@ -102,20 +111,32 @@ public class Item {
         return this.getDescription();
     }
 
-    public Date getDate() {
-        return date;
+    public GregorianCalendar getDate() {
+        return this.date;
     }
 
     public ArrayList<Tag> getTags() {
-        return tags;
+        return this.tags;
     }
 
     public ArrayList<UUID> getPictures() {
-        return pictures;
+        return this.pictures;
     }
 
     public Integer getSerial() {
-        return serial;
+        return this.serial;
+    }
+
+    /**
+     * TODO: This should be able to return any number of possible serial number formats.
+     * Examples: this.getSerial = 12345678905, this.getSerialAsString("0-ddddd-ddddd-d")
+     *           returns 0-12345-67890-5. will implement once i find a need for it
+     *           (which may never come)
+     *
+     * @return serial number formatted as string
+     */
+    public String getSerialAsString(String format) {
+        throw new NotImplementedError();
     }
 
     public Double getValue() {
@@ -127,6 +148,27 @@ public class Item {
 
     public String getComments() {
         return comments;
+    }
+
+    /**
+     * Returns "make / model", "make", "model", or an empty string depending on which
+     * of the properties are not empty strings
+     *
+     * @return make and model together
+     */
+    public String getMakeModel() {
+        StringBuilder out = new StringBuilder();
+        if (this.getMake().equals("") && this.getModel().equals("")) {
+            return "";
+        } else if (this.getMake().equals("") || this.getModel().equals("")) {
+            out.append(this.getMake());
+            out.append(this.getModel());
+        } else {
+            out.append(this.getMake());
+            out.append(" / ");
+            out.append(this.getModel());
+        }
+        return out.toString();
     }
 
     public void setMake(String make) {
@@ -141,11 +183,11 @@ public class Item {
         this.description = description;
     }
 
-    public void setDate(Date date) {
+    public void setDate(GregorianCalendar date) {
         this.date = date;
     }
 
-    public void setValue(Double value) {
+    public void setValue(Double value) throws IllegalArgumentException {
         if (value < 0.0d) {
             throw new IllegalArgumentException(String.format("negative value not allowed for item %s", this.getName()));
         }
@@ -156,7 +198,13 @@ public class Item {
         this.comments = comments;
     }
 
-    public void addTags(ArrayList<Tag> tags) {
+    /**
+     * Adds all tags in tags to this object's tags. If a tag is already owned by this object, then
+     * don't add the tag.
+     *
+     * @param tags
+     */
+    public void addTags(@NonNull ArrayList<Tag> tags) {
         for (int i = 0; i < tags.size(); i++) {
             Tag tag = tags.get(i);
             if (!this.tags.contains(tag)) {
@@ -166,10 +214,20 @@ public class Item {
     }
 
     /**
-     * Should we allow duplicate images here??
+     * Removes all tags which exist in both this item's tags and passed in tag list.
+     *
+     * @param tags The tags to remove from this item
+     */
+    public void removeTags(@NonNull ArrayList<Tag> tags) {
+        this.tags.removeAll(tags);
+    }
+
+    /**
+     * TODO: Should we allow duplicate images here??
+     *
      * @param pictures
      */
-    public void addPictures(ArrayList<UUID> pictures) {
+    public void addPictures(@NonNull ArrayList<UUID> pictures) {
         this.pictures.addAll(pictures);
     }
 
