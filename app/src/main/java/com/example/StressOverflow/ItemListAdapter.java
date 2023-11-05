@@ -1,4 +1,7 @@
-package com.example.myapplication;
+/**
+ * Adapter class for main list view of items
+ */
+package com.example.StressOverflow;
 
 import android.content.Context;
 import android.text.Layout;
@@ -6,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,10 +32,23 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     public View getView(int pos, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = LayoutInflater.from(this.context).inflate(R.layout.activity_main, parent, false);
+            view = LayoutInflater.from(this.context).inflate(R.layout.listview_item_content, parent, false);
         }
         Item item = items.get(pos);
-        // add all of the fragment components here
+
+        TextView itemTitle = view.findViewById(R.id.listview__item__title);
+        TextView itemMakeModel = view.findViewById(R.id.listview__item__model__make);
+        TextView itemDescription = view.findViewById(R.id.listview__item__description);
+        TextView itemPrice = view.findViewById(R.id.listview__item__price);
+        TextView itemDate = view.findViewById(R.id.listview__item__date);
+        TextView itemSerial = view.findViewById(R.id.listview__item__serial__number);
+
+        itemTitle.setText(item.getName());
+        itemMakeModel.setText(item.getMakeModel());
+        itemDescription.setText(item.getDescription(true));
+        itemPrice.setText((item.getValue().toString()));
+        itemDate.setText(item.getDate().toString());
+        itemSerial.setText(item.getSerial());
 
         return view;
     }
@@ -40,14 +57,18 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
      * Sums the value of all items present in the list.
      * @return cumulative value of items in the list
      */
-    public double getTotalValue() {
+    public Double getTotalValue() {
         double cum = 0;
         for (int i = 0; i < items.size(); i++) {
             cum = cum + items.get(i).getValue();
         }
-        return cum;
+        return Math.round(cum * 100.0d) / 100.0d;
     }
 
+    public void addItem(Item item) {
+        this.items.add(item);
+        this.notifyDataSetChanged();
+    }
     /**
      * Removes the item as position `pos`.
      * @param pos the item at this position gets removed

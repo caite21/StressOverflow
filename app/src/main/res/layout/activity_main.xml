@@ -13,6 +13,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <Button
+        android:id="@+id/big__fat__login__buton"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="login intent tester"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
