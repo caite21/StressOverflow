@@ -1,0 +1,262 @@
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="*"
+    android:stretchColumns="*"
+    android:padding="20dp"
+    android:background="@color/white"
+    tools:context=".FilterDialog">
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_height="0dp"
+        android:layout_width="match_parent" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:text="Keywords" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" >
+
+        <AutoCompleteTextView
+            android:id="@+id/keyword_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:insetTop="0dp" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/keyword_chips"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test keyword 1" />
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test keyword 2" />
+
+        </com.google.android.material.chip.ChipGroup>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="25dp"
+            android:textSize="25sp"
+            android:text="Dates"/>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <EditText
+            android:id="@+id/start_date_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_weight="1"
+            android:hint="From" />
+
+        <EditText
+            android:id="@+id/end_date_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_weight="1"
+            android:hint="To" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:textSize="25sp"
+            android:text="Tags"/>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <CheckBox
+            android:id="@+id/select_all_tags"
+            android:layout_height="40dp"
+            android:text="Select All" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/tag_chips"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test tag 1" />
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test tag 2" />
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test tag 3" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:textSize="25sp"
+            android:text="Sort"/>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="2" >
+            <Button
+                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/sort_date_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_weight="1"
+                android:text="Date" />
+            <Button
+                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/sort_descr_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_weight="1.5"
+                android:text="Description" />
+            <Button
+                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/sort_make_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_weight="1"
+                android:text="Make" />
+            <Button
+                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/sort_value_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_weight="1"
+                android:text="Value" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1" >
+            <Button
+                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/asc_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ascending" />
+            <Button
+                style="?attr/materialButtonOutlinedStyle"
+                android:id="@+id/desc_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Descending" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TableRow
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent">
+
+        <Button
+            android:id="@+id/back_btn"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/red"
+            android:text="Back"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/filter_btn"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_column="3"
+            android:layout_gravity="end"
+            android:text="Filter"
+            android:backgroundTint="@color/green"
+            android:textColor="@color/white" />
+
+    </TableRow>
+
+</TableLayout>
