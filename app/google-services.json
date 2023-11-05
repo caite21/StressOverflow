@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "349065917469",
+    "project_id": "stressoverflow",
+    "storage_bucket": "stressoverflow.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:349065917469:android:27adee1b08711e9434c2f4",
+        "android_client_info": {
+          "package_name": "com.example.StressOverflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCytHcUVbrODfmeN1sDzi2d2BJSXs_YUXI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.StressOverflow;
 
 import android.content.Context;
 
