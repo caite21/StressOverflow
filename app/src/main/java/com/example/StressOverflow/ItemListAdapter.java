@@ -22,7 +22,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     private Context context;
 
     public ItemListAdapter(Context context, ArrayList<Item> items) {
-        super(context, 0, items);
+        super(context, R.layout.listview_item_content, items);
         this.items = items;
         this.context = context;
     }
@@ -48,7 +48,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         itemDescription.setText(item.getDescription(true));
         itemPrice.setText((item.getValue().toString()));
         itemDate.setText(item.getDate().toString());
-        itemSerial.setText(item.getSerial());
+        itemSerial.setText(item.getSerial().toString());
 
         return view;
     }
