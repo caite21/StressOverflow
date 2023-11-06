@@ -1,8 +1,8 @@
-<TableLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:shrinkColumns="*"
     android:stretchColumns="*"
     android:padding="20dp"
@@ -10,7 +10,6 @@
     tools:context=".FilterDialog">
 
     <TableRow
-        android:id="@+id/tableRow1"
         android:layout_height="0dp"
         android:layout_width="match_parent" >
 
@@ -19,7 +18,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:textSize="25sp"
-            android:text="Keywords" />
+            android:text="@string/filter__dialog__keywords__header" />
 
     </TableRow>
 
@@ -28,7 +27,7 @@
         android:layout_height="wrap_content" >
 
         <AutoCompleteTextView
-            android:id="@+id/keyword_input"
+            android:id="@+id/filter__dialog__keywords__textedit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -41,21 +40,10 @@
         android:layout_height="match_parent" >
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/keyword_chips"
+            android:id="@+id/filter__dialog__keywords__chipgroup"
             android:layout_height="wrap_content"
-            android:layout_weight="1" >
+            android:layout_weight="1" />
 
-            <com.google.android.material.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="test keyword 1" />
-
-            <com.google.android.material.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="test keyword 2" />
-
-        </com.google.android.material.chip.ChipGroup>
     </TableRow>
 
     <TableRow
@@ -68,7 +56,7 @@
             android:layout_weight="1"
             android:layout_marginTop="25dp"
             android:textSize="25sp"
-            android:text="Dates"/>
+            android:text="@string/filter__dialog__date__header"/>
 
     </TableRow>
 
@@ -77,7 +65,7 @@
         android:layout_height="match_parent" >
 
         <EditText
-            android:id="@+id/start_date_input"
+            android:id="@+id/filter__dialog__start__date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:clickable="false"
@@ -85,10 +73,10 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:layout_weight="1"
-            android:hint="From" />
+            android:hint="@string/filter__dialog__start__date__hint" />
 
         <EditText
-            android:id="@+id/end_date_input"
+            android:id="@+id/filter__dialog__end__date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:clickable="false"
@@ -96,7 +84,7 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:layout_weight="1"
-            android:hint="To" />
+            android:hint="@string/filter__dialog__end__date__hint" />
     </TableRow>
 
     <TableRow
@@ -108,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textSize="25sp"
-            android:text="Tags"/>
+            android:text="@string/filter__dialog__tags__header"/>
 
     </TableRow>
 
@@ -117,9 +105,9 @@
         android:layout_height="match_parent" >
 
         <CheckBox
-            android:id="@+id/select_all_tags"
+            android:id="@+id/filter__dialog__all__tags__checkbox"
             android:layout_height="40dp"
-            android:text="Select All" />
+            android:text="@string/filter__dialog__tags__select__all__text" />
 
     </TableRow>
 
@@ -128,27 +116,10 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/tag_chips"
+            android:id="@+id/filter__dialog__tags__chipgroup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" >
-
-            <com.google.android.material.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="test tag 1" />
-
-            <com.google.android.material.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="test tag 2" />
-
-            <com.google.android.material.chip.Chip
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="test tag 3" />
-
-        </com.google.android.material.chip.ChipGroup>
+            android:layout_weight="1" />
 
     </TableRow>
 
@@ -161,7 +132,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textSize="25sp"
-            android:text="Sort"/>
+            android:text="@string/filter__dialog__sort__header"/>
 
     </TableRow>
 
@@ -170,91 +141,105 @@
         android:layout_height="match_parent" >
 
         <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/filter__dialog__sort__field"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="2" >
+            android:layout_weight="2"
+            app:singleSelection="true" >
+
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/sort_date_btn"
+                android:id="@+id/filter__dialog__date__sort__btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
                 android:layout_weight="1"
-                android:text="Date" />
+                android:text="@string/filter__dialog__date__btn__text" />
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/sort_descr_btn"
+                android:id="@+id/filter__dialog__decr__sort__btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
                 android:layout_weight="1.5"
-                android:text="Description" />
+                android:text="@string/filter__dialog__descr__btn__text" />
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/sort_make_btn"
+                android:id="@+id/filter__dialog__make__sort__btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
                 android:layout_weight="1"
-                android:text="Make" />
+                android:text="@string/filter__dialog__make__btn__text" />
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/sort_value_btn"
+                android:id="@+id/filter__dialog__value__sort__btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
                 android:layout_weight="1"
-                android:text="Value" />
+                android:text="@string/filter__dialog__value__btn__text" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
         <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/filter__dialog__sort__order"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            app:singleSelection="true" >
+
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/asc_btn"
+                android:id="@+id/filter__dialog__asc__sort__btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Ascending" />
+                android:text="@string/filter__dialog__asc__btn__text" />
             <Button
                 style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/desc_btn"
+                android:id="@+id/filter__dialog__desc__sort__btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Descending" />
+                android:text="@string/filter__dialog__desc__btn__text" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </TableRow>
 
     <TableRow
         android:layout_marginTop="50dp"
         android:layout_width="match_parent">
 
         <Button
-            android:id="@+id/back_btn"
             style="@style/Widget.Material3.Button.TonalButton"
+            android:id="@+id/filter__dialog__back__btn"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/red"
-            android:text="Back"
+            android:text="@string/filter__dialog__back__btn__text"
+            android:backgroundTint="@color/black"
             android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/filter_btn"
             style="@style/Widget.Material3.Button.TonalButton"
+            android:id="@+id/filter__dialog__filter__btn"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
             android:layout_column="3"
             android:layout_gravity="end"
-            android:text="Filter"
-            android:backgroundTint="@color/green"
+            android:text="@string/filter__dialog__filter__btn__text"
+            android:backgroundTint="@color/black"
             android:textColor="@color/white" />
 
     </TableRow>
