@@ -21,14 +21,15 @@
             android:textSize="20dp"
             tools:ignore="SpUsage"
             />
+
         <Button
             android:id="@+id/activity__item__list__filter__item__button"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:text="@string/activity_item_list_filter_button_text"
             android:textSize="20dp"
-            tools:ignore="SpUsage"
-            />
+            tools:ignore="SpUsage" />
+
     </LinearLayout>
     <ListView
         android:id="@+id/activity__item__list__item__list"
@@ -67,4 +68,14 @@
         android:background="@color/lavender"
         android:textAlignment="center"
         />
+
+    <Button
+        android:id="@+id/showTagList_button"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="ShowTagList" />
 </FrameLayout>

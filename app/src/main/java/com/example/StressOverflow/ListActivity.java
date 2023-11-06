@@ -3,6 +3,7 @@ package com.example.StressOverflow;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,7 +47,15 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
         this.addItemButton = findViewById(R.id.activity__item__list__add__item__button);
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
+        Button showTagListButton = findViewById(R.id.showTagList_button);
 
+        showTagListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ListActivity.this, TagList.class);
+                startActivity(intent);
+            }
+        });
         //Fragment newItemFragment = new AddItemFragment();
         //newItemFragment.setArguments(new Bundle());
         //getSupportFragmentManager()

@@ -3,7 +3,7 @@ package com.example.StressOverflow;
 public class Tag {
     private String tagName;
 
-    public void Tag(String tagName){
+    public Tag(String tagName){
         this.tagName = tagName;
     }
 
