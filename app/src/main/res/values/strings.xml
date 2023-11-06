@@ -18,4 +18,20 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="filter__dialog__keywords__header">Keywords</string>
+    <string name="filter__dialog__date__header">Dates</string>
+    <string name="filter__dialog__start__date__hint">From</string>
+    <string name="filter__dialog__end__date__hint">To</string>
+    <string name="filter__dialog__tags__header">Tags</string>
+    <string name="filter__dialog__tags__select__all__text">Select All</string>
+    <string name="filter__dialog__sort__header">Sort</string>
+    <string name="filter__dialog__date__btn__text">Date</string>
+    <string name="filter__dialog__descr__btn__text">Description</string>
+    <string name="filter__dialog__make__btn__text">Make</string>
+    <string name="filter__dialog__value__btn__text">Value</string>
+    <string name="filter__dialog__asc__btn__text">Ascending</string>
+    <string name="filter__dialog__desc__btn__text">Descending</string>
+    <string name="filter__dialog__back__btn__text">Back</string>
+    <string name="filter__dialog__filter__btn__text">Filter</string>
+
 </resources>

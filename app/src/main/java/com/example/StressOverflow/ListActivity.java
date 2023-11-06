@@ -1,6 +1,7 @@
 package com.example.StressOverflow;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -79,20 +80,43 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
         this.itemList.setAdapter(this.itemListAdapter);
 
+        ArrayList<Tag> tags = new ArrayList<Tag>();
+        tags.add(new Tag("tag1"));
+        tags.add(new Tag("tag2"));
+
         this.itemListAdapter.addItem(
-                new Item("Test 123",
+                new Item("Test 1",
                         "Make",
                         "Model",
-                        "This is an item",
+                        "I need to stop procrastinating... common word",
+                        new GregorianCalendar(2023, 11, 5),
+                        100.0d,
+                        "asdf",
+                        tags,
+                        new ArrayList<UUID>(),
+                        2000
+                )
+        );
+
+        tags.add(new Tag("tag3"));
+
+        this.itemListAdapter.addItem(
+                new Item("Test 2",
+                        "Make",
+                        "Model",
+                        "keywords are very hard to think of; common words",
                         new GregorianCalendar(2020, 1, 15),
                         100.0d,
                         "asdf",
-                        new ArrayList<Tag>(),
+                        tags,
                         new ArrayList<UUID>(),
                         2000
                 )
         );
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
+
+        Dialog filterDialog = new Dialog(ListActivity.this);
+        this.addItemButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
     }
 
     @Override
