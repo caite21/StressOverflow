@@ -87,7 +87,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
 
         this.itemListAdapter.addItem(
                 new Item("Test 1",
-                        "Make",
+                        "Make1",
                         "Model",
                         "I need to stop procrastinating... common word",
                         new GregorianCalendar(2023, 11, 5),
@@ -103,7 +103,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
 
         this.itemListAdapter.addItem(
                 new Item("Test 2",
-                        "Make",
+                        "Make2",
                         "Model",
                         "keywords are very hard to think of; common words",
                         new GregorianCalendar(2020, 1, 15),
@@ -114,6 +114,21 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
                         2000
                 )
         );
+
+        this.itemListAdapter.addItem(
+                new Item("Test 1",
+                        "Make2",
+                        "Model",
+                        "I need to stop procrastinating... uncommon word",
+                        new GregorianCalendar(2023, 11, 5),
+                        100.0d,
+                        "asdf",
+                        tags,
+                        new ArrayList<UUID>(),
+                        2000
+                )
+        );
+
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
 
         Dialog filterDialog = new Dialog(ListActivity.this);

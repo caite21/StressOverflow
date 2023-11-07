@@ -36,6 +36,8 @@ public class FilterDialog {
     private final ChipGroup keywordChips;
     private final EditText startDateInput;
     private final EditText endDateInput;
+//    private final CheckBox checkAllMakes;
+    private final ChipGroup makeChips;
     private final CheckBox checkAllTags;
     private final ChipGroup tagChips;
     private final MaterialButtonToggleGroup sortField;
@@ -77,6 +79,17 @@ public class FilterDialog {
         return tags;
     }
 
+    private ArrayList<String> getMakes(ItemListAdapter adapter){
+        ArrayList<String> makes;
+        makes = new ArrayList<String>();
+        for (int i=0; i<adapter.getCount(); i++){
+            if (!makes.contains(adapter.getItem(i).getMake())) {
+                makes.add(adapter.getItem(i).getMake());
+            }
+        }
+        return makes;
+    }
+
     public FilterDialog(Dialog dialog, ItemListAdapter itemAdapter, ListView itemList) {
         dialog.setContentView(R.layout.filter_dialog);
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -87,6 +100,8 @@ public class FilterDialog {
         this.keywordChips = dialog.findViewById(R.id.filter__dialog__keywords__chipgroup);
         this.startDateInput = dialog.findViewById(R.id.filter__dialog__start__date);
         this.endDateInput = dialog.findViewById(R.id.filter__dialog__end__date);
+//        this.checkAllMakes = dialog.findViewById(R.id.filter__dialog__all__makes__checkbox);
+        this.makeChips = dialog.findViewById(R.id.filter__dialog__makes__chipgroup);
         this.checkAllTags = dialog.findViewById(R.id.filter__dialog__all__tags__checkbox);
         this.tagChips = dialog.findViewById(R.id.filter__dialog__tags__chipgroup);
         this.sortField = dialog.findViewById(R.id.filter__dialog__sort__field);
@@ -174,6 +189,27 @@ public class FilterDialog {
             this.tagChips.addView(chip);
         }
 
+//        this.checkAllMakes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                for (int i=0; i<makeChips.getChildCount(); i++) {
+//                    Chip chip = (Chip) makeChips.getChildAt(i);
+//                    chip.setChecked(isChecked);
+//                }
+//            }
+//        });
+
+        ArrayList<String> makes = getMakes(itemAdapter);
+        for (int i=0; i<makes.size(); i++) {
+            Chip chip = new Chip(dialog.getContext());
+            chip.setText(makes.get(i));
+            chip.setCheckedIconVisible(true);
+            chip.setCheckable(true);
+            chip.setActivated(false);
+            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
+            this.makeChips.addView(chip);
+        }
+
         // Just input handing for sorting since sortOrder and sortField are mutually dependant
         // TODO: Doesn't fully work since depends on top to bottom, uh either scrap or figure out...
         this.sortField.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
@@ -206,6 +242,13 @@ public class FilterDialog {
             dateConds.add(startDateInput.getText().toString());
             dateConds.add(endDateInput.getText().toString());
             filterConds.put("dates", dateConds);
+
+            ArrayList<String> makeConds = new ArrayList<String>();
+            for (int chipId : makeChips.getCheckedChipIds()) {
+                Chip chip = makeChips.findViewById(chipId);
+                makeConds.add(chip.getText().toString());
+            }
+            filterConds.put("makes", makeConds);
 
             ArrayList<String> tagConds = new ArrayList<String>();
             for (int chipId : tagChips.getCheckedChipIds()) {
