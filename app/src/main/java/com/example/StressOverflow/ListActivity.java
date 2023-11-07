@@ -36,6 +36,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
 
     int selected = -1;
     Intent loginIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +117,8 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
 
         Dialog filterDialog = new Dialog(ListActivity.this);
-        this.addItemButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
+        filterButton.setClickable(true);
+        this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
     }
 
     @Override
