@@ -107,7 +107,13 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         } else {
             selectedItems.add(item);
         }
+        if (selectedItems.isEmpty()){
+            setSelectionMode(false);
+        }
         notifyDataSetChanged();
+    }
+    public boolean getSelectionMode(){
+        return inSelectionMode;
     }
     public ArrayList<Item> getSelectedItems() {
         ArrayList<Item> selected = new ArrayList<>();

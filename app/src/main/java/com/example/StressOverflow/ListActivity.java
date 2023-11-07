@@ -69,6 +69,7 @@ TagFragment.OnFragmentInteractionListener{
             }
         });
         this.addTagButton.setOnClickListener(openTagFragment);
+        this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
         //Fragment newItemFragment = new AddItemFragment();
         //newItemFragment.setArguments(new Bundle());
@@ -168,9 +169,15 @@ TagFragment.OnFragmentInteractionListener{
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             addTagButton.setVisibility(View.VISIBLE);
+            addItemButton.setVisibility(View.GONE);
+            deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
             itemListAdapter.setSelectionMode(true);
             itemListAdapter.toggleSelection(position);
+
+            if (itemListAdapter.getSelectedItems().size() == 0){
+                exitSelectionMode();
+            }
             return true;
         }
 
@@ -179,12 +186,15 @@ TagFragment.OnFragmentInteractionListener{
     private void exitSelectionMode() {
         inSelectionMode = false;
         itemListAdapter.setSelectionMode(false);
+        addTagButton.setVisibility(View.GONE);
+        addItemButton.setVisibility(View.VISIBLE);
+        deleteItemButton.setVisibility(View.GONE);
     }
 
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //Switch to Tag Fragment
+            new TagFragment().show(getSupportFragmentManager(), "ADD TAG");
         }
     };
 
@@ -194,4 +204,14 @@ TagFragment.OnFragmentInteractionListener{
         //Add all the tags to the selected items
 
     }
+
+    private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            ArrayList<Item> itemsToDelete = itemListAdapter.getSelectedItems();
+            for (Item i: itemsToDelete){
+                itemListAdapter.remove(i);
+            }
+        }
+    };
 }

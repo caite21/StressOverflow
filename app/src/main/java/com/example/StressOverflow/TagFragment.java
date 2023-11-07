@@ -42,7 +42,6 @@ public class TagFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-
         return builder.setView(view)
                 .setTitle("AddTag")
                 .setNegativeButton("Cancel", null)

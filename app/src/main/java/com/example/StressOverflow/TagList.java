@@ -31,6 +31,7 @@ public class TagList extends AppCompatActivity {
 
     TextView addTagTextView;
     Button confirmAdd_button;
+    Button back_button;
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
     private CollectionReference tagsRef;
@@ -52,6 +53,9 @@ public class TagList extends AppCompatActivity {
         confirmAdd_button = findViewById(R.id.confirmAdd_button);
         addTag_button.setOnClickListener(enterText);
         confirmAdd_button.setOnClickListener(addTag);
+        back_button = findViewById(R.id.tagListBack_button);
+
+        back_button.setOnClickListener(backToMain);
         ListView tagListView = findViewById(R.id.tagListView);
         tagAdapter = new TagListAdapter(TagList.this, tagList);
         tagListView.setAdapter(tagAdapter);
@@ -117,6 +121,11 @@ public class TagList extends AppCompatActivity {
         return valid;
     }
 
-
+    private View.OnClickListener backToMain = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            finish();
+        }
+    };
 
 }
