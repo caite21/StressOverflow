@@ -27,11 +27,11 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Tag tag = getItem(position);
 
         if (convertView ==null){
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_tag_content, parent,false);
         }
+        Tag tag = getItem(position);
         TextView tagName = convertView.findViewById(R.id.tagContent);
         tagName.setText(tag.getTagName());
         Button deleteButton = convertView.findViewById(R.id.deleteTag_button);
@@ -43,11 +43,17 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                 for(Tag t : tags){
                     if (t.getTagName() == tagName){
                         tags.remove(t);
+                        notifyDataSetChanged();
                         break;
                     }
                 }
             }
         });
         return convertView;
+    }
+
+    public void addTag(Tag tag) {
+        this.tags.add(tag);
+        this.notifyDataSetChanged();
     }
 }
