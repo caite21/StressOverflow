@@ -122,9 +122,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         }
         notifyDataSetChanged();
     }
-    public boolean getSelectionMode(){
-        return inSelectionMode;
-    }
     public ArrayList<Item> getSelectedItems() {
         ArrayList<Item> selected = new ArrayList<>();
         for (Item it : selectedItems) {

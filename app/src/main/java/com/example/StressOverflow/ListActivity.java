@@ -92,6 +92,7 @@ TagFragment.OnFragmentInteractionListener{
          */
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
+            new AddItemFragment().show(getSupportFragmentManager(), "EDIT ITEM");
         });
 
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
