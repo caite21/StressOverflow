@@ -103,6 +103,9 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         return view;
     }
 
+    public int getItemListSize(){
+        return items.size();
+    }
     public void setSelectionMode(boolean enabled) {
         inSelectionMode = enabled;
         notifyDataSetChanged(); // Notify the adapter to refresh the view

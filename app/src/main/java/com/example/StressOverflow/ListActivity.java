@@ -71,6 +71,7 @@ TagFragment.OnFragmentInteractionListener{
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
+
         //Fragment newItemFragment = new AddItemFragment();
         //newItemFragment.setArguments(new Bundle());
         //getSupportFragmentManager()
@@ -127,7 +128,9 @@ TagFragment.OnFragmentInteractionListener{
                 )
         );
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
-
+        if(itemListAdapter.getItemListSize()==0){
+            exitSelectionMode();
+        }
         Dialog filterDialog = new Dialog(ListActivity.this);
         this.addItemButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
@@ -215,6 +218,10 @@ TagFragment.OnFragmentInteractionListener{
             for (Item i: itemsToDelete){
                 itemListAdapter.remove(i);
             }
+            if (itemListAdapter.getItemListSize()==0){
+                exitSelectionMode();
+            }
         }
     };
+
 }
