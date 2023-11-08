@@ -4,34 +4,22 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.StressOverflow.AddItemFragment;
-import com.example.StressOverflow.Item;
-import com.example.StressOverflow.ItemListAdapter;
-import com.example.StressOverflow.Util;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener,
-TagFragment.OnFragmentInteractionListener{
+AddTagToItemFragment.OnFragmentInteractionListener{
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
@@ -219,7 +207,7 @@ TagFragment.OnFragmentInteractionListener{
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            new TagFragment().show(getSupportFragmentManager(), "ADD TAGS");
+            new AddTagToItemFragment().show(getSupportFragmentManager(), "ADD TAGS");
         }
     };
 

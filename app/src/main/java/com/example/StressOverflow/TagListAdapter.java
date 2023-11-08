@@ -43,6 +43,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                 for(Tag t : tags){
                     if (t.getTagName() == tagName){
                         tags.remove(t);
+
                         notifyDataSetChanged();
                         break;
                     }

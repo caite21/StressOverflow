@@ -1,5 +1,7 @@
 package com.example.StressOverflow;
 
+import static java.security.AccessController.getContext;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
@@ -25,12 +28,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class TagList extends AppCompatActivity {
+public class TagList extends AppCompatActivity implements AddTagFragment.OnFragmentInteractionListener {
     ArrayList<Tag> tagList = new ArrayList<>();
     Button addTag_button;
 
-    TextView addTagTextView;
-    Button confirmAdd_button;
     Button back_button;
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
@@ -49,12 +50,8 @@ public class TagList extends AppCompatActivity {
 //
 //        tagList.addAll(tagstoAdd);
         addTag_button = findViewById(R.id.addTag_button);
-        addTagTextView = findViewById(R.id.addTagTextView);
-        confirmAdd_button = findViewById(R.id.confirmAdd_button);
-        addTag_button.setOnClickListener(enterText);
-        confirmAdd_button.setOnClickListener(addTag);
         back_button = findViewById(R.id.tagListBack_button);
-
+        addTag_button.setOnClickListener(addTag);
         back_button.setOnClickListener(backToMain);
         ListView tagListView = findViewById(R.id.tagListView);
         tagAdapter = new TagListAdapter(TagList.this, tagList);
@@ -82,38 +79,19 @@ public class TagList extends AppCompatActivity {
 
     }
 
-    private View.OnClickListener enterText = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            addTagTextView.setVisibility(View.VISIBLE);
-            confirmAdd_button.setVisibility(View.VISIBLE);
-        }
-    };
+
 
     private View.OnClickListener addTag = new View.OnClickListener(){
         @Override
         public void onClick(View v) {
-            String tagName = String.valueOf(addTagTextView.getText());
-            boolean valid = Validate(tagName);
-            if (valid){
-                Tag tagToAdd = new Tag(tagName);
-                tagAdapter.addTag(tagToAdd);
-                HashMap<String, String> data = new HashMap<>();
-                data.put("Tag", tagName);
-                tagsRef.document(tagName).set(data);
-                addTagTextView.setText(null);
-                addTagTextView.setVisibility(View.GONE);
-                confirmAdd_button.setVisibility(View.GONE);
-            }else{
-                addTagTextView.setError("Duplicate name, choose another name");
-            }
+            new AddTagFragment().show(getSupportFragmentManager(), "ADD TAG");
         }
     };
 
     private Boolean Validate(String tagName){
         boolean valid = true;
         for (Tag t: tagList){
-            if (t.getTagName().equals(tagName)){
+            if (t.getTagName().equals(tagName) || tagName.isEmpty()){
                 valid = false;
                 break;
             }
@@ -128,4 +106,20 @@ public class TagList extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onOkPressed(Tag newTag) {
+        String tagName = newTag.getTagName();
+        boolean valid = Validate(tagName);
+        if (valid){
+            Tag tagToAdd = new Tag(tagName);
+            tagAdapter.addTag(tagToAdd);
+            HashMap<String, String> data = new HashMap<>();
+            data.put("Tag", tagName);
+            tagsRef.document(tagName).set(data);
+
+        }else{
+            Toast toast = Toast.makeText(this, "Duplicate/Invalid Tag Name", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
 }
