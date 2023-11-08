@@ -54,7 +54,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             view = LayoutInflater.from(this.context).inflate(R.layout.listview_item_content, parent, false);
         }
         Item item = items.get(pos);
-        ArrayList<Tag> tags = item.getTags();
         TextView itemTitle = view.findViewById(R.id.listview__item__title);
         TextView itemMakeModel = view.findViewById(R.id.listview__item__model__make);
         TextView itemDescription = view.findViewById(R.id.listview__item__description);
@@ -69,37 +68,10 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 //        itemDate.setText(item.getDate().toString());
         itemSerial.setText(item.getSerial().toString());
 
-        ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
-        tagChipGroup.removeAllViews();
-        int tagCounter = 0;
-        for (Tag t: tags){
-            if (tagCounter!=3){
-                Chip chip = new Chip(this.context);
-                chip.setText(t.getTagName());
-                chip.setClickable(false);
-                chip.setFocusable(false);
-                chip.setLongClickable(false);
-                chip.setEnabled(false);
-                tagChipGroup.addView(chip);
-                tagCounter++;
-            }else{
-                break;
-            }
-        }
+        addTagChips(view, item);
+        applySelectionBackground(view, item);
+        //Change background color depending on selection mode
 
-        if (inSelectionMode) {
-            // Handle the selection mode appearance
-            if (selectedItems.contains(item)) {
-                // Change background color or apply other visual cues for selected items
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.lavender));
-            } else {
-                // Restore default appearance for unselected items
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-            }
-        } else {
-            // Normal mode, no selection
-            view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-        }
         return view;
     }
 
@@ -180,7 +152,40 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.items.sort(cmp);
         this.notifyDataSetChanged();
     }
-
+    private void addTagChips(View view, Item item){
+        ArrayList<Tag> tags = item.getTags();
+        ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
+        tagChipGroup.removeAllViews();
+        int tagCounter = 0;
+        for (Tag t: tags){
+            if (tagCounter!=3){
+                Chip chip = new Chip(this.context);
+                chip.setText(t.getTagName());
+                chip.setClickable(false);
+                chip.setFocusable(false);
+                chip.setLongClickable(false);
+                chip.setEnabled(false);
+                tagChipGroup.addView(chip);
+                tagCounter++;
+            }else{
+                break;
+            }
+        }
+    }
+    private void applySelectionBackground(View view, Item item){
+        if (inSelectionMode) {
+            if (selectedItems.contains(item)) {
+                // Change background color for selected items
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.lavender));
+            } else {
+                // Restore default appearance for unselected items
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            }
+        } else {
+            // Normal mode, no selection
+            view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
+    }
     /**
      * Filters the list according to something somehow
      */

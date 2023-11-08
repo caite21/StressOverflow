@@ -50,14 +50,7 @@ AddTagToItemFragment.OnFragmentInteractionListener{
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
 
         Button showTagListButton = findViewById(R.id.showTagList_button);
-
-        showTagListButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ListActivity.this, TagList.class);
-                startActivity(intent);
-            }
-        });
+        showTagListButton.setOnClickListener(showList);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
@@ -231,6 +224,14 @@ AddTagToItemFragment.OnFragmentInteractionListener{
             if (itemListAdapter.getItemListSize()==0){
                 exitSelectionMode();
             }
+        }
+    };
+
+    private View.OnClickListener showList = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(ListActivity.this, TagList.class);
+            startActivity(intent);
         }
     };
 
