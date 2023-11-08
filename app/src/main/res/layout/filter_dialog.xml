@@ -96,6 +96,42 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"
             android:textSize="25sp"
+            android:text="@string/filter__dialog__make__header"/>
+
+    </TableRow>
+
+<!--    <TableRow-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" >-->
+
+<!--        <CheckBox-->
+<!--            android:id="@+id/filter__dialog__all__makes__checkbox"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:text="@string/filter__dialog__tags__select__all__text" />-->
+
+<!--    </TableRow>-->
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/filter__dialog__makes__chipgroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:textSize="25sp"
             android:text="@string/filter__dialog__tags__header"/>
 
     </TableRow>

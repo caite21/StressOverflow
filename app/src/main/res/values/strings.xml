@@ -33,5 +33,6 @@
     <string name="filter__dialog__desc__btn__text">Descending</string>
     <string name="filter__dialog__back__btn__text">Back</string>
     <string name="filter__dialog__filter__btn__text">Filter</string>
+    <string name="filter__dialog__make__header">Make</string>
 
 </resources>

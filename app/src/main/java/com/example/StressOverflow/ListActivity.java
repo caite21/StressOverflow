@@ -43,7 +43,9 @@ TagFragment.OnFragmentInteractionListener{
 
     int selected = -1;
     Intent loginIntent;
+
     private boolean inSelectionMode = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +102,7 @@ TagFragment.OnFragmentInteractionListener{
         GregorianCalendar cal1 = new GregorianCalendar(2023, 11, 5);
         this.itemListAdapter.addItem(
                 new Item("Test 1",
-                        "Make",
+                        "Make1",
                         "Model",
                         "I need to stop procrastinating... common word",
                         new GregorianCalendar(2023, 11, 5),
@@ -116,7 +118,7 @@ TagFragment.OnFragmentInteractionListener{
 
         this.itemListAdapter.addItem(
                 new Item("Test 2",
-                        "Make",
+                        "Make2",
                         "Model",
                         "keywords are very hard to think of; common words",
                         new GregorianCalendar(2020, 1, 15),
@@ -127,13 +129,32 @@ TagFragment.OnFragmentInteractionListener{
                         2000
                 )
         );
+
+        this.itemListAdapter.addItem(
+                new Item("Test 1",
+                        "Make2",
+                        "Model",
+                        "I need to stop procrastinating... uncommon word",
+                        new GregorianCalendar(2023, 11, 5),
+                        100.0d,
+                        "asdf",
+                        tags,
+                        new ArrayList<UUID>(),
+                        2000
+                )
+        );
+
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
         Dialog filterDialog = new Dialog(ListActivity.this);
-        this.addItemButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
+        //this.addItemButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
+
+
+        filterButton.setClickable(true);
+        this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
     }
 
     @Override

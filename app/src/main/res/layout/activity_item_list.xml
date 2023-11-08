@@ -5,31 +5,8 @@
     android:id="@+id/activity__item__list__container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:orientation="vertical">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:padding="6dp">
-
-        <Button
-            android:id="@+id/activity__item__list__edit__item__button"
-            android:layout_width="120dp"
-            android:layout_height="match_parent"
-            android:text="@string/activity_item_list_edit_button_text"
-            android:textSize="20dp"
-            tools:ignore="SpUsage" />
-
-        <Button
-            android:id="@+id/activity__item__list__filter__item__button"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:text="@string/activity_item_list_filter_button_text"
-            android:textSize="20dp"
-            tools:ignore="SpUsage" />
-
-    </LinearLayout>
-
     <ListView
         android:id="@+id/activity__item__list__item__list"
         android:layout_width="match_parent"
@@ -39,6 +16,46 @@
     </ListView>
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/activity__item__list__edit__item__button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="2.5dp"
+                android:layout_marginEnd="2.5dp"
+                android:text="@string/activity_item_list_edit_button_text"
+                android:textSize="15sp"
+                tools:ignore="SpUsage"
+                />
+
+            <Button
+                android:id="@+id/activity__item__list__filter__item__button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="2.5dp"
+                android:layout_marginEnd="2.5dp"
+                android:text="@string/activity_item_list_filter_button_text"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/showTagList_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="2.5dp"
+                android:layout_marginEnd="2.5dp"
+                android:textSize="15sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="Show Tags" />
+
+    </LinearLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/activity__item__list__add__item__button"
         android:layout_width="match_parent"
@@ -47,7 +64,8 @@
         android:layout_margin="30dp"
         android:clickable="true"
         android:focusable="true"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@android:drawable/ic_input_add"
+        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/activity__item__list__add__tag__button"
@@ -82,13 +100,4 @@
         android:textAlignment="center"
         android:textSize="30sp" />
 
-    <Button
-        android:id="@+id/showTagList_button"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_weight="1"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="ShowTagList" />
 </FrameLayout>
