@@ -194,14 +194,17 @@ TagFragment.OnFragmentInteractionListener{
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            new TagFragment().show(getSupportFragmentManager(), "ADD TAG");
+            new TagFragment().show(getSupportFragmentManager(), "ADD TAGS");
         }
     };
 
 
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
-        //Add all the tags to the selected items
+        for (Item i: itemListAdapter.getSelectedItems()){
+            i.addTags(tagsToAdd);
+            itemListAdapter.notifyDataSetChanged();
+        }
 
     }
 

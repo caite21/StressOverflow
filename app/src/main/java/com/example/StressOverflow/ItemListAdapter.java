@@ -70,14 +70,21 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         itemSerial.setText(item.getSerial().toString());
 
         ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
+        tagChipGroup.removeAllViews();
+        int tagCounter = 0;
         for (Tag t: tags){
-            Chip chip = new Chip(this.context);
-            chip.setText(t.getTagName());
-            chip.setClickable(false);
-            chip.setFocusable(false);
-            chip.setLongClickable(false);
-            chip.setEnabled(false);
-            tagChipGroup.addView(chip);
+            if (tagCounter!=3){
+                Chip chip = new Chip(this.context);
+                chip.setText(t.getTagName());
+                chip.setClickable(false);
+                chip.setFocusable(false);
+                chip.setLongClickable(false);
+                chip.setEnabled(false);
+                tagChipGroup.addView(chip);
+                tagCounter++;
+            }else{
+                break;
+            }
         }
 
         if (inSelectionMode) {
