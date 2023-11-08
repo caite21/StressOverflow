@@ -28,10 +28,22 @@ public class AddTagToItemFragment extends DialogFragment {
     public AddTagToItemFragment() {
     }
 
+    /**
+     * Interface for interaction between the AddTagFragment and the hosting activity
+     */
     public interface OnFragmentInteractionListener{
+        /**
+         * Called when OK on addTagToItem dialog is clicked
+         * @param tagsToAdd the tags selected by user
+         */
         void addTagPressed(ArrayList<Tag> tagsToAdd);
     }
 
+    /**
+     * Called when the fragment is attached to a context to ensure that the hosting activity
+     * implements the necessary interaction listener interface.
+     * @param context context to which the fragment is attached
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -42,10 +54,18 @@ public class AddTagToItemFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Create dialog and its contents
+     * @param savedInstanceState The last saved instance state of the Fragment,
+     * or null if this is a freshly created Fragment.
+     *
+     * @return
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_tag_to_item, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
         //Hardcoded tagList
         ArrayList<Tag> tags = new ArrayList<>();
         Tag tag1 = new Tag("Tag1");
@@ -82,6 +102,9 @@ public class AddTagToItemFragment extends DialogFragment {
                 }).create();
     }
 
+    /**
+     * Direct user to master TagList to add new tags.
+     */
     private View.OnClickListener openTagList = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

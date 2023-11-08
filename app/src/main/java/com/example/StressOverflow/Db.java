@@ -42,7 +42,9 @@ public class Db {
         this.images = this.db.collection("images");
         this.credentials = this.db.collection("credentials");
     }
-
+    public CollectionReference getTagsCollectionReference(){
+        return this.tags;
+    }
     /**
      * adds a new item to firebase. to update an existing item, use updateItem(Item item).
      *
@@ -133,4 +135,37 @@ public class Db {
                 });
         return out;
     }
+
+    public void addTag(Tag tag){
+        String tagName = tag.getTagName();
+        this.tags
+                .document(tagName)
+                .set(tag.toFirebaseObject())
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
+
+    }
+
+    public void deleteTag(Tag tag){
+        String tagName = tag.getTagName();
+        this.tags
+                .document(tagName)
+                .set(tag.toFirebaseObject())
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
+
+    }
+
+
+
 }

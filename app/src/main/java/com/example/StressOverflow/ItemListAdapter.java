@@ -70,18 +70,31 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
         addTagChips(view, item);
         applySelectionBackground(view, item);
-        //Change background color depending on selection mode
 
         return view;
     }
 
+    /**
+     * Gets the size of item list
+     * @return size of item list
+     */
     public int getItemListSize(){
         return items.size();
     }
+
+    /**
+     * Changes the selection mode
+     * @param enabled the selection mode to be set to
+     */
     public void setSelectionMode(boolean enabled) {
         inSelectionMode = enabled;
         notifyDataSetChanged(); // Notify the adapter to refresh the view
     }
+
+    /**
+     * Toggle selection and add or remove from selectedItems list
+     * @param pos position of the item that is being selected or unselected
+     */
     public void toggleSelection(int pos) {
         Item item = items.get(pos);
         if (selectedItems.contains(item)) {
@@ -94,6 +107,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         }
         notifyDataSetChanged();
     }
+
+    /**
+     * Gets the list of items that are currently selected
+     * @return list of selected items
+     */
     public ArrayList<Item> getSelectedItems() {
         ArrayList<Item> selected = new ArrayList<>();
         for (Item it : selectedItems) {
@@ -152,6 +170,12 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.items.sort(cmp);
         this.notifyDataSetChanged();
     }
+
+    /**
+     * Add the tags for the item on runtime
+     * @param view gets the current view that it's rendering
+     * @param item gets the current item that it's rendering
+     */
     private void addTagChips(View view, Item item){
         ArrayList<Tag> tags = item.getTags();
         ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
@@ -172,6 +196,12 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             }
         }
     }
+
+    /**
+     * Change the background color depending on its selection mode
+     * @param view gets the current view that it's rendering
+     * @param item gets the item that it's rendering
+     */
     private void applySelectionBackground(View view, Item item){
         if (inSelectionMode) {
             if (selectedItems.contains(item)) {

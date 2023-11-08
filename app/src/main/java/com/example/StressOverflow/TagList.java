@@ -36,26 +36,29 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
     private CollectionReference tagsRef;
+    private Db tagDb;
+    /**
+     * sets up the event listeners of the different views on this activtiy
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_list);
         db = FirebaseFirestore.getInstance();
-        tagsRef = db.collection("tags");
-//        Tag Tag1 = new Tag("purple");
-//        Tag Tag2 = new Tag("blue");
-//        Tag Tag3 = new Tag("yellow");
-//
-//        List<Tag> tagstoAdd = Arrays.asList(Tag1,Tag2,Tag3);
-//
-//        tagList.addAll(tagstoAdd);
+        tagDb = new Db(db);
+        tagsRef = tagDb.getTagsCollectionReference();
         addTag_button = findViewById(R.id.addTag_button);
         back_button = findViewById(R.id.tagListBack_button);
         addTag_button.setOnClickListener(addTag);
         back_button.setOnClickListener(backToMain);
         ListView tagListView = findViewById(R.id.tagListView);
-        tagAdapter = new TagListAdapter(TagList.this, tagList);
+        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb);
         tagListView.setAdapter(tagAdapter);
+
         tagsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots,
@@ -74,13 +77,12 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                 }
             }
         });
-        //Intent intent = new Intent(this, TagFragment.class);
-        //intent.putParcelableArrayListExtra("tagList", (ArrayList<? extends Parcelable>) tagList);
-
     }
 
 
-
+    /**
+     * Called when the addTag button is clicked, shows user the add tag dialog.
+     */
     private View.OnClickListener addTag = new View.OnClickListener(){
         @Override
         public void onClick(View v) {
@@ -88,6 +90,11 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         }
     };
 
+    /**
+     * Simple error checking that checks for duplicate names and if the field is empty
+     * @param tagName
+     * @return if it is valid or not
+     */
     private Boolean Validate(String tagName){
         boolean valid = true;
         for (Tag t: tagList){
@@ -99,6 +106,9 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         return valid;
     }
 
+    /**
+     * Called when back button is clicked, directs user to the activity they were last on
+     */
     private View.OnClickListener backToMain = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -106,6 +116,10 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         }
     };
 
+    /**
+     * Called when OK button on dialog is pressed, adds new tag to the listview and the database
+     * @param newTag the new Tag that was entered in the dialog
+     */
     @Override
     public void onOkPressed(Tag newTag) {
         String tagName = newTag.getTagName();
@@ -113,9 +127,9 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         if (valid){
             Tag tagToAdd = new Tag(tagName);
             tagAdapter.addTag(tagToAdd);
-            HashMap<String, String> data = new HashMap<>();
-            data.put("Tag", tagName);
-            tagsRef.document(tagName).set(data);
+//            HashMap<String, String> data = new HashMap<>();
+//            data.put("Tag", tagName);
+//            tagsRef.document(tagName).set(data);
 
         }else{
             Toast toast = Toast.makeText(this, "Duplicate/Invalid Tag Name", Toast.LENGTH_SHORT);
