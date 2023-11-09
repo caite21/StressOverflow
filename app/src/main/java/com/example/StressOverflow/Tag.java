@@ -1,9 +1,18 @@
 package com.example.StressOverflow;
 
 
+import static android.content.ContentValues.TAG;
+
+import android.os.Parcelable;
+import android.util.Log;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Tag implements Serializable {
     private String tagName;
@@ -32,10 +41,23 @@ public class Tag implements Serializable {
     public void setTagName(String tagName) {
         this.tagName = tagName;
     }
-    public HashMap<String, Object> toFirebaseObject() {
+    public HashMap<String, Object> toFirebaseObject(String ownerName) {
         HashMap<String, Object> data = new HashMap<>();
         data.put("tagName", this.tagName);
-
+        data.put("ownerName", ownerName);
         return data;
+    }
+
+    public static Tag fromFirebaseObject(Map<String, Object> data) {
+        try {
+            @SuppressWarnings("unchecked") // just trust me bro
+            Tag out = new Tag(
+                    (String) data.get("tagName")
+            );
+            return out;
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "Creation of item from Firebase hashmap went wrong: ", e);
+        }
+        return null;
     }
 }

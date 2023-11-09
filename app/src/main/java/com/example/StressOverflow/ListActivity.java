@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -13,13 +14,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener,
-AddTagToItemFragment.OnFragmentInteractionListener{
+AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
@@ -28,9 +35,11 @@ AddTagToItemFragment.OnFragmentInteractionListener{
     FloatingActionButton deleteItemButton;
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
-
+    String ownerName;
     int selected = -1;
     Intent loginIntent;
+
+    private ArrayList<Tag> allTags = new ArrayList<>();
 
     private boolean inSelectionMode = false;
 
@@ -55,6 +64,12 @@ AddTagToItemFragment.OnFragmentInteractionListener{
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Db tagDb = new Db(db);
+        CollectionReference tagsRef = tagDb.getTagsCollectionReference();
+        this.ownerName = loginIntent.getStringExtra("login");
+
+        tagDb.getAllTags(ownerName, this);
         //Fragment newItemFragment = new AddItemFragment();
         //newItemFragment.setArguments(new Bundle());
         //getSupportFragmentManager()
@@ -128,7 +143,6 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         "Sunny"
                 )
         );
-
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
@@ -203,7 +217,12 @@ AddTagToItemFragment.OnFragmentInteractionListener{
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            new AddTagToItemFragment().show(getSupportFragmentManager(), "ADD TAGS");
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("allTags", allTags);
+            AddTagToItemFragment fragment = new AddTagToItemFragment(ownerName);
+            fragment.setArguments(bundle);
+            fragment.show(getSupportFragmentManager(),"ADD TAGS");
+            //new AddTagToItemFragment(ownerName).show(getSupportFragmentManager(), "ADD TAGS");
         }
     };
 
@@ -214,7 +233,6 @@ AddTagToItemFragment.OnFragmentInteractionListener{
             i.addTags(tagsToAdd);
             itemListAdapter.notifyDataSetChanged();
         }
-
     }
 
     private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
@@ -234,8 +252,13 @@ AddTagToItemFragment.OnFragmentInteractionListener{
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(ListActivity.this, TagList.class);
+            intent.putExtra("ownerName", ownerName);
             startActivity(intent);
         }
     };
 
+    @Override
+    public void onTagListReceived(ArrayList<Tag> tags) {
+        this.allTags = tags;
+    }
 }

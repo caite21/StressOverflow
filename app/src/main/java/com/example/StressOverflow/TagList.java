@@ -31,12 +31,12 @@ import java.util.List;
 public class TagList extends AppCompatActivity implements AddTagFragment.OnFragmentInteractionListener {
     ArrayList<Tag> tagList = new ArrayList<>();
     Button addTag_button;
-
     Button back_button;
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
     private CollectionReference tagsRef;
     private Db tagDb;
+    private String ownerName;
     /**
      * sets up the event listeners of the different views on this activtiy
      * @param savedInstanceState If the activity is being re-initialized after
@@ -48,6 +48,10 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_list);
+        //do some sort of error checking since TagList can be accessed by other pages as well
+        Intent intent = getIntent();
+        ownerName = intent.getStringExtra("ownerName");
+
         db = FirebaseFirestore.getInstance();
         tagDb = new Db(db);
         tagsRef = tagDb.getTagsCollectionReference();
@@ -56,9 +60,10 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         addTag_button.setOnClickListener(addTag);
         back_button.setOnClickListener(backToMain);
         ListView tagListView = findViewById(R.id.tagListView);
-        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb);
+        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb, ownerName);
         tagListView.setAdapter(tagAdapter);
 
+        //displays on tagList Activity
         tagsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots,
@@ -70,8 +75,12 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                 if (querySnapshots != null) {
                     tagList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
-                        String tagName = doc.getId();
-                        tagList.add(new Tag(tagName));
+                        String ownerNameTagName = doc.getId();
+                        if (!ownerNameTagName.isEmpty()){
+                            String[] parts = ownerNameTagName.split(":");
+                            String tagName = parts[1];
+                            tagList.add(new Tag(tagName));
+                        }
                     }
                     tagAdapter.notifyDataSetChanged();
                 }
@@ -126,10 +135,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         boolean valid = Validate(tagName);
         if (valid){
             Tag tagToAdd = new Tag(tagName);
-            tagAdapter.addTag(tagToAdd);
-//            HashMap<String, String> data = new HashMap<>();
-//            data.put("Tag", tagName);
-//            tagsRef.document(tagName).set(data);
+            tagAdapter.addTag(tagToAdd, ownerName);
 
         }else{
             Toast toast = Toast.makeText(this, "Duplicate/Invalid Tag Name", Toast.LENGTH_SHORT);

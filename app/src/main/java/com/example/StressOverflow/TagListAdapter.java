@@ -27,17 +27,20 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
     private Context context;
     private Db db;
     int position;
+    private String ownerName;
 
     /**
      * Constructor for the adapter
      * @param context context of the adapter
      * @param tags list of all tags
      */
-    public TagListAdapter(Context context, ArrayList<Tag> tags,Db db) {
+    public TagListAdapter(Context context, ArrayList<Tag> tags,Db db, String ownerName) {
         super(context, R.layout.listview_tag_content, tags);
         this.context = context;
         this.tags = tags;
         this.db = db;
+        this.ownerName = ownerName;
+
     }
 
     /**
@@ -65,7 +68,20 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
         TextView tagName = convertView.findViewById(R.id.tagContent);
         tagName.setText(tag.getTagName());
         Button deleteButton = convertView.findViewById(R.id.deleteTag_button);
-        deleteButton.setOnClickListener(tagListDelete);
+        deleteButton.setOnClickListener( new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                String tagName = tag.getTagName();
+                for (Tag t: tags){
+                    if (tagName.equals(t.getTagName())){
+                        tags.remove(t);
+                        db.deleteTag(tag,ownerName);
+                        break;
+                    }
+                }
+                notifyDataSetChanged();
+            }
+        });
 
         return convertView;
     }
@@ -74,26 +90,15 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      * Called when the delete button is clicked
      * deletes the tag from the database
      */
-    private View.OnClickListener tagListDelete = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String tagName = tags.get(position).getTagName();
-            for(Tag t : tags){
-                if (t.getTagName() == tagName){
-                    tags.remove(t);
-                    notifyDataSetChanged();
-                    break;
-                }
-            }
-        }
-    };
+
 
     /**
      * Add tag to tag list, called when addTag button is clicked from the AddTag dialog
      * @param tag new tag to add
      */
-    public void addTag(Tag tag) {
-        db.addTag(tag);
+    public void addTag(Tag tag, String ownerName) {
+        tags.add(tag);
+        db.addTag(tag, ownerName);
         notifyDataSetChanged();
     }
 }

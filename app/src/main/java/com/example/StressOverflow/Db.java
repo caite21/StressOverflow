@@ -35,6 +35,9 @@ public class Db {
     private CollectionReference images;
     private CollectionReference credentials;
 
+    public interface TagListCallback{
+        void onTagListReceived(ArrayList<Tag> tags);
+    }
     public Db(@NonNull FirebaseFirestore database) {
         this.db = database;
         this.items = this.db.collection("items");
@@ -136,11 +139,11 @@ public class Db {
         return out;
     }
 
-    public void addTag(Tag tag){
+    public void addTag(Tag tag, String ownerName){
         String tagName = tag.getTagName();
         this.tags
-                .document(tagName)
-                .set(tag.toFirebaseObject())
+                .document(String.format("%s:%s", ownerName, tagName))
+                .set(tag.toFirebaseObject(ownerName))
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -151,11 +154,11 @@ public class Db {
 
     }
 
-    public void deleteTag(Tag tag){
+    public void deleteTag(Tag tag, String ownerName){
         String tagName = tag.getTagName();
         this.tags
-                .document(tagName)
-                .set(tag.toFirebaseObject())
+                .document(String.format("%s:%s", ownerName, tagName))
+                .delete()
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -166,6 +169,26 @@ public class Db {
 
     }
 
-
+    public ArrayList<Tag> getAllTags(String ownerName, final TagListCallback callback){
+        ArrayList<Tag> out = new ArrayList<>();
+        this.db.collection("tags")
+                .whereEqualTo("ownerName", ownerName)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> data = document.getData();
+                                out.add(Tag.fromFirebaseObject(data));
+                            }
+                            callback.onTagListReceived(out);
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+        return out;
+    };
 
 }
