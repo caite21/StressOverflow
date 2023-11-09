@@ -18,6 +18,12 @@
         <activity android:name=".ListActivity"
             android:exported="false"/>
         <activity
+            android:name=".FilterDialog"
+            android:exported="false" />
+        <activity
+            android:name=".ItemView"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
