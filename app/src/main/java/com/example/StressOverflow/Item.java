@@ -7,19 +7,29 @@
  */
 package com.example.StressOverflow;
 
+import static android.content.ContentValues.TAG;
+
+import android.annotation.SuppressLint;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.StressOverflow.Util;
+import com.google.protobuf.Any;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import kotlin.NotImplementedError;
 
 public class Item {
 
+    private UUID id;
     private String name;
     private String make;
     private String model;
@@ -28,8 +38,11 @@ public class Item {
     private Double value;
     private String comments;
     private ArrayList<Tag> tags = new ArrayList<Tag>();
-    private ArrayList<UUID> pictures = new ArrayList<UUID>();
+    private ArrayList<Image> pictures = new ArrayList<Image>();
     private Integer serial;
+    private String owner;
+
+    public Item() {}
 
     public Item(
             String name,
@@ -40,9 +53,66 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<UUID> pictures,
+            ArrayList<Image> pictures,
+            Integer serial,
+            String owner
+    ) {
+        this.id = UUID.randomUUID();
+        this.setName(name);
+        this.setMake(make);
+        this.setModel(model);
+        this.setDescription(description);
+        this.setDate(date);
+        this.setValue(value);
+        this.setComments(comments);
+        this.addTags(tags);
+        this.addPictures(pictures);
+        this.setSerial(serial);
+        this.setOwner(owner);
+    }
+
+    public Item(
+            UUID uuid,
+            String name,
+            String make,
+            String model,
+            String description,
+            GregorianCalendar date,
+            Double value,
+            String comments,
+            ArrayList<Tag> tags,
+            ArrayList<Image> pictures,
+            Integer serial,
+            String owner
+    ) {
+        this.id = uuid;
+        this.setName(name);
+        this.setMake(make);
+        this.setModel(model);
+        this.setDescription(description);
+        this.setDate(date);
+        this.setValue(value);
+        this.setComments(comments);
+        this.addTags(tags);
+        this.addPictures(pictures);
+        this.setSerial(serial);
+        this.setOwner(owner);
+    }
+
+    // added this because of error message TODO: remove this constructor
+    public Item(
+            String name,
+            String make,
+            String model,
+            String description,
+            GregorianCalendar date,
+            Double value,
+            String comments,
+            ArrayList<Tag> tags,
+            ArrayList<Image> pictures,
             Integer serial
     ) {
+        this.id = UUID.randomUUID();
         this.setName(name);
         this.setMake(make);
         this.setModel(model);
@@ -64,6 +134,9 @@ public class Item {
         this.name = name;
     }
 
+    public UUID getId() {
+        return this.id;
+    }
     public String getName() {
         return this.name;
     }
@@ -115,16 +188,40 @@ public class Item {
         return this.date;
     }
 
+    public String getDateAsString() {
+        return String.format("%s/%s/%s",
+                this.getDate().get(Calendar.YEAR),
+                this.getDate().get(Calendar.MONTH) + 1,
+                this.getDate().get(Calendar.DATE)
+        );
+    }
+
+    public String getDateYear() {
+        return String.format("%s", this.getDate().get(Calendar.YEAR));
+    }
+
+    public String getDateMonth() {
+        return String.format("%s", this.getDate().get(Calendar.MONTH) + 1);
+    }
+
+    public String getDateDate() {
+        return String.format("%s", this.getDate().get(Calendar.DATE));
+    }
+
     public ArrayList<Tag> getTags() {
         return this.tags;
     }
 
-    public ArrayList<UUID> getPictures() {
+    public ArrayList<Image> getPictures() {
         return this.pictures;
     }
 
     public Integer getSerial() {
         return this.serial;
+    }
+
+    public String getOwner() {
+        return this.owner;
     }
 
     /**
@@ -171,6 +268,10 @@ public class Item {
         return out.toString();
     }
 
+    public void setPictures(ArrayList<Image> pictures) {
+        this.pictures = pictures;
+    }
+
     public void setMake(String make) {
         this.make = make;
     }
@@ -192,6 +293,10 @@ public class Item {
             throw new IllegalArgumentException(String.format("negative value not allowed for item %s", this.getName()));
         }
         this.value = value;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public void setComments(String comments) {
@@ -227,11 +332,78 @@ public class Item {
      *
      * @param pictures
      */
-    public void addPictures(@NonNull ArrayList<UUID> pictures) {
+    public void addPictures(@NonNull ArrayList<Image> pictures) {
         this.pictures.addAll(pictures);
     }
 
     public void setSerial(int serial) {
         this.serial = serial;
+    }
+
+    /**
+     * converts this thing to firebase object to store
+     *
+     * @return stuff i guess
+     */
+    public HashMap<String, Object> toFirebaseObject() {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("id", this.getId());
+        data.put("name", this.getName());
+        data.put("make", this.getModel());
+        data.put("model", this.getModel());
+        data.put("description", this.getDescription());
+        // unknown how firebase handles dates, we can fix this later.
+        data.put("year", this.getDate().get(Calendar.YEAR));
+        data.put("month", this.getDate().get(Calendar.MONTH) + 1);
+        data.put("day", this.getDate().get(Calendar.DATE));
+        data.put("value", this.getValue());
+        data.put("comments", this.getComments());
+        data.put("owner", this.getOwner());
+        data.put("serial", this.getSerial());
+        data.put("pictures", this.getPictures());
+        data.put("tags", this.getTags());
+        return data;
+    }
+
+    /**
+     * turns a hashmap from firebase into an item object
+     *
+     * @param data the hashmap stored in firebase
+     * @return stuff the item
+     */
+    public static Item fromFirebaseObject(Map<String, Object> data) {
+        try {
+            ArrayList<Tag> tags = new ArrayList<>();
+            tags.add(new Tag("Hello!"));
+            ArrayList<UUID> images = new ArrayList<>();
+            UUID uid = new UUID(
+                    ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
+                    ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
+            );
+            @SuppressWarnings({"unchecked", "ConstantConditions"}) // just trust me bro
+                    // TODO: sunny should not be trusted.
+            Item out = new Item(
+                    uid,
+                    (String) data.get("name"),
+                    (String) data.get("make"),
+                    (String) data.get("model"),
+                    (String) data.get("description"),
+                    new GregorianCalendar(
+                            ((Long) data.get("year")).intValue(),
+                            ((Long) data.get("month")).intValue(),
+                            ((Long) data.get("day")).intValue()
+                    ),
+                    (Double) data.get("value"),
+                    (String) data.get("comments"),
+                    (ArrayList<Tag>) data.get("tags"),
+                    (ArrayList<Image>) data.get("pictures"),
+                    (Integer) data.get("serial"),
+                    (String) data.get("owner")
+            );
+            return out;
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "Creation of item from Firebase hashmap went wrong: ", e);
+        }
+        return null;
     }
 }

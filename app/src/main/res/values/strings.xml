@@ -5,16 +5,22 @@
     <string name="add_item_fragment_make_header">Make &amp; model</string>
     <string name="add_item_fragment_description_header">Description</string>
     <string name="add_item_fragment_date_header">Date</string>
+    <string name="add_item_fragment_year_header">Year</string>
+    <string name="add_item_fragment_month_header">Month</string>
     <string name="add_item_fragment_value_header">Value</string>
     <string name="add_item_fragment_comment_header">Comments</string>
     <string name="add_item_fragment_tag_header">Tags</string>
     <string name="add_item_fragment_picture_header">Pictures</string>
+    <string name="add_item_fragment_picture_button_text">Select pictures</string>
     <string name="add_item_fragment_serial_header">Serial Number</string>
     <string name="add_item_fragment_description_button">Scan barcode</string>
     <string name="add_item_fragment_serial_button">Scan number</string>
 
-    <string name="activity_item_list_edit_button_text">Edit</string>
+    <string name="activity_item_list_edit_button_text">Add Item</string>
     <string name="activity_item_list_filter_button_text">Sort / Filter</string>
+
+    <string name="select_image_fragment_delete_button_text">Delete Selected Image</string>
+    <string name="select_image_fragment_add_images_button_text">Add Images</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
