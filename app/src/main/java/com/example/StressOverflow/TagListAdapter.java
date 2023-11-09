@@ -26,7 +26,6 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
     private ArrayList<Tag> tags;
     private Context context;
     private Db db;
-    int position;
     private String ownerName;
 
     /**
@@ -64,7 +63,6 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_tag_content, parent,false);
         }
         Tag tag = getItem(position);
-        this.position = position;
         TextView tagName = convertView.findViewById(R.id.tagContent);
         tagName.setText(tag.getTagName());
         Button deleteButton = convertView.findViewById(R.id.deleteTag_button);
@@ -101,7 +99,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      * Add tag to tag list, called when addTag button is clicked from the AddTag dialog
      * @param tag new tag to add
      */
-    public void addTag(Tag tag, String ownerName) {
+    public void addTag(Tag tag) {
         tags.add(tag);
         db.addTag(tag);
         notifyDataSetChanged();

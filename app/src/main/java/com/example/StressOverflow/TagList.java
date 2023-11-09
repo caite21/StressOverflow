@@ -138,7 +138,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         boolean valid = Validate(tagName);
         if (valid){
             Tag tagToAdd = new Tag(tagName);
-            tagAdapter.addTag(tagToAdd, ownerName);
+            tagAdapter.addTag(tagToAdd);
 
         }else{
             Toast toast = Toast.makeText(this, "Duplicate/Invalid Tag Name", Toast.LENGTH_SHORT);

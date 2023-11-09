@@ -41,6 +41,12 @@ public class Tag implements Serializable {
     public void setTagName(String tagName) {
         this.tagName = tagName;
     }
+
+    /**
+     * formats data to a firebaseObject
+     * @param ownerName name of the owner that's logged in
+     * @return formatted data
+     */
     public HashMap<String, Object> toFirebaseObject(String ownerName) {
         HashMap<String, Object> data = new HashMap<>();
         data.put("tagName", this.tagName);
@@ -48,9 +54,14 @@ public class Tag implements Serializable {
         return data;
     }
 
+    /**
+     * format data from firebaseObject to a tag
+     * @param data data that's passed in from firebase
+     * @return new Tag
+     */
+
     public static Tag fromFirebaseObject(Map<String, Object> data) {
         try {
-            @SuppressWarnings("unchecked") // just trust me bro
             Tag out = new Tag(
                     (String) data.get("tagName")
             );
