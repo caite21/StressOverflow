@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener,
-AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener {
+AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener, 
+AddImagesFragment.OnFragmentInteractionListener{
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
@@ -42,6 +43,7 @@ AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentI
     TextView sumOfItemCosts;
     private FirebaseFirestore db;
     private CollectionReference items;
+    ArrayList<Image> addedPictures;
 
     int selected = -1;
     Intent loginIntent;
@@ -126,7 +128,9 @@ AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentI
      * to the item list adapter.
      */
     public void onSubmitAdd(Item item) {
-        this.itemListAdapter.addItem(item);
+        item.setPictures(addedPictures);
+        this.itemListAdapter.add(item);
+
         this.setSumOfItemCosts();
         this.items
                 .document(item.getId().toString())
@@ -249,4 +253,16 @@ AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentI
             }
         }
     };
+
+    /**
+     * When user confirms adding images, the updated list
+     * of pictures is passed so that the pictures can be attached
+     * when the user is done adding/editing an item,
+     *
+     * @param pictures taken with camera or selected from library
+     */
+    @Override
+    public void onConfirmImages(ArrayList<Image> pictures) {
+        addedPictures = pictures;
+    }
 }

@@ -38,7 +38,7 @@ public class Item {
     private Double value;
     private String comments;
     private ArrayList<Tag> tags = new ArrayList<Tag>();
-    private ArrayList<UUID> pictures = new ArrayList<UUID>();
+    private ArrayList<Image> pictures = new ArrayList<Image>();
     private Integer serial;
     private String owner;
 
@@ -53,7 +53,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<UUID> pictures,
+            ArrayList<Image> pictures,
             Integer serial,
             String owner
     ) {
@@ -81,7 +81,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<UUID> pictures,
+            ArrayList<Image> pictures,
             Integer serial,
             String owner
     ) {
@@ -97,6 +97,32 @@ public class Item {
         this.addPictures(pictures);
         this.setSerial(serial);
         this.setOwner(owner);
+    }
+
+    // added this because of error message TODO: remove this constructor
+    public Item(
+            String name,
+            String make,
+            String model,
+            String description,
+            GregorianCalendar date,
+            Double value,
+            String comments,
+            ArrayList<Tag> tags,
+            ArrayList<Image> pictures,
+            Integer serial
+    ) {
+        this.id = UUID.randomUUID();
+        this.setName(name);
+        this.setMake(make);
+        this.setModel(model);
+        this.setDescription(description);
+        this.setDate(date);
+        this.setValue(value);
+        this.setComments(comments);
+        this.addTags(tags);
+        this.addPictures(pictures);
+        this.setSerial(serial);
     }
 
     public void setName(String name) throws IllegalArgumentException {
@@ -186,7 +212,7 @@ public class Item {
         return this.tags;
     }
 
-    public ArrayList<UUID> getPictures() {
+    public ArrayList<Image> getPictures() {
         return this.pictures;
     }
 
@@ -240,6 +266,10 @@ public class Item {
             out.append(this.getModel());
         }
         return out.toString();
+    }
+
+    public void setPictures(ArrayList<Image> pictures) {
+        this.pictures = pictures;
     }
 
     public void setMake(String make) {
@@ -302,7 +332,7 @@ public class Item {
      *
      * @param pictures
      */
-    public void addPictures(@NonNull ArrayList<UUID> pictures) {
+    public void addPictures(@NonNull ArrayList<Image> pictures) {
         this.pictures.addAll(pictures);
     }
 
@@ -365,9 +395,9 @@ public class Item {
                     ),
                     (Double) data.get("value"),
                     (String) data.get("comments"),
-                    tags,
-                    images,
-                    ((Long) data.get("serial")).intValue(),
+                    (ArrayList<Tag>) data.get("tags"),
+                    (ArrayList<Image>) data.get("pictures"),
+                    (Integer) data.get("serial"),
                     (String) data.get("owner")
             );
             return out;

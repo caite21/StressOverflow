@@ -4,6 +4,7 @@
 package com.example.StressOverflow;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.Layout;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +63,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         TextView itemPrice = view.findViewById(R.id.listview__item__price);
         TextView itemDate = view.findViewById(R.id.listview__item__date);
         TextView itemSerial = view.findViewById(R.id.listview__item__serial__number);
+        ImageView itemPicture = view.findViewById(R.id.listview__item__picture);
 
         itemTitle.setText(item.getName());
         itemMakeModel.setText(item.getMakeModel());
@@ -68,6 +71,12 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         itemPrice.setText((item.getValue().toString()));
         itemDate.setText(item.getDateAsString());
         itemSerial.setText(item.getSerial().toString());
+
+        // the first picture is shown
+        if (item.getPictures().size() > 0) {
+            itemPicture.setImageBitmap((item.getPictures().get(0)).getBitmap());
+        }
+
 
         ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
         tagChipGroup.removeAllViews();
