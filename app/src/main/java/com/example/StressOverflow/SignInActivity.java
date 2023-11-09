@@ -42,6 +42,11 @@ public class SignInActivity extends AppCompatActivity  {
             startActivity(i);
         });
 
+        this.forgot_password.setOnClickListener((v) -> {
+            Intent i = new Intent(SignInActivity.this, ForgotPasswordActivity.class);
+            startActivity(i);
+        });
+
         this.sign_in_button.setOnClickListener((v) -> {
             String newUsername = email_username_field.getText().toString();
             String newPassword = password_in_field.getText().toString();
