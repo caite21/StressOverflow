@@ -139,7 +139,8 @@ public class Db {
         return out;
     }
 
-    public void addTag(Tag tag, String ownerName){
+    public void addTag(Tag tag){
+        String ownerName = AppGlobals.getInstance().getOwnerName();
         String tagName = tag.getTagName();
         this.tags
                 .document(String.format("%s:%s", ownerName, tagName))
@@ -154,8 +155,9 @@ public class Db {
 
     }
 
-    public void deleteTag(Tag tag, String ownerName){
+    public void deleteTag(Tag tag){
         String tagName = tag.getTagName();
+        String ownerName = AppGlobals.getInstance().getOwnerName();
         this.tags
                 .document(String.format("%s:%s", ownerName, tagName))
                 .delete()
@@ -169,8 +171,9 @@ public class Db {
 
     }
 
-    public ArrayList<Tag> getAllTags(String ownerName, final TagListCallback callback){
+    public ArrayList<Tag> getAllTags(final TagListCallback callback){
         ArrayList<Tag> out = new ArrayList<>();
+        String ownerName = AppGlobals.getInstance().getOwnerName();
         this.db.collection("tags")
                 .whereEqualTo("ownerName", ownerName)
                 .get()
@@ -190,5 +193,6 @@ public class Db {
                 });
         return out;
     };
+
 
 }

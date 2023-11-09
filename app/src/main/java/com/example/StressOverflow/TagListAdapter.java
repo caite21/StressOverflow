@@ -34,12 +34,12 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      * @param context context of the adapter
      * @param tags list of all tags
      */
-    public TagListAdapter(Context context, ArrayList<Tag> tags,Db db, String ownerName) {
+    public TagListAdapter(Context context, ArrayList<Tag> tags,Db db) {
         super(context, R.layout.listview_tag_content, tags);
         this.context = context;
         this.tags = tags;
         this.db = db;
-        this.ownerName = ownerName;
+        this.ownerName = AppGlobals.getInstance().getOwnerName();
 
     }
 
@@ -75,7 +75,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                 for (Tag t: tags){
                     if (tagName.equals(t.getTagName())){
                         tags.remove(t);
-                        db.deleteTag(tag,ownerName);
+                        db.deleteTag(tag);
                         break;
                     }
                 }
@@ -98,7 +98,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      */
     public void addTag(Tag tag, String ownerName) {
         tags.add(tag);
-        db.addTag(tag, ownerName);
+        db.addTag(tag);
         notifyDataSetChanged();
     }
 }

@@ -38,8 +38,8 @@ public class AddTagToItemFragment extends DialogFragment{
     private CollectionReference tagsRef;
     private Db tagDb;
     private String ownerName;
-    public AddTagToItemFragment(String ownerName) {
-        this.ownerName = ownerName;
+    public AddTagToItemFragment() {
+        this.ownerName = AppGlobals.getInstance().getOwnerName();
     }
 
 
@@ -91,10 +91,8 @@ public class AddTagToItemFragment extends DialogFragment{
         makeNewTag.setOnClickListener(openTagList);
         chipGroup = view.findViewById(R.id.tagFragment_chipGroup);
 
+        allTags = AppGlobals.getInstance().getAllTags();
 
-        if (getArguments() != null) {
-            allTags = (ArrayList<Tag>) getArguments().getSerializable("allTags");
-        }
         for (Tag t: allTags){
             Chip chip = new Chip(getContext());
             chip.setText(t.getTagName());

@@ -68,8 +68,8 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
         Db tagDb = new Db(db);
         CollectionReference tagsRef = tagDb.getTagsCollectionReference();
         this.ownerName = loginIntent.getStringExtra("login");
-
-        tagDb.getAllTags(ownerName, this);
+        AppGlobals.getInstance().setOwnerName(this.ownerName);
+        tagDb.getAllTags( this);
         //Fragment newItemFragment = new AddItemFragment();
         //newItemFragment.setArguments(new Bundle());
         //getSupportFragmentManager()
@@ -217,10 +217,10 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("allTags", allTags);
-            AddTagToItemFragment fragment = new AddTagToItemFragment(ownerName);
-            fragment.setArguments(bundle);
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("allTags", allTags);
+            AddTagToItemFragment fragment = new AddTagToItemFragment();
+            //fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(),"ADD TAGS");
             //new AddTagToItemFragment(ownerName).show(getSupportFragmentManager(), "ADD TAGS");
         }
@@ -252,13 +252,13 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(ListActivity.this, TagList.class);
-            intent.putExtra("ownerName", ownerName);
             startActivity(intent);
         }
     };
 
+    //list of tags on start up
     @Override
     public void onTagListReceived(ArrayList<Tag> tags) {
-        this.allTags = tags;
+        AppGlobals.getInstance().setAllTags(tags);
     }
 }

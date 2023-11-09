@@ -48,9 +48,6 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_list);
-        //do some sort of error checking since TagList can be accessed by other pages as well
-        Intent intent = getIntent();
-        ownerName = intent.getStringExtra("ownerName");
 
         db = FirebaseFirestore.getInstance();
         tagDb = new Db(db);
@@ -60,7 +57,8 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         addTag_button.setOnClickListener(addTag);
         back_button.setOnClickListener(backToMain);
         ListView tagListView = findViewById(R.id.tagListView);
-        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb, ownerName);
+        this.ownerName = AppGlobals.getInstance().getOwnerName();
+        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb);
         tagListView.setAdapter(tagAdapter);
 
         //displays on tagList Activity
@@ -81,6 +79,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                             String tagName = parts[1];
                             tagList.add(new Tag(tagName));
                         }
+                        AppGlobals.getInstance().setAllTags(tagList);
                     }
                     tagAdapter.notifyDataSetChanged();
                 }
