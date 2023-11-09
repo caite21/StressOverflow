@@ -2,14 +2,16 @@ package com.example.StressOverflow;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ListActivity;
+//import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
     Button loginButton;
+    Button itemListButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,5 +26,7 @@ public class MainActivity extends AppCompatActivity {
             i.putExtra("login", uname);
             startActivity(i);
         });
+
+
     }
 }

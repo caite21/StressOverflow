@@ -16,14 +16,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_title_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
+
         <EditText
             android:id="@+id/add__item__fragment__edit__title"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@color/white"
-            />
+            android:hint="Item Name" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_make_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_description_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
         <LinearLayout
             android:layout_width="match_parent"
@@ -111,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/add_item_fragment_date_header"
-                android:textSize="@string/add__item__fragment__header__font__size"
+                android:textSize="20dp"
                 />
             <EditText
                 android:id="@+id/add__item__fragment__edit__date"
@@ -131,7 +132,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/add_item_fragment_value_header"
-                android:textSize="@string/add__item__fragment__header__font__size"
+                android:textSize="20dp"
                 />
             <EditText
                 android:id="@+id/add__item__fragment__edit__value"
@@ -152,7 +153,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_comment_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
         <EditText
             android:id="@+id/add__item__fragment__edit__comment"
@@ -172,7 +173,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_tag_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
         <EditText
             android:id="@+id/add__item__fragment__edit__tags"
@@ -192,7 +193,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_picture_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
         <EditText
             android:id="@+id/add__item__fragment__edit__pictures"
@@ -212,7 +213,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_item_fragment_serial_header"
-            android:textSize="@string/add__item__fragment__header__font__size"
+            android:textSize="20dp"
             />
         <LinearLayout
             android:layout_width="match_parent"
