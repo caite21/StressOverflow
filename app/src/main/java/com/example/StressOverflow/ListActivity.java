@@ -236,6 +236,13 @@ AddTagToItemFragment.OnFragmentInteractionListener, AddImagesFragment.OnFragment
         }
     };
 
+    /**
+     * When user confirms adding images, the updated list
+     * of pictures is passed so that the pictures can be attached
+     * when the user is done adding/editing an item,
+     *
+     * @param pictures taken with camera or selected from library
+     */
     @Override
     public void onConfirmImages(ArrayList<Image> pictures) {
         addedPictures = pictures;
