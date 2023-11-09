@@ -11,13 +11,23 @@ import android.widget.Button;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Checks Firebase session to figure out if the user has logged in recently.
+ * If not, then directs the user to sign-in page, otherwise open ListActivity
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
+    /**
+     * Called upon creation of activity. Directs the user to the appropriate
+     * activity.
+     */
+    // NEEDS REFACTORING (SAGI)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseAuth instance = FirebaseAuth.getInstance();
         FirebaseUser user = instance.getCurrentUser();
+        // if (false) {         UNCOMMENT TO DEBUG, COMMENT LINE BELOW
         if (user != null) {
             Intent i = new Intent(MainActivity.this, ListActivity.class);
             startActivity(i);

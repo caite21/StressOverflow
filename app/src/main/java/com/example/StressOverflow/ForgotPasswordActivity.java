@@ -20,11 +20,22 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Prompts the user to fill in email. User is able to reset the password or go back
+ * to SignInActivity. If the email is valid, sends an email with the link
+ * to reset the password. Directs the user to SignInActivity page upon successful completion.
+ */
 public class ForgotPasswordActivity extends AppCompatActivity {
     private TextView back_button;
     private EditText email_field;
     private Button reset_password_button;
     private FirebaseAuth mAuth;
+    /**
+     * Called upon creation of activity. Sets the behavior of buttons and fields.
+     * Upon clicking Reset Password button, sends the email from a no-reply address to allow
+     * users to reset the password
+     */
+    // NEEDS REFACTORING (SAGI)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -29,6 +29,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Prompts the user to fill in username, email and password. User is able to
+ * sign up or go back to SignInActivity. Checks username uniqueness, checks if the email is valid,
+ * registers the user upon successful completion into the database, encrypts the password
+ */
 public class SignUpActivity extends AppCompatActivity {
     private TextView back_button;
     private EditText username_field;
@@ -39,6 +44,13 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
+    /**
+     * Called upon creation of activity. Sets the behavior of buttons and fields.
+     * Upon clicking sign-up button, checks if all fields are filled, checks if the username
+     * already exists, checks if the passwords match (password and re-enter password fields),
+     * registers the user and directs to the ListActivity page.
+     */
+    // NEEDS REFACTORING (SAGI)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

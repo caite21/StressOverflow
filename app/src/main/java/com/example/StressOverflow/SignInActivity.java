@@ -25,6 +25,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+/**
+ * Prompts the user to fill in username/email and password. User is able to
+ * sign up or reset the password. Checks email validity, checks if the username
+ * exists in the database, authenticates the user.
+ */
 public class SignInActivity extends AppCompatActivity  {
     private EditText email_username_field;
     private EditText password_in_field;
@@ -34,6 +39,13 @@ public class SignInActivity extends AppCompatActivity  {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
+    /**
+     * Called upon creation of activity. Sets the behavior of buttons and fields.
+     * Upon clicking sign-in button, checks if all fields are filled, checks if the username exists,
+     * checks if the email and password match, authenticates the user and directs them to
+     * ListActivity page.
+     */
+    // NEEDS REFACTORING (SAGI)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
