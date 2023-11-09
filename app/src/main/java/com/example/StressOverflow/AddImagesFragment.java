@@ -37,6 +37,11 @@ import androidx.annotation.Nullable;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
+/**
+ * Fragment displays an item's images and allows the user to add
+ * multiple images from their library, add a picture with the
+ * camera, and delete images
+ */
 public class AddImagesFragment extends DialogFragment  {
     private Uri imageUri;
     private ActivityResultLauncher<Intent> addImagesLauncher;
@@ -52,7 +57,9 @@ public class AddImagesFragment extends DialogFragment  {
     private Item item;
 
 
-
+    /**
+     * Fragment listener must receive updated list of images
+     */
     public interface OnFragmentInteractionListener {
         void onConfirmImages(ArrayList<Image> images);
     }
@@ -62,11 +69,22 @@ public class AddImagesFragment extends DialogFragment  {
         // required
     }
 
+    /**
+     * View images of an item
+     *
+     * @param item which contains the images
+     */
     public AddImagesFragment(Item item) {
         // for editing an item
         this.item = item;
         itemUUID = null;
     }
+
+    /**
+     * View images of a uuid
+     *
+     * @param uuid which is associated with the images
+     */
     public AddImagesFragment(UUID uuid) {
         // for editing an item
         item = null;
@@ -87,6 +105,13 @@ public class AddImagesFragment extends DialogFragment  {
 //        }
     }
 
+    /**
+     * Displays images in the grid and implements Add and Delete buttons.
+     *
+     * @param savedInstanceState The last saved instance state of the Fragment,
+     * or null if this is a freshly created Fragment.
+     * @return built dialog fragment
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -177,6 +202,10 @@ public class AddImagesFragment extends DialogFragment  {
                 }).create();
     }
 
+    /**
+     * A pop-up that gives the options of adding images by taking a picture with the
+     * camera or selecting pictures from the library
+     */
     private void openImageChooser() {
         // Intent to capture a photo
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -202,6 +231,12 @@ public class AddImagesFragment extends DialogFragment  {
         addImagesLauncher.launch(chooser);
     }
 
+    /**
+     * Converts uri to bitmap
+     *
+     * @param uri to convert to bitmap
+     * @return bitmap of uri
+     */
     private Bitmap getBitmapFromUri(Uri uri) {
         try {
             InputStream inputStream = contentResolver.openInputStream(uri);
