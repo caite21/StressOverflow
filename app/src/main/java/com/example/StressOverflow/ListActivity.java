@@ -99,7 +99,8 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         "asdf",
                         tags,
                         new ArrayList<UUID>(),
-                        2000
+                        2000,
+                        "_"
                 )
         );
 
@@ -115,7 +116,8 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         "asdf",
                         tags,
                         new ArrayList<UUID>(),
-                        2000
+                        2000,
+                        "_"
                 )
         );
 
@@ -129,7 +131,8 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         "asdf",
                         tags,
                         new ArrayList<UUID>(),
-                        2000
+                        2000,
+                        "_"
                 )
         );
 

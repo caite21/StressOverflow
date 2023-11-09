@@ -16,11 +16,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -31,11 +37,15 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText reenter_password_field;
     private Button sign_up_button;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_page);
         mAuth = FirebaseAuth.getInstance();
+
+        db = FirebaseFirestore.getInstance();
 
         this.back_button = findViewById(R.id.back_button);
         this.username_field = findViewById(R.id.username_field);
@@ -89,26 +99,38 @@ public class SignUpActivity extends AppCompatActivity {
             if (!valid) {
                 return;
             }
-            mAuth.createUserWithEmailAndPassword(newEmail, newPassword)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d("SIGNUP STATUS", "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                Intent i = new Intent(SignUpActivity.this, ListActivity.class);
-                                startActivity(i);
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w("SIGNUP STATUS", "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                                email_field.startAnimation(animation);
-                            }
-                        }
-                    });
+            DocumentReference userRef = db.collection("users").document(newUsername);
+            userRef.get().addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    username_field.setError("Username is already taken");
+                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                    username_field.startAnimation(animation);
+                } else {
+                    Map<String, Object> updateMap = new HashMap();
+                    updateMap.put("email", newEmail);
+                    db.collection("users").document(newUsername).set(updateMap);
+                    mAuth.createUserWithEmailAndPassword(newEmail, newPassword)
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Sign in success, update UI with the signed-in user's information
+                                        Log.d("SIGNUP STATUS", "createUserWithEmail:success");
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        Intent i = new Intent(SignUpActivity.this, ListActivity.class);
+                                        startActivity(i);
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Log.w("SIGNUP STATUS", "createUserWithEmail:failure", task.getException());
+                                        Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                                        email_field.startAnimation(animation);
+                                    }
+                                }
+                            });
+                }
+            });
         });
 
     }
