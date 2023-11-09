@@ -40,6 +40,7 @@ public class AddTagToItemFragment extends DialogFragment{
     private CollectionReference tagsRef;
     private Db tagDb;
     private String ownerName;
+
     public AddTagToItemFragment() {
         this.ownerName = AppGlobals.getInstance().getOwnerName();
     }
@@ -55,6 +56,7 @@ public class AddTagToItemFragment extends DialogFragment{
          */
         void addTagPressed(ArrayList<Tag> tagsToAdd);
     }
+
 
     /**
      * Called when the fragment is attached to a context to ensure that the hosting activity

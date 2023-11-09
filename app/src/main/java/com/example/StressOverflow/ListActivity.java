@@ -97,11 +97,11 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
         this.itemList.setAdapter(this.itemListAdapter);
 
-        ArrayList<Tag> tags = new ArrayList<Tag>();
-        tags.add(new Tag("tag1"));
-        tags.add(new Tag("tag2"));
+//        ArrayList<Tag> tags = new ArrayList<Tag>();
+//        tags.add(new Tag("tag1"));
+//        tags.add(new Tag("tag2"));
 
-        GregorianCalendar cal1 = new GregorianCalendar(2023, 11, 5);
+//        GregorianCalendar cal1 = new GregorianCalendar(2023, 11, 5);
 //        this.itemListAdapter.addItem(
 //                new Item("Test 1",
 //                        "Make1",
@@ -256,7 +256,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             addTagButton.setVisibility(View.VISIBLE);
-            addItemButton.setVisibility(View.GONE);
+            //addItemButton.setVisibility(View.GONE);
             deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
             itemListAdapter.setSelectionMode(true);
@@ -274,7 +274,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         inSelectionMode = false;
         itemListAdapter.setSelectionMode(false);
         addTagButton.setVisibility(View.GONE);
-        addItemButton.setVisibility(View.VISIBLE);
+        //addItemButton.setVisibility(View.VISIBLE);
         deleteItemButton.setVisibility(View.GONE);
     }
 
@@ -311,8 +311,11 @@ AddImagesFragment.OnFragmentInteractionListener{
                             throw new RuntimeException("Error with item update on collection items: ", e);
                         }
                     });
+
             itemListAdapter.notifyDataSetChanged();
         }
+        exitSelectionMode();
+
     }
 
     /**

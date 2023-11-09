@@ -74,7 +74,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                     tagList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         String ownerNameTagName = doc.getId();
-                        if (!ownerNameTagName.isEmpty()){
+                        if (!ownerNameTagName.isEmpty() && ownerNameTagName.contains(":")){
                             String[] parts = ownerNameTagName.split(":");
                             String tagName = parts[1];
                             String ownerName = parts[0];
