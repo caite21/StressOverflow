@@ -80,6 +80,9 @@ AddImagesFragment.OnFragmentInteractionListener{
         itemList.setOnItemLongClickListener(selectItems);
 
         this.ownerName = loginIntent.getStringExtra("login");
+        if(this.ownerName == null){
+            this.ownerName = "testUser";
+        }
         AppGlobals.getInstance().setOwnerName(this.ownerName);
 
 
@@ -97,56 +100,6 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
         this.itemList.setAdapter(this.itemListAdapter);
 
-//        ArrayList<Tag> tags = new ArrayList<Tag>();
-//        tags.add(new Tag("tag1"));
-//        tags.add(new Tag("tag2"));
-
-//        GregorianCalendar cal1 = new GregorianCalendar(2023, 11, 5);
-//        this.itemListAdapter.addItem(
-//                new Item("Test 1",
-//                        "Make1",
-//                        "Model",
-//                        "I need to stop procrastinating... common word",
-//                        new GregorianCalendar(2023, 11, 5),
-//                        100.0d,
-//                        "asdf",
-//                        tags,
-//                        new ArrayList<UUID>(),
-//                        2000,
-//                        "Crystal"
-//                )
-//        );
-//        tags.add(new Tag("tag3"));
-//
-//        this.itemListAdapter.addItem(
-//                new Item("Test 2",
-//                        "Make2",
-//                        "Model",
-//                        "keywords are very hard to think of; common words",
-//                        new GregorianCalendar(2020, 1, 15),
-//                        100.0d,
-//                        "asdf",
-//                        tags,
-//                        new ArrayList<UUID>(),
-//                        2000,
-//                        "Ying"
-//                )
-//        );
-//
-//        this.itemListAdapter.addItem(
-//                new Item("Test 1",
-//                        "Make2",
-//                        "Model",
-//                        "I need to stop procrastinating... uncommon word",
-//                        new GregorianCalendar(2023, 11, 5),
-//                        100.0d,
-//                        "asdf",
-//                        tags,
-//                        new ArrayList<UUID>(),
-//                        2000,
-//                        "Sunny"
-//                )
-//        );
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
 
         if(itemListAdapter.getItemListSize()==0){
@@ -158,7 +111,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
         this.items
-                .whereEqualTo("owner", this.loginIntent.getStringExtra("login"))
+                .whereEqualTo("owner", this.ownerName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

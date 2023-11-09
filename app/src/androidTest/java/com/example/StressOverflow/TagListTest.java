@@ -60,16 +60,24 @@ public class TagListTest {
     public ActivityScenarioRule<TagList> tagListRule =
             new ActivityScenarioRule<TagList>(TagList.class);
 
-    @Rule
-    public ActivityScenarioRule<ListActivity> listActivityRule =
-            new ActivityScenarioRule<>(ListActivity.class);
-
     @Test
-    public void ListActivitytoTagList(){
-        onView(withId(R.id.showTagList_button)).perform(click());
-        onView(ViewMatchers.withId(R.id.addTag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
+    public void cancelAddToTagList() throws InterruptedException {
+        testTagName = "cancelTestTag";
+        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(withText("Cancel")).inRoot(isDialog()).perform(click());
+        onView(withId(R.id.addTagTextView)).check(doesNotExist());
 
+        // Perform the query with a callback
+        database.checkTagExist(new Tag(testTagName), new Db.TagExistCallback() {
+            @Override
+            public void onTagExist(boolean exists) {
+                // Assert that the document exists
+                assertFalse(exists);
+            }
+        });
+    }
     @Test
     public void addToTagList() throws InterruptedException {
         testTagName = "testTag";
@@ -88,6 +96,8 @@ public class TagListTest {
             }
         });
     }
+
+
     @Test
     public void deleteFromTagList() throws InterruptedException {
         testTagName = "deleteTag";

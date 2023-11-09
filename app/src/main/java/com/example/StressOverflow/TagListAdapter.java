@@ -89,10 +89,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
         return convertView;
     }
 
-    /**
-     * Called when the delete button is clicked
-     * deletes the tag from the database
-     */
+
 
 
     /**
