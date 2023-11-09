@@ -10,41 +10,41 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import org.checkerframework.checker.units.qual.A;
+import com.example.StressOverflow.Util;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
-public class AddItemFragment extends DialogFragment{
+public class EditItemFragment extends DialogFragment {
 
     private EditText itemTitleField;
     private EditText itemMakeField;
     private EditText itemModelField;
     private EditText itemDescriptionField;
     private EditText itemDateField;
-    private EditText itemMonthField;
     private EditText itemYearField;
+    private EditText itemMonthField;
     private EditText itemValueField;
     private EditText itemCommentsField;
-    private EditText itemTagsField;
-    private Button itemPicturesButton;
     private EditText itemSerialField;
     private OnFragmentInteractionListener listener;
-    private String owner;
+    private Item selectedItem;
+    private int pos;
 
-    public AddItemFragment(String owner) {
-        this.owner = owner;
+    public EditItemFragment(int pos, Item selectedItem) {
+        this.selectedItem = selectedItem;
+        this.pos = pos;
     }
     public interface OnFragmentInteractionListener {
-        void onSubmitAdd(Item item);
+        void onSubmitEdit(int id, Item item);
     }
 
     @Override
@@ -69,28 +69,29 @@ public class AddItemFragment extends DialogFragment{
         itemMakeField = view.findViewById(R.id.add__item__fragment__edit__make);
         itemModelField = view.findViewById(R.id.add__item__fragment__edit__model);
         itemDescriptionField = view.findViewById(R.id.add__item__fragment__edit__description);
-        itemMonthField = view.findViewById(R.id.add__item__fragment__edit__month);
         itemYearField = view.findViewById(R.id.add__item__fragment__edit__year);
+        itemMonthField = view.findViewById(R.id.add__item__fragment__edit__month);
         itemDateField = view.findViewById(R.id.add__item__fragment__edit__date);
         itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
         itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
-        itemTagsField = view.findViewById(R.id.add__item__fragment__edit__tags);
-        itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
 
-        itemPicturesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Opens fragment that shows the item's pictures
-                new AddImagesFragment().show(getChildFragmentManager(), "ADD_IMAGES");
-            }
-        });
+        itemTitleField.setText(this.selectedItem.getName());
+        itemMakeField.setText(this.selectedItem.getMake());
+        itemModelField.setText(this.selectedItem.getModel());
+        itemDescriptionField.setText(this.selectedItem.getDescription());
+        itemValueField.setText(Double.toString(selectedItem.getValue()));
+        itemYearField.setText(this.selectedItem.getDateYear());
+        itemMonthField.setText(this.selectedItem.getDateMonth());
+        itemDateField.setText(this.selectedItem.getDateDate());
+        itemCommentsField.setText(this.selectedItem.getComments());
+        itemSerialField.setText(Integer.toString(selectedItem.getSerial()));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         return builder
                 .setView(view)
-                .setTitle("Add an item")
+                .setTitle("Edit an item")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -102,26 +103,28 @@ public class AddItemFragment extends DialogFragment{
                         GregorianCalendar date = new GregorianCalendar(
                                 Integer.parseInt(itemYearField.getText().toString()),
                                 Integer.parseInt(itemMonthField.getText().toString()),
-                                Integer.parseInt(itemDateField.getText().toString()));
-                        Double value = Double.parseDouble(itemValueField.getText().toString());
+                                Integer.parseInt(itemDateField.getText().toString())
+                        );
+                        Double value = Double.valueOf(itemValueField.getText().toString());
                         String comments = itemCommentsField.getText().toString();
-                        ArrayList<Tag> tags = new ArrayList<>();
-                        ArrayList<Image> pictures = new ArrayList<>();
-                        String serial = itemSerialField.getText().toString();
+                        Integer serial = Integer.valueOf(itemSerialField.getText().toString());
 
                         try {
-                            listener.onSubmitAdd(new Item(
-                                    title,
-                                    make,
-                                    model,
-                                    desc,
-                                    date,
-                                    value,
-                                    comments,
-                                    tags,
-                                    pictures,
-                                    Integer.valueOf(serial),
-                                    owner
+                            listener.onSubmitEdit(
+                                    pos,
+                                    new Item(
+                                        selectedItem.getId(),
+                                        title,
+                                        make,
+                                        model,
+                                        desc,
+                                        date,
+                                        value,
+                                        comments,
+                                        selectedItem.getTags(),
+                                        selectedItem.getPictures(),
+                                        serial,
+                                        selectedItem.getOwner()
                             ));
                         } catch (IllegalArgumentException e) {
                             Util.showLongToast(

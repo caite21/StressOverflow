@@ -3,7 +3,33 @@ package com.example.StressOverflow;
 import android.content.Context;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.UUID;
+
 public final class Util {
+
+    /**
+     * Returns a mock item with test fields labelled by val
+     *
+     * @param val integer label to use
+     * @return temporary Item object with val everywhere
+     */
+    public static Item dummyItem(int val) {
+        return new Item(
+                String.format("TestObject%s", String.valueOf(val)),
+                String.format("TestMake%s", String.valueOf(val)),
+                String.format("TestModel%s", String.valueOf(val)),
+                String.format("TestDescription%s", String.valueOf(val)),
+                new GregorianCalendar(2022, 1, 2),
+                (double) val,
+                String.format("TestComment%s", String.valueOf(val)),
+                new ArrayList<Tag>(),
+                new ArrayList<Image>(),
+                (Integer) val,
+                "Test Owner"
+        );
+    }
     /**
      * Upper bound for maximum character length for a name for a single item
      */

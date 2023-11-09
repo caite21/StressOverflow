@@ -1,26 +1,39 @@
 package com.example.StressOverflow;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Map;
 import java.util.UUID;
 
-public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener,
-AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
+public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, Db.TagListCallback, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
+AddImagesFragment.OnFragmentInteractionListener{
+
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
@@ -32,6 +45,10 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     Db database = new Db(db);
+  //  private FirebaseFirestore db;
+    private CollectionReference items;
+    ArrayList<Image> addedPictures;
+
     int selected = -1;
     Intent loginIntent;
 
@@ -43,8 +60,11 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_list);
+
         this.loginIntent = getIntent();
+        this.db = FirebaseFirestore.getInstance();
+        this.items = this.db.collection("items");
+        setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
         this.editButton = findViewById(R.id.activity__item__list__edit__item__button);
@@ -53,7 +73,6 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-
         Button showTagListButton = findViewById(R.id.showTagList_button);
         showTagListButton.setOnClickListener(showList);
         this.addTagButton.setOnClickListener(openTagFragment);
@@ -65,87 +84,96 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
 
 
         database.getAllTags( this);
-        //Fragment newItemFragment = new AddItemFragment();
-        //newItemFragment.setArguments(new Bundle());
-        //getSupportFragmentManager()
-        //        .beginTransaction()
-        //        .add(R.id.activity__item__list__container, newItemFragment, "test")
-        //        .commit();
-        /**
-         this.addItemButton.setOnClickListener((v) -> {
-         Fragment newItemFragment = new AddItemFragment();
-         newItemFragment.setArguments(new Bundle());
-         getSupportFragmentManager()
-         .beginTransaction()
-         .add(R.id.activity__item__list__add__fragment__layout, newItemFragment, "test")
-         .commit();
-         });
-         */
+
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
-            new AddItemFragment().show(getSupportFragmentManager(), "EDIT ITEM");
+            Item selected = this.itemListAdapter.getItem(position);
+            new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
+        });
+        this.editButton.setOnClickListener((v) -> {
+            new AddItemFragment(this.loginIntent.getStringExtra("login")).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
         this.itemList.setAdapter(this.itemListAdapter);
+
         ArrayList<Tag> tags = new ArrayList<Tag>();
         tags.add(new Tag("tag1"));
         tags.add(new Tag("tag2"));
+
         GregorianCalendar cal1 = new GregorianCalendar(2023, 11, 5);
-        this.itemListAdapter.addItem(
-                new Item("Test 1",
-                        "Make1",
-                        "Model",
-                        "I need to stop procrastinating... common word",
-                        new GregorianCalendar(2023, 11, 5),
-                        100.0d,
-                        "asdf",
-                        tags,
-                        new ArrayList<UUID>(),
-                        2000,
-                        "Crystal"
-                )
-        );
-        tags.add(new Tag("tag3"));
-
-        this.itemListAdapter.addItem(
-                new Item("Test 2",
-                        "Make2",
-                        "Model",
-                        "keywords are very hard to think of; common words",
-                        new GregorianCalendar(2020, 1, 15),
-                        100.0d,
-                        "asdf",
-                        tags,
-                        new ArrayList<UUID>(),
-                        2000,
-                        "Ying"
-                )
-        );
-
-        this.itemListAdapter.addItem(
-                new Item("Test 1",
-                        "Make2",
-                        "Model",
-                        "I need to stop procrastinating... uncommon word",
-                        new GregorianCalendar(2023, 11, 5),
-                        100.0d,
-                        "asdf",
-                        tags,
-                        new ArrayList<UUID>(),
-                        2000,
-                        "Sunny"
-                )
-        );
+//        this.itemListAdapter.addItem(
+//                new Item("Test 1",
+//                        "Make1",
+//                        "Model",
+//                        "I need to stop procrastinating... common word",
+//                        new GregorianCalendar(2023, 11, 5),
+//                        100.0d,
+//                        "asdf",
+//                        tags,
+//                        new ArrayList<UUID>(),
+//                        2000,
+//                        "Crystal"
+//                )
+//        );
+//        tags.add(new Tag("tag3"));
+//
+//        this.itemListAdapter.addItem(
+//                new Item("Test 2",
+//                        "Make2",
+//                        "Model",
+//                        "keywords are very hard to think of; common words",
+//                        new GregorianCalendar(2020, 1, 15),
+//                        100.0d,
+//                        "asdf",
+//                        tags,
+//                        new ArrayList<UUID>(),
+//                        2000,
+//                        "Ying"
+//                )
+//        );
+//
+//        this.itemListAdapter.addItem(
+//                new Item("Test 1",
+//                        "Make2",
+//                        "Model",
+//                        "I need to stop procrastinating... uncommon word",
+//                        new GregorianCalendar(2023, 11, 5),
+//                        100.0d,
+//                        "asdf",
+//                        tags,
+//                        new ArrayList<UUID>(),
+//                        2000,
+//                        "Sunny"
+//                )
+//        );
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
+
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
         Dialog filterDialog = new Dialog(ListActivity.this);
 
-
         filterButton.setClickable(true);
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
+
+        this.items
+                .whereEqualTo("owner", this.loginIntent.getStringExtra("login"))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> data = document.getData();
+                                Item item = Item.fromFirebaseObject(data);
+                                onSubmitAdd(item);
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
     @Override
@@ -154,8 +182,20 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
      * to the item list adapter.
      */
     public void onSubmitAdd(Item item) {
+        item.setPictures(addedPictures);
         this.itemListAdapter.add(item);
+
         this.setSumOfItemCosts();
+        this.items
+                .document(item.getId().toString())
+                .set(item.toFirebaseObject())
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item addition on collection items: ", e);
+                        throw new RuntimeException("Error with item update on collection items: ", e);
+                    }
+                });
     }
 
     /**
@@ -163,15 +203,47 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
      *
      * @param position pos of item to delete
      */
-    public void onSubmitDelete(int position) {
+    public void onSubmitDelete(Item item) {
         try {
-            this.itemListAdapter.deleteItem(position);
+            UUID id_to_delete = item.getId();
+            this.items
+                    .document(id_to_delete.toString())
+                    .delete()
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error with item deletion on collection items: ", e);
+                            throw new RuntimeException("Error with item deletion on collection items: ", e);
+                        }
+                    });
+            itemListAdapter.remove(item);
+            this.setSumOfItemCosts();
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
         }
         this.setSumOfItemCosts();
     }
 
+    public void onSubmitEdit(int position, Item item) {
+        try {
+            this.itemListAdapter.editItem(position, item);
+            this.setSumOfItemCosts();
+            this.items
+                    .document(item.getId().toString())
+                    .update(item.toFirebaseObject())
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error with item update on collection items: ", e);
+                            throw new RuntimeException("Error with item update on collection items: ", e);
+                        }
+                    });
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Util.showShortToast(this.getApplicationContext(), "Attempted to edit out of bounds object") ;
+        } catch (Exception e) {
+            Util.showShortToast(this.getApplicationContext(), "Something wrong happened");
+        }
+    }
     @SuppressLint("SetTextI18n") // ?? man
     /**
      *
@@ -229,7 +301,16 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
                 }
             }
             i.addTags(tagsToAdd);
-            database.updateItem(i);
+            this.items
+                    .document(i.getId().toString())
+                    .update(i.toFirebaseObject())
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error with item update on collection items: ", e);
+                            throw new RuntimeException("Error with item update on collection items: ", e);
+                        }
+                    });
             itemListAdapter.notifyDataSetChanged();
         }
     }
@@ -244,7 +325,7 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
             //iterate through the selected list and delete from adapter and database
             for (Item i: itemsToDelete){
                 itemListAdapter.remove(i);
-                database.deleteItem(i);
+                onSubmitDelete(i);
             }
             //if there are no more items, exit selection mode
             if (itemListAdapter.getItemListSize()==0){
@@ -270,6 +351,18 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
      */
     @Override
     public void onTagListReceived(ArrayList<Tag> tags) {
-        AppGlobals.getInstance().setAllTags(tags);
+            AppGlobals.getInstance().setAllTags(tags);
+    }
+
+    /**
+     *When user confirms adding images, the updated list
+     * of pictures is passed so that the pictures can be attached
+     * when the user is done adding/editing an item,
+     *
+     * @param pictures taken with camera or selected from library
+     */
+    @Override
+    public void onConfirmImages(ArrayList<Image> pictures) {
+        addedPictures = pictures;
     }
 }

@@ -38,7 +38,7 @@ public class Item {
     private Double value;
     private String comments;
     private ArrayList<Tag> tags = new ArrayList<Tag>();
-    private ArrayList<UUID> pictures = new ArrayList<UUID>();
+    private ArrayList<Image> pictures = new ArrayList<Image>();
     private Integer serial;
     private String owner;
 
@@ -53,7 +53,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<UUID> pictures,
+            ArrayList<Image> pictures,
             Integer serial,
             String owner
     ) {
@@ -81,7 +81,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<UUID> pictures,
+            ArrayList<Image> pictures,
             Integer serial,
             String owner
     ) {
@@ -97,6 +97,32 @@ public class Item {
         this.addPictures(pictures);
         this.setSerial(serial);
         this.setOwner(owner);
+    }
+
+    // added this because of error message TODO: remove this constructor
+    public Item(
+            String name,
+            String make,
+            String model,
+            String description,
+            GregorianCalendar date,
+            Double value,
+            String comments,
+            ArrayList<Tag> tags,
+            ArrayList<Image> pictures,
+            Integer serial
+    ) {
+        this.id = UUID.randomUUID();
+        this.setName(name);
+        this.setMake(make);
+        this.setModel(model);
+        this.setDescription(description);
+        this.setDate(date);
+        this.setValue(value);
+        this.setComments(comments);
+        this.addTags(tags);
+        this.addPictures(pictures);
+        this.setSerial(serial);
     }
 
     public void setName(String name) throws IllegalArgumentException {
@@ -162,11 +188,32 @@ public class Item {
         return this.date;
     }
 
+    public String getDateAsString() {
+        return String.format("%s/%s/%s",
+                this.getDate().get(Calendar.YEAR),
+                this.getDate().get(Calendar.MONTH) + 1,
+                this.getDate().get(Calendar.DATE)
+        );
+    }
+
+    public String getDateYear() {
+        return String.format("%s", this.getDate().get(Calendar.YEAR));
+    }
+
+    public String getDateMonth() {
+        return String.format("%s", this.getDate().get(Calendar.MONTH) + 1);
+    }
+
+    public String getDateDate() {
+        return String.format("%s", this.getDate().get(Calendar.DATE));
+    }
+
     public ArrayList<Tag> getTags() {
         return this.tags;
     }
 
-    public ArrayList<UUID> getPictures() {
+    public ArrayList<Image> getPictures() {
+        this.pictures = new ArrayList<>();
         return this.pictures;
     }
 
@@ -220,6 +267,10 @@ public class Item {
             out.append(this.getModel());
         }
         return out.toString();
+    }
+
+    public void setPictures(ArrayList<Image> pictures) {
+        this.pictures = pictures;
     }
 
     public void setMake(String make) {
@@ -282,7 +333,7 @@ public class Item {
      *
      * @param pictures
      */
-    public void addPictures(@NonNull ArrayList<UUID> pictures) {
+    public void addPictures(@NonNull ArrayList<Image> pictures) {
         this.pictures.addAll(pictures);
     }
 
@@ -323,19 +374,31 @@ public class Item {
      */
     public static Item fromFirebaseObject(Map<String, Object> data) {
         try {
-            @SuppressWarnings("unchecked") // just trust me bro
+            ArrayList<Tag> tags = new ArrayList<>();
+            tags.add(new Tag("Hello!"));
+            ArrayList<Image> images = new ArrayList<>();
+            UUID uid = new UUID(
+                    ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
+                    ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
+            );
+            @SuppressWarnings({"unchecked", "ConstantConditions"}) // just trust me bro
+                    // TODO: sunny should not be trusted.
             Item out = new Item(
-                    UUID.fromString((String) data.get("UUID")),
+                    uid,
                     (String) data.get("name"),
                     (String) data.get("make"),
                     (String) data.get("model"),
                     (String) data.get("description"),
-                    new GregorianCalendar((int) data.get("year"), (int) data.get("month"), (int) data.get("date")),
+                    new GregorianCalendar(
+                            ((Long) data.get("year")).intValue(),
+                            ((Long) data.get("month")).intValue(),
+                            ((Long) data.get("day")).intValue()
+                    ),
                     (Double) data.get("value"),
                     (String) data.get("comments"),
-                    (ArrayList<Tag>) data.get("tags"),
-                    (ArrayList<UUID>) data.get("pictures"),
-                    (Integer) data.get("serial"),
+                    tags,
+                    images,
+                    ((Long) data.get("serial")).intValue(),
                     (String) data.get("owner")
             );
             return out;
