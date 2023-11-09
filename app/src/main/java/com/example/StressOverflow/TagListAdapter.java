@@ -68,6 +68,11 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
         TextView tagName = convertView.findViewById(R.id.tagContent);
         tagName.setText(tag.getTagName());
         Button deleteButton = convertView.findViewById(R.id.deleteTag_button);
+
+        /**
+         * Is called when the deleteButton is clicked on for a tag
+         * this method must be in getView in order to get the correct tag
+         */
         deleteButton.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View v) {

@@ -77,7 +77,10 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                         if (!ownerNameTagName.isEmpty()){
                             String[] parts = ownerNameTagName.split(":");
                             String tagName = parts[1];
-                            tagList.add(new Tag(tagName));
+                            String ownerName = parts[0];
+                            if (ownerName.equals(AppGlobals.getInstance().getOwnerName())){
+                                tagList.add(new Tag(tagName));
+                            }
                         }
                         AppGlobals.getInstance().setAllTags(tagList);
                     }
@@ -106,7 +109,8 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     private Boolean Validate(String tagName){
         boolean valid = true;
         for (Tag t: tagList){
-            if (t.getTagName().equals(tagName) || tagName.isEmpty()){
+            //convert the strings to lowercase to compare
+            if ((t.getTagName().toLowerCase()).equals(tagName.toLowerCase()) || tagName.isEmpty()){
                 valid = false;
                 break;
             }

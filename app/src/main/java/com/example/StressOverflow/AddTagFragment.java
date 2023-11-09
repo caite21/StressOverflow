@@ -16,15 +16,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddTagFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * This fragment is called when a user wants to create a new tag
  */
 public class AddTagFragment extends DialogFragment {
     private OnFragmentInteractionListener listener;
     private TextView addTagTextView;
 
     private Tag newTag;
+
+    /**
+     * Constructor
+     */
     public AddTagFragment() {
         // Required empty public constructor
     }

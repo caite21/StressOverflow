@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,7 +36,14 @@ public class Db {
     private CollectionReference images;
     private CollectionReference credentials;
 
+    /**
+     * Used when the asynchronous data is finished querying
+     */
     public interface TagListCallback{
+        /**
+         * Called when the tagList has been loaded from the database
+         * @param tags array list of tags from the database
+         */
         void onTagListReceived(ArrayList<Tag> tags);
     }
     public Db(@NonNull FirebaseFirestore database) {
@@ -45,6 +53,11 @@ public class Db {
         this.images = this.db.collection("images");
         this.credentials = this.db.collection("credentials");
     }
+
+    /**
+     * returns the collection reference of the tags collection
+     * @return the collection reference of the tags
+     */
     public CollectionReference getTagsCollectionReference(){
         return this.tags;
     }
@@ -84,6 +97,25 @@ public class Db {
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
                 });
+    }
+
+    /**
+     * Deletes an item
+     * @param item selected item
+     */
+    public void deleteItem(Item item){
+        UUID uuid = item.getId();
+        this.items
+                .document(uuid.toString())
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
+
     }
 
     /**
@@ -139,6 +171,10 @@ public class Db {
         return out;
     }
 
+    /**
+     * Adds a tag to the database
+     * @param tag tag to be added
+     */
     public void addTag(Tag tag){
         String ownerName = AppGlobals.getInstance().getOwnerName();
         String tagName = tag.getTagName();
@@ -155,6 +191,10 @@ public class Db {
 
     }
 
+    /**
+     * Deletes a tag from database
+     * @param tag tag to be deleted
+     */
     public void deleteTag(Tag tag){
         String tagName = tag.getTagName();
         String ownerName = AppGlobals.getInstance().getOwnerName();
@@ -171,6 +211,13 @@ public class Db {
 
     }
 
+    /**
+     * Gets all the tags from the database, initializes the tag list from start up
+     * @param callback the context of where it's called from
+     * @return an arraylist of all the tags
+     * TODO: call this whenever there is a change to the method, currently getting all the tags through global variables
+     *
+     */
     public ArrayList<Tag> getAllTags(final TagListCallback callback){
         ArrayList<Tag> out = new ArrayList<>();
         String ownerName = AppGlobals.getInstance().getOwnerName();
@@ -194,5 +241,31 @@ public class Db {
         return out;
     };
 
+    public void checkTagExist(Tag tag, TagExistCallback callback){
+        String ownerName = AppGlobals.getInstance().getOwnerName();
+        String tagName = tag.getTagName();
+        this.db.collection("tags")
+                .whereEqualTo("documentID", String.format("%s:%s", ownerName, tagName))
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        boolean isEmpty = !queryDocumentSnapshots.isEmpty();
+                        callback.onTagExist(!isEmpty);
+                    }
 
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Handle the failure if needed
+                        // You can also invoke the callback with an error flag
+                        callback.onTagExist(false);
+                    }
+                });
+    }
+
+    public interface TagExistCallback {
+        void onTagExist(boolean exists);
+    }
 }

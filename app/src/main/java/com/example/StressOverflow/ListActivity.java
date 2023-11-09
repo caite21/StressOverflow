@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -14,12 +13,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -36,6 +30,8 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
     String ownerName;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Db database = new Db(db);
     int selected = -1;
     Intent loginIntent;
 
@@ -64,12 +60,11 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Db tagDb = new Db(db);
-        CollectionReference tagsRef = tagDb.getTagsCollectionReference();
         this.ownerName = loginIntent.getStringExtra("login");
         AppGlobals.getInstance().setOwnerName(this.ownerName);
-        tagDb.getAllTags( this);
+
+
+        database.getAllTags( this);
         //Fragment newItemFragment = new AddItemFragment();
         //newItemFragment.setArguments(new Bundle());
         //getSupportFragmentManager()
@@ -149,8 +144,6 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
         }
         Dialog filterDialog = new Dialog(ListActivity.this);
 
-        //this.addItemButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
-
 
         filterButton.setClickable(true);
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
@@ -217,37 +210,54 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("allTags", allTags);
             AddTagToItemFragment fragment = new AddTagToItemFragment();
-            //fragment.setArguments(bundle);
             fragment.show(getSupportFragmentManager(),"ADD TAGS");
-            //new AddTagToItemFragment(ownerName).show(getSupportFragmentManager(), "ADD TAGS");
         }
     };
 
 
+    /**
+     * Called when user adds new tags to an item
+     * @param tagsToAdd the tags selected by user
+     */
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
         for (Item i: itemListAdapter.getSelectedItems()){
+            ArrayList <Tag> currentTags = i.getTags();
+            for (Tag newTag : tagsToAdd) {
+                if (currentTags.contains(newTag)) {
+                    tagsToAdd.remove(newTag);
+                }
+            }
             i.addTags(tagsToAdd);
+            database.updateItem(i);
             itemListAdapter.notifyDataSetChanged();
         }
     }
 
+    /**
+     * Gets the list of currently selected items and deletes it
+     */
     private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             ArrayList<Item> itemsToDelete = itemListAdapter.getSelectedItems();
+            //iterate through the selected list and delete from adapter and database
             for (Item i: itemsToDelete){
                 itemListAdapter.remove(i);
+                database.deleteItem(i);
             }
+
+            //if there are no more items, exit selection mode
             if (itemListAdapter.getItemListSize()==0){
                 exitSelectionMode();
             }
         }
     };
 
+    /**
+     * Directs user to the TagList Activity that shows user all the current existing tags
+     */
     private View.OnClickListener showList = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -256,7 +266,10 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
         }
     };
 
-    //list of tags on start up
+    /**
+     * Gets the list of all the tags on app startup
+     * @param tags array list of tags from the database
+     */
     @Override
     public void onTagListReceived(ArrayList<Tag> tags) {
         AppGlobals.getInstance().setAllTags(tags);

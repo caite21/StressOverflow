@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+ * Called when a user wants to add a tag to an already existing item
+ */
 public class AddTagToItemFragment extends DialogFragment{
     private OnFragmentInteractionListener listener;
     private ChipGroup chipGroup;
@@ -69,11 +71,6 @@ public class AddTagToItemFragment extends DialogFragment{
         }
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
 
     /**
      * Create dialog and its contents
@@ -93,6 +90,7 @@ public class AddTagToItemFragment extends DialogFragment{
 
         allTags = AppGlobals.getInstance().getAllTags();
 
+        //add all the tags as chips in the dialog
         for (Tag t: allTags){
             Chip chip = new Chip(getContext());
             chip.setText(t.getTagName());
@@ -128,41 +126,5 @@ public class AddTagToItemFragment extends DialogFragment{
             startActivity(intent);
         }
     };
-
-//    private void createAndShowDialog(){
-//        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_tag_to_item, null);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        Button makeNewTag = view.findViewById(R.id.makeNewTag_button);
-//        makeNewTag.setOnClickListener(openTagList);
-//        chipGroup = view.findViewById(R.id.tagFragment_chipGroup);
-//
-//        for (Tag t: allTags){
-//            Chip chip = new Chip(getContext());
-//            chip.setText(t.getTagName());
-//            chip.setCheckedIconVisible(true);
-//            chip.setCheckable(true);
-//            chip.setActivated(false);
-//            chipGroup.addView(chip);
-//            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
-//        }
-//        builder.setView(view)
-//                .setTitle("AddTag")
-//                .setNegativeButton("Cancel", null)
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener(){
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        for (int chipID : chipGroup.getCheckedChipIds()){
-//                            Chip newChip = chipGroup.findViewById(chipID);
-//                            Tag newTag = new Tag(newChip.getText().toString());
-//                            newTags.add(newTag);
-//                        }
-//                        listener.addTagPressed(newTags);
-//                        dialog.dismiss();
-//                    }
-//                }).create();
-//
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-//    }
 
 }

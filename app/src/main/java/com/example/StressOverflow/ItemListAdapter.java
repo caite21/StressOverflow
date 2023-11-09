@@ -31,8 +31,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
+/**
+ * An adapter that displays the content in ListActivity
+ */
 public class ItemListAdapter extends ArrayAdapter<Item> {
     private ArrayList<Item> items;
     private Context context;
@@ -180,6 +182,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         ArrayList<Tag> tags = item.getTags();
         ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
         tagChipGroup.removeAllViews();
+
+        //display a maximum of 3 tags
         int tagCounter = 0;
         for (Tag t: tags){
             if (tagCounter!=3){
