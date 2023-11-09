@@ -61,6 +61,11 @@ public class Db {
     public CollectionReference getTagsCollectionReference(){
         return this.tags;
     }
+
+    public CollectionReference getItemsCollectionReference(){
+        return this.items;
+    }
+
     /**
      * adds a new item to firebase. to update an existing item, use updateItem(Item item).
      *
@@ -204,8 +209,8 @@ public class Db {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error with item insertion into collection items: ", e);
-                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                        throw new RuntimeException("Error with item deletion into collection items: ", e);
                     }
                 });
 
@@ -250,8 +255,11 @@ public class Db {
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        boolean isEmpty = !queryDocumentSnapshots.isEmpty();
-                        callback.onTagExist(!isEmpty);
+                        if (queryDocumentSnapshots.isEmpty()){
+                            callback.onTagExist(false);
+                        }else{
+                            callback.onTagExist(true);
+                        }
                     }
 
                 })

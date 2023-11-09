@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     private ArrayList<Item> items;
     private Context context;
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Db database = new Db(db);
     private Set<Item> selectedItems = new HashSet<>();
     private boolean inSelectionMode = false;
 
@@ -139,6 +142,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
     public void addItem(Item item) {
         this.items.add(item);
+        database.addItem(item);
         this.notifyDataSetChanged();
     }
 

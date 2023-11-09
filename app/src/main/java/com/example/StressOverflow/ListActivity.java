@@ -106,7 +106,6 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
                         "Crystal"
                 )
         );
-
         tags.add(new Tag("tag3"));
 
         this.itemListAdapter.addItem(
@@ -247,7 +246,6 @@ AddTagToItemFragment.OnFragmentInteractionListener, Db.TagListCallback{
                 itemListAdapter.remove(i);
                 database.deleteItem(i);
             }
-
             //if there are no more items, exit selection mode
             if (itemListAdapter.getItemListSize()==0){
                 exitSelectionMode();
