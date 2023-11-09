@@ -21,12 +21,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-//import com.google.firebase.firestore.CollectionReference;
-//import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.UUID;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -35,29 +34,57 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
+
 public class AddImagesFragment extends DialogFragment  {
     private Uri imageUri;
     private ActivityResultLauncher<Intent> addImagesLauncher;
     private ArrayList<Bitmap> photos = new ArrayList<>();
-//    private FirebaseFirestore db;
-//    private CollectionReference itemsRef;
-    private AddImagesFragment.OnFragmentInteractionListener listener;
+    private FirebaseFirestore db;
+    private OnFragmentInteractionListener listener;
     private ContentResolver contentResolver;
     private ArrayList<Image> imagesList;
     private ArrayAdapter<Image> imageAdapter;
     private GridView imageDisplay;
     private Image clickedImage;
+    private UUID itemUUID;
+    private Item item;
+
+
+
+    public interface OnFragmentInteractionListener {
+        void onConfirmImages(ArrayList<Image> images);
+    }
+
+
+    public AddImagesFragment() {
+        // required
+    }
+
+    public AddImagesFragment(Item item) {
+        // for editing an item
+        this.item = item;
+        itemUUID = null;
+    }
+    public AddImagesFragment(UUID uuid) {
+        // for editing an item
+        item = null;
+        this.itemUUID = uuid;
+    }
 
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        listener = (OnFragmentInteractionListener) context;
 
-        if (context instanceof AddImagesFragment.OnFragmentInteractionListener) {
-            listener = (AddImagesFragment.OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context + "OnFragmentInteractionListener is not implemented");
-        }
+        // do not want to check if the activity is implementing the interface
+//        if (context instanceof AddImagesFragment.OnFragmentInteractionListener) {
+//            listener = (AddImagesFragment.OnFragmentInteractionListener) context;
+//        } else {
+//            throw new RuntimeException(context + "OnFragmentInteractionListener is not implemented");
+//        }
     }
 
     @NonNull
@@ -65,17 +92,20 @@ public class AddImagesFragment extends DialogFragment  {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.select_image_fragment, null);
         contentResolver = requireContext().getContentResolver();
+        Db db = new Db(FirebaseFirestore.getInstance());
 
-        // TODO: get pictures already attached from the database
-        imagesList = new ArrayList<>();
+        if (item == null & itemUUID != null) {
+            item = db.getItem(itemUUID);
+        }
+
+        // Get pictures already attached pictures
+        if (item != null ) {
+            imagesList = item.getPictures();
+        }
 
         imageDisplay = view.findViewById(R.id.images_area);
         imageAdapter = new ImagesDisplayAdapter(requireContext(), imagesList);
         imageDisplay.setAdapter(imageAdapter);
-
-        // TODO: get firebase collection
-//        db = FirebaseFirestore.getInstance();
-//        itemsRef = db.collection("items");
 
         imageDisplay.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -92,7 +122,6 @@ public class AddImagesFragment extends DialogFragment  {
                 if (clickedImage != null) {
                     imagesList.remove(clickedImage);
                     imageAdapter.notifyDataSetChanged();
-                    // TODO: update firestore
                 }
             }
         });
@@ -104,10 +133,6 @@ public class AddImagesFragment extends DialogFragment  {
                 openImageChooser();
             }
         });
-
-
-        // TODO: addSnapShotListener for firestore
-
 
         addImagesLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -148,12 +173,8 @@ public class AddImagesFragment extends DialogFragment  {
                 .setTitle("Attach Images")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Confirm", (dialog, which) -> {
-//                    listener.onConfirmAddImagesPressed(images);
+                    listener.onConfirmImages(imagesList);
                 }).create();
-    }
-
-    public interface OnFragmentInteractionListener {
-//        void onConfirmAddImagesPressed(ArrayList<Image> images);
     }
 
     private void openImageChooser() {

@@ -32,11 +32,8 @@ public class ImagesDisplayAdapter extends ArrayAdapter<Image> {
         }
 
         Image image = images.get(position);
-
         ImageView imageView = view.findViewById(R.id.image);
         imageView.setImageBitmap(image.getBitmap());
-
-        // TODO: add image(s) to ItemList
 
         return view;
     }

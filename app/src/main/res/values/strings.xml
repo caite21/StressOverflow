@@ -9,6 +9,7 @@
     <string name="add_item_fragment_comment_header">Comments</string>
     <string name="add_item_fragment_tag_header">Tags</string>
     <string name="add_item_fragment_picture_header">Pictures</string>
+    <string name="add_item_fragment_picture_button_text">Select pictures</string>
     <string name="add_item_fragment_serial_header">Serial Number</string>
     <string name="add_item_fragment_description_button">Scan barcode</string>
     <string name="add_item_fragment_serial_button">Scan number</string>

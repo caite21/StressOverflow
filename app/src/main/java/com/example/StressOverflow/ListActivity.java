@@ -19,7 +19,7 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener,
-AddTagToItemFragment.OnFragmentInteractionListener{
+AddTagToItemFragment.OnFragmentInteractionListener, AddImagesFragment.OnFragmentInteractionListener{
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
@@ -28,6 +28,7 @@ AddTagToItemFragment.OnFragmentInteractionListener{
     FloatingActionButton deleteItemButton;
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
+    ArrayList<Image> addedPictures;
 
     int selected = -1;
     Intent loginIntent;
@@ -98,7 +99,7 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         100.0d,
                         "asdf",
                         tags,
-                        new ArrayList<UUID>(),
+                        new ArrayList<Image>(),
                         2000
                 )
         );
@@ -114,7 +115,7 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         100.0d,
                         "asdf",
                         tags,
-                        new ArrayList<UUID>(),
+                        new ArrayList<Image>(),
                         2000
                 )
         );
@@ -128,7 +129,7 @@ AddTagToItemFragment.OnFragmentInteractionListener{
                         100.0d,
                         "asdf",
                         tags,
-                        new ArrayList<UUID>(),
+                        new ArrayList<Image>(),
                         2000
                 )
         );
@@ -152,6 +153,7 @@ AddTagToItemFragment.OnFragmentInteractionListener{
      * to the item list adapter.
      */
     public void onSubmitAdd(Item item) {
+        item.setPictures(addedPictures);
         this.itemListAdapter.add(item);
         this.setSumOfItemCosts();
     }
@@ -234,4 +236,8 @@ AddTagToItemFragment.OnFragmentInteractionListener{
         }
     };
 
+    @Override
+    public void onConfirmImages(ArrayList<Image> pictures) {
+        addedPictures = pictures;
+    }
 }

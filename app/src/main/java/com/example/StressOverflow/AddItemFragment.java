@@ -10,20 +10,20 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.StressOverflow.Util;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
-public class AddItemFragment extends DialogFragment {
+public class AddItemFragment extends DialogFragment{
 
     private EditText itemTitleField;
     private EditText itemMakeField;
@@ -33,7 +33,7 @@ public class AddItemFragment extends DialogFragment {
     private EditText itemValueField;
     private EditText itemCommentsField;
     private EditText itemTagsField;
-    private EditText itemPicturesField;
+    private Button itemPicturesButton;
     private EditText itemSerialField;
     private OnFragmentInteractionListener listener;
 
@@ -67,8 +67,16 @@ public class AddItemFragment extends DialogFragment {
         itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
         itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
         itemTagsField = view.findViewById(R.id.add__item__fragment__edit__tags);
-        itemPicturesField = view.findViewById(R.id.add__item__fragment__edit__pictures);
+        itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
+
+        itemPicturesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Opens fragment that shows the item's pictures
+                new AddImagesFragment().show(getChildFragmentManager(), "ADD_IMAGES");
+            }
+        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -87,7 +95,7 @@ public class AddItemFragment extends DialogFragment {
                         Double value = 50.0d;
                         String comments = itemCommentsField.getText().toString();
                         ArrayList<Tag> tags = new ArrayList<>();
-                        ArrayList<UUID> pictures = new ArrayList<>();
+                        ArrayList<Image> pictures = new ArrayList<>();
                         String serial = itemSerialField.getText().toString();
 
                         try {

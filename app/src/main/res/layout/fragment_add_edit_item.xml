@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    >
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/subtle_grey"
     android:padding="16dp">
     <LinearLayout
@@ -195,11 +201,13 @@
             android:text="@string/add_item_fragment_picture_header"
             android:textSize="20dp"
             />
-        <EditText
+        <Button
             android:id="@+id/add__item__fragment__edit__pictures"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@color/white"
+            android:layout_marginStart="10dp"
+            android:text="@string/add_item_fragment_picture_button_text"
             />
     </LinearLayout>
     <LinearLayout
@@ -238,3 +246,6 @@
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
+
+
+</ScrollView>
