@@ -77,7 +77,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             itemPicture.setImageBitmap((item.getPictures().get(0)).getBitmap());
         }
 
-
         ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
         tagChipGroup.removeAllViews();
         int tagCounter = 0;
