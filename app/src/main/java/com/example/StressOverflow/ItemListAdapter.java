@@ -69,7 +69,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         itemMakeModel.setText(item.getMakeModel());
         itemDescription.setText(item.getDescription(true));
         itemPrice.setText((item.getValue().toString()));
-//        itemDate.setText(item.getDate().toString());
+        itemDate.setText(item.getDateAsString());
         itemSerial.setText(item.getSerial().toString());
 
         // the first picture is shown
@@ -138,8 +138,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         }
         return selected;
     }
-
-
 
     /**
      * Sums the value of all items present in the list.

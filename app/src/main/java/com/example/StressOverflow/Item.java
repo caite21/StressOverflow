@@ -188,6 +188,26 @@ public class Item {
         return this.date;
     }
 
+    public String getDateAsString() {
+        return String.format("%s/%s/%s",
+                this.getDate().get(Calendar.YEAR),
+                this.getDate().get(Calendar.MONTH) + 1,
+                this.getDate().get(Calendar.DATE)
+        );
+    }
+
+    public String getDateYear() {
+        return String.format("%s", this.getDate().get(Calendar.YEAR));
+    }
+
+    public String getDateMonth() {
+        return String.format("%s", this.getDate().get(Calendar.MONTH) + 1);
+    }
+
+    public String getDateDate() {
+        return String.format("%s", this.getDate().get(Calendar.DATE));
+    }
+
     public ArrayList<Tag> getTags() {
         return this.tags;
     }
@@ -353,14 +373,26 @@ public class Item {
      */
     public static Item fromFirebaseObject(Map<String, Object> data) {
         try {
-            @SuppressWarnings("unchecked") // just trust me bro
+            ArrayList<Tag> tags = new ArrayList<>();
+            tags.add(new Tag("Hello!"));
+            ArrayList<UUID> images = new ArrayList<>();
+            UUID uid = new UUID(
+                    ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
+                    ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
+            );
+            @SuppressWarnings({"unchecked", "ConstantConditions"}) // just trust me bro
+                    // TODO: sunny should not be trusted.
             Item out = new Item(
-                    UUID.fromString((String) data.get("UUID")),
+                    uid,
                     (String) data.get("name"),
                     (String) data.get("make"),
                     (String) data.get("model"),
                     (String) data.get("description"),
-                    new GregorianCalendar((int) data.get("year"), (int) data.get("month"), (int) data.get("date")),
+                    new GregorianCalendar(
+                            ((Long) data.get("year")).intValue(),
+                            ((Long) data.get("month")).intValue(),
+                            ((Long) data.get("day")).intValue()
+                    ),
                     (Double) data.get("value"),
                     (String) data.get("comments"),
                     (ArrayList<Tag>) data.get("tags"),

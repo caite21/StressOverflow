@@ -117,11 +117,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_item_fragment_date_header"
+                android:text="@string/add_item_fragment_year_header"
                 android:textSize="20dp"
                 />
             <EditText
-                android:id="@+id/add__item__fragment__edit__date"
+                android:id="@+id/add__item__fragment__edit__year"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@color/white"
@@ -132,22 +132,61 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             >
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_item_fragment_value_header"
+                android:text="@string/add_item_fragment_month_header"
                 android:textSize="20dp"
                 />
             <EditText
-                android:id="@+id/add__item__fragment__edit__value"
+                android:id="@+id/add__item__fragment__edit__month"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_item_fragment_date_header"
+                android:textSize="20dp"
+                />
+            <EditText
+                android:id="@+id/add__item__fragment__edit__date"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@color/white"
                 />
         </LinearLayout>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_item_fragment_value_header"
+            android:textSize="20dp"
+            />
+        <EditText
+            android:id="@+id/add__item__fragment__edit__value"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/white"
+            />
+    </LinearLayout>
+  
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -161,54 +200,59 @@
             android:text="@string/add_item_fragment_comment_header"
             android:textSize="20dp"
             />
+
         <EditText
             android:id="@+id/add__item__fragment__edit__comment"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:background="@color/white"
             />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="8dp"
-        >
-        <TextView
-            android:id="@+id/add__item__fragment__tag__header"
+      
+      </LinearLayout>
+  
+      <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_item_fragment_tag_header"
-            android:textSize="20dp"
-            />
-        <EditText
-            android:id="@+id/add__item__fragment__edit__tags"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/white"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="8dp"
-        >
-        <TextView
-            android:id="@+id/add__item__fragment__picture__header"
+            android:orientation="vertical"
+            android:paddingBottom="8dp"
+            >
+            <TextView
+                android:id="@+id/add__item__fragment__tag__header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_item_fragment_tag_header"
+                android:textSize="20dp"
+                />
+            <EditText
+                android:id="@+id/add__item__fragment__edit__tags"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white"
+                />
+        </LinearLayout>
+
+      <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_item_fragment_picture_header"
-            android:textSize="20dp"
-            />
-        <Button
-            android:id="@+id/add__item__fragment__edit__pictures"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/white"
-            android:layout_marginStart="10dp"
-            android:text="@string/add_item_fragment_picture_button_text"
-            />
+            android:orientation="vertical"
+            android:paddingBottom="8dp"
+            >
+            <TextView
+                android:id="@+id/add__item__fragment__picture__header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_item_fragment_picture_header"
+                android:textSize="20dp"
+                />
+            <Button
+                android:id="@+id/add__item__fragment__edit__pictures"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white"
+                android:layout_marginStart="10dp"
+                android:text="@string/add_item_fragment_picture_button_text"
+                />
+
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

@@ -21,12 +21,10 @@ public class MainActivity extends AppCompatActivity {
         this.loginButton = findViewById(R.id.big__fat__login__buton);
 
         this.loginButton.setOnClickListener((v) -> {
-            String uname = "demo@test.com";
+            String uname = "Sunny's TESTING NUMBER TWO";
             Intent i = new Intent(MainActivity.this, ListActivity.class);
             i.putExtra("login", uname);
             startActivity(i);
         });
-
-
     }
 }
