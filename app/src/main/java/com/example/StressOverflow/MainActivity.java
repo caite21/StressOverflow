@@ -8,22 +8,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-    private Button loginButton;
-    private Button itemListButton;
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        this.loginButton = findViewById(R.id.big__fat__login__buton);
-
-        this.loginButton.setOnClickListener((v) -> {
+        FirebaseAuth instance = FirebaseAuth.getInstance();
+        FirebaseUser user = instance.getCurrentUser();
+        if (user != null) {
+            Intent i = new Intent(MainActivity.this, ListActivity.class);
+            startActivity(i);
+        } else {
             Intent i = new Intent(MainActivity.this, SignInActivity.class);
             startActivity(i);
-        });
-
+        }
     }
 }
