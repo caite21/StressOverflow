@@ -122,10 +122,12 @@ public class AddImagesFragment extends DialogFragment  {
         if (item == null & itemUUID != null) {
             item = db.getItem(itemUUID);
         }
-
-        // Get pictures already attached pictures
         if (item != null ) {
+            // get already attached pictures
             imagesList = item.getPictures();
+        } else {
+            // new item
+            imagesList = new ArrayList<>();
         }
 
         imageDisplay = view.findViewById(R.id.images_area);
