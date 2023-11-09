@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import android.view.View;
 
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -56,8 +57,18 @@ public class TagListTest {
     }
 
     @Rule
-    public ActivityScenarioRule<TagList> scenario =
+    public ActivityScenarioRule<TagList> tagListRule =
             new ActivityScenarioRule<TagList>(TagList.class);
+
+    @Rule
+    public ActivityScenarioRule<ListActivity> listActivityRule =
+            new ActivityScenarioRule<>(ListActivity.class);
+
+    @Test
+    public void ListActivitytoTagList(){
+        onView(withId(R.id.showTagList_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.addTag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+    }
 
     @Test
     public void addToTagList() throws InterruptedException {
