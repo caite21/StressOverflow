@@ -10,8 +10,8 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loginButton;
-    Button itemListButton;
+    private Button loginButton;
+    private Button itemListButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +21,9 @@ public class MainActivity extends AppCompatActivity {
         this.loginButton = findViewById(R.id.big__fat__login__buton);
 
         this.loginButton.setOnClickListener((v) -> {
-            String uname = "demo@test.com";
-            Intent i = new Intent(MainActivity.this, ListActivity.class);
-            i.putExtra("login", uname);
+            Intent i = new Intent(MainActivity.this, SignInActivity.class);
             startActivity(i);
         });
-
 
     }
 }
