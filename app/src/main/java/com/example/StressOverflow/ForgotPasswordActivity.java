@@ -3,6 +3,8 @@ package com.example.StressOverflow;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -42,6 +44,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             String emailToSend = email_field.getText().toString();
             if (emailToSend.isEmpty()) {
                 email_field.setError("This field cannot be blank");
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                email_field.startAnimation(animation);
                 return;
             }
 
@@ -57,6 +61,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                 Log.w("RESET PASSWORD EMAIL STATUS:", "Reset password:failure", task.getException());
                                 Toast.makeText(ForgotPasswordActivity.this, "Failed to send reset password email.",
                                         Toast.LENGTH_SHORT).show();
+                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                                email_field.startAnimation(animation);
+
                             }
                         }
                     });

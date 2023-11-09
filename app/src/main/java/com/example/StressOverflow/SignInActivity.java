@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,13 +52,20 @@ public class SignInActivity extends AppCompatActivity  {
         this.sign_in_button.setOnClickListener((v) -> {
             String newUsername = email_username_field.getText().toString();
             String newPassword = password_in_field.getText().toString();
-
+            boolean valid = true;
             if (newUsername.isEmpty()) {
                 email_username_field.setError("This field cannot be blank");
-                return;
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                email_username_field.startAnimation(animation);
+                valid = false;
             }
             if (newPassword.isEmpty()) {
                 password_in_field.setError("This field cannot be blank");
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                password_in_field.startAnimation(animation);
+                valid = false;
+            }
+            if (!valid) {
                 return;
             }
 
@@ -75,6 +84,8 @@ public class SignInActivity extends AppCompatActivity  {
                                 Log.w("SIGNIN STATUS", "signInWithEmail:failure", task.getException());
                                 Toast.makeText(SignInActivity.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
+                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                                password_in_field.startAnimation(animation);
                             }
                         }
                     });

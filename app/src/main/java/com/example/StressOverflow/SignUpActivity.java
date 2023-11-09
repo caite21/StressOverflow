@@ -5,6 +5,8 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -52,24 +54,39 @@ public class SignUpActivity extends AppCompatActivity {
             String newEmail = email_field.getText().toString();
             String newPassword = password_field.getText().toString();
             String newPasswordReenter = reenter_password_field.getText().toString();
+            boolean valid = true;
             if (newUsername.isEmpty()) {
                 username_field.setError("This field cannot be blank");
-                return;
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                username_field.startAnimation(animation);
+                valid = false;
             }
             if (newEmail.isEmpty()) {
                 email_field.setError("This field cannot be blank");
-                return;
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                email_field.startAnimation(animation);
+                valid = false;
             }
             if (newPassword.isEmpty()) {
                 password_field.setError("This field cannot be blank");
-                return;
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                password_field.startAnimation(animation);
+                valid = false;
             }
             if (newPasswordReenter.isEmpty()) {
                 reenter_password_field.setError("This field cannot be blank");
-                return;
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                reenter_password_field.startAnimation(animation);
+                valid = false;
             }
             if (!newPasswordReenter.equals(newPassword)) {
                 reenter_password_field.setError("Password don't match!");
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                reenter_password_field.startAnimation(animation);
+                password_field.startAnimation(animation);
+                valid = false;
+            }
+            if (!valid) {
                 return;
             }
             mAuth.createUserWithEmailAndPassword(newEmail, newPassword)
@@ -87,6 +104,8 @@ public class SignUpActivity extends AppCompatActivity {
                                 Log.w("SIGNUP STATUS", "createUserWithEmail:failure", task.getException());
                                 Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
+                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                                email_field.startAnimation(animation);
                             }
                         }
                     });
