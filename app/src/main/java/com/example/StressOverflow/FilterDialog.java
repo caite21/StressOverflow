@@ -132,40 +132,40 @@ public class FilterDialog {
         });
 
         // Gets calendar popup for date selects
-        this.startDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Calendar c = Calendar.getInstance();
-                int year = c.get(Calendar.YEAR);
-                int month = c.get(Calendar.MONTH);
-                int day = c.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    dialog.getContext(),
-                    (view, year12, monthOfYear, dayOfMonth) ->
-                        startDateInput.setText(String.format("%d-%d-%d", dayOfMonth, monthOfYear + 1, year12)),
-                    year, month, day
-                );
-                datePickerDialog.show();
-            }
-        });
-        this.endDateInput.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Calendar c = Calendar.getInstance();
-                int year = c.get(Calendar.YEAR);
-                int month = c.get(Calendar.MONTH);
-                int day = c.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    dialog.getContext(),
-                    (view, year1, monthOfYear, dayOfMonth) ->
-                        endDateInput.setText(String.format("%d-%d-%d", dayOfMonth, monthOfYear + 1, year1)),
-                    year, month, day
-                );
-                datePickerDialog.show();
-            }
-        });
+//        this.startDateInput.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final Calendar c = Calendar.getInstance();
+//                int year = c.get(Calendar.YEAR);
+//                int month = c.get(Calendar.MONTH);
+//                int day = c.get(Calendar.DAY_OF_MONTH);
+//
+//                DatePickerDialog datePickerDialog = new DatePickerDialog(
+//                    dialog.getContext(),
+//                    (view, year12, monthOfYear, dayOfMonth) ->
+//                        startDateInput.setText(String.format("%d-%d-%d", dayOfMonth, monthOfYear + 1, year12)),
+//                    year, month, day
+//                );
+//                datePickerDialog.show();
+//            }
+//        });
+//        this.endDateInput.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final Calendar c = Calendar.getInstance();
+//                int year = c.get(Calendar.YEAR);
+//                int month = c.get(Calendar.MONTH);
+//                int day = c.get(Calendar.DAY_OF_MONTH);
+//
+//                DatePickerDialog datePickerDialog = new DatePickerDialog(
+//                    dialog.getContext(),
+//                    (view, year1, monthOfYear, dayOfMonth) ->
+//                        endDateInput.setText(String.format("%d-%d-%d", dayOfMonth, monthOfYear + 1, year1)),
+//                    year, month, day
+//                );
+//                datePickerDialog.show();
+//            }
+//        });
 
         this.checkAllTags.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

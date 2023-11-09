@@ -213,6 +213,7 @@ public class Item {
     }
 
     public ArrayList<Image> getPictures() {
+        this.pictures = new ArrayList<>();
         return this.pictures;
     }
 
@@ -375,7 +376,7 @@ public class Item {
         try {
             ArrayList<Tag> tags = new ArrayList<>();
             tags.add(new Tag("Hello!"));
-            ArrayList<UUID> images = new ArrayList<>();
+            ArrayList<Image> images = new ArrayList<>();
             UUID uid = new UUID(
                     ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
                     ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
@@ -395,9 +396,9 @@ public class Item {
                     ),
                     (Double) data.get("value"),
                     (String) data.get("comments"),
-                    (ArrayList<Tag>) data.get("tags"),
-                    (ArrayList<Image>) data.get("pictures"),
-                    (Integer) data.get("serial"),
+                    tags,
+                    images,
+                    ((Long) data.get("serial")).intValue(),
                     (String) data.get("owner")
             );
             return out;
