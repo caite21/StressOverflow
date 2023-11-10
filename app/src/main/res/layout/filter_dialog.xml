@@ -127,7 +127,8 @@
             android:id="@+id/filter__dialog__makes__chipgroup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:visibility="visible" />
 
     </TableRow>
 
@@ -163,7 +164,8 @@
             android:id="@+id/filter__dialog__tags__chipgroup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:visibility="visible"/>
 
     </TableRow>
 

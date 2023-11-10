@@ -350,7 +350,7 @@ public class Item {
         HashMap<String, Object> data = new HashMap<>();
         data.put("id", this.getId());
         data.put("name", this.getName());
-        data.put("make", this.getModel());
+        data.put("make", this.getMake());
         data.put("model", this.getModel());
         data.put("description", this.getDescription());
         // unknown how firebase handles dates, we can fix this later.

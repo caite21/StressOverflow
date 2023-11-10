@@ -36,7 +36,6 @@ public class FilterDialog {
     private final ChipGroup keywordChips;
     private final EditText startDateInput;
     private final EditText endDateInput;
-//    private final CheckBox checkAllMakes;
     private final ChipGroup makeChips;
     private final CheckBox checkAllTags;
     private final ChipGroup tagChips;
@@ -45,8 +44,10 @@ public class FilterDialog {
     private final Button backBtn;
     private final Button FilterBtn;
 
-    /*
-    Get keywords from the descriptions of all the listview items.
+    /**
+     * Gets all the words in each item's description.
+     * @param adapter - item list adapter
+     * @return Arraylist of unique description words.
      */
     private ArrayList<String> getKeywords(ItemListAdapter adapter){
         ArrayList<String> keywords;
@@ -62,8 +63,10 @@ public class FilterDialog {
         return keywords;
     }
 
-    /*
-
+    /**
+     * Gets all the tags names from all the items.
+     * @param adapter - item list adapter
+     * @return Arraylist of unique tags.
      */
     private ArrayList<String> getTags(ItemListAdapter adapter){
         ArrayList<String> tags;
@@ -79,6 +82,11 @@ public class FilterDialog {
         return tags;
     }
 
+    /**
+     * Gets all the makes of each item.
+     * @param adapter - item list adapter
+     * @return Arraylist of unique makes.
+     */
     private ArrayList<String> getMakes(ItemListAdapter adapter){
         ArrayList<String> makes;
         makes = new ArrayList<String>();
@@ -90,6 +98,13 @@ public class FilterDialog {
         return makes;
     }
 
+    /**
+     * Displays and configures all the dialog box components.
+     * TODO: Convert into fragment and move listeners to their own functions
+     * @param dialog
+     * @param itemAdapter
+     * @param itemList
+     */
     public FilterDialog(Dialog dialog, ItemListAdapter itemAdapter, ListView itemList) {
         dialog.setContentView(R.layout.filter_dialog);
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -100,7 +115,6 @@ public class FilterDialog {
         this.keywordChips = dialog.findViewById(R.id.filter__dialog__keywords__chipgroup);
         this.startDateInput = dialog.findViewById(R.id.filter__dialog__start__date);
         this.endDateInput = dialog.findViewById(R.id.filter__dialog__end__date);
-//        this.checkAllMakes = dialog.findViewById(R.id.filter__dialog__all__makes__checkbox);
         this.makeChips = dialog.findViewById(R.id.filter__dialog__makes__chipgroup);
         this.checkAllTags = dialog.findViewById(R.id.filter__dialog__all__tags__checkbox);
         this.tagChips = dialog.findViewById(R.id.filter__dialog__tags__chipgroup);
@@ -167,6 +181,19 @@ public class FilterDialog {
             }
         });
 
+        // Adds makes based on what's set in listview
+        ArrayList<String> makes = this.getMakes(itemAdapter);
+        for (int i=0; i<makes.size(); i++) {
+            Chip chip = new Chip(dialog.getContext());
+            chip.setText(makes.get(i));
+            chip.setCheckedIconVisible(true);
+            chip.setCheckable(true);
+            chip.setActivated(false);
+            chip.setVisibility(View.VISIBLE);
+            this.makeChips.addView(chip);
+            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
+        }
+
         this.checkAllTags.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -178,48 +205,17 @@ public class FilterDialog {
         });
 
         // Adds tags based on what's set in listview
-        ArrayList<String> tags = getTags(itemAdapter);
+        ArrayList<String> tags = this.getTags(itemAdapter);
         for (int i=0; i<tags.size(); i++) {
             Chip chip = new Chip(dialog.getContext());
             chip.setText(tags.get(i));
             chip.setCheckedIconVisible(true);
             chip.setCheckable(true);
             chip.setActivated(false);
+            chip.setVisibility(View.VISIBLE);
             chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
             this.tagChips.addView(chip);
         }
-
-//        this.checkAllMakes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                for (int i=0; i<makeChips.getChildCount(); i++) {
-//                    Chip chip = (Chip) makeChips.getChildAt(i);
-//                    chip.setChecked(isChecked);
-//                }
-//            }
-//        });
-
-        ArrayList<String> makes = getMakes(itemAdapter);
-        for (int i=0; i<makes.size(); i++) {
-            Chip chip = new Chip(dialog.getContext());
-            chip.setText(makes.get(i));
-            chip.setCheckedIconVisible(true);
-            chip.setCheckable(true);
-            chip.setActivated(false);
-            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
-            this.makeChips.addView(chip);
-        }
-
-        // Just input handing for sorting since sortOrder and sortField are mutually dependant
-        // TODO: Doesn't fully work since depends on top to bottom, uh either scrap or figure out...
-        this.sortField.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
-            @Override
-            public void onButtonChecked(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-                sortOrder.setSelectionRequired(isChecked);
-                if (!isChecked) sortOrder.clearChecked();
-                else sortOrder.check(sortOrder.getChildAt(0).getId());
-            }
-        });
 
         this.backBtn.setOnClickListener(v -> {
             dialog.dismiss();
@@ -227,6 +223,7 @@ public class FilterDialog {
 
         /*
         I know its messy... A bit more of a proof of concept than a final idea
+        Creates the map of conditions and calls upon the filter function.
          */
         this.FilterBtn.setOnClickListener(v -> {
             Map<String, ArrayList<String>> filterConds = new HashMap<String, ArrayList<String>>();
