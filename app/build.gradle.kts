@@ -43,5 +43,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("org.mockito:mockito-core:2.25.0")
     androidTestImplementation("org.mockito:mockito-inline:2.13.0")
-
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
+    implementation("com.google.firebase:firebase-auth")
 }

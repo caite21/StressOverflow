@@ -102,6 +102,9 @@ AddImagesFragment.OnFragmentInteractionListener{
 
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
 
+        ArrayList<Tag> tags = new ArrayList<Tag>();
+        tags.add(new Tag("tag1"));
+        tags.add(new Tag("tag2"));
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
