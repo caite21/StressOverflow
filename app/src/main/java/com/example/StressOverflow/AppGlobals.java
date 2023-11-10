@@ -16,7 +16,7 @@ public class AppGlobals {
      */
     private AppGlobals() {
         allTags = new ArrayList<>();
-        ownerName = "";
+        ownerName = "testUser";
     }
 
     /**

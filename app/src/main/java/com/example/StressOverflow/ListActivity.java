@@ -80,11 +80,11 @@ AddImagesFragment.OnFragmentInteractionListener{
         itemList.setOnItemLongClickListener(selectItems);
 
         this.ownerName = loginIntent.getStringExtra("login");
-        if(this.ownerName == null){
-            this.ownerName = "testUser";
+        if(this.ownerName != null){
+            AppGlobals.getInstance().setOwnerName(this.ownerName);
+        }else{
+            this.ownerName =  AppGlobals.getInstance().getOwnerName();
         }
-        AppGlobals.getInstance().setOwnerName(this.ownerName);
-
 
         database.getAllTags( this);
 
@@ -111,7 +111,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
         this.items
-                .whereEqualTo("owner", this.ownerName)
+                .whereEqualTo("owner",this.ownerName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -205,6 +205,9 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.sumOfItemCosts.setText(this.itemListAdapter.getTotalValue().toString());
     }
 
+    /**
+     * Called when long clicks are applied to an item
+     */
     private AdapterView.OnItemLongClickListener selectItems = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -223,6 +226,10 @@ AddImagesFragment.OnFragmentInteractionListener{
 
     };
 
+    /**
+     * Called when there are no items anymore and when user exits the addTagToItem fragment
+     * Styles the selected items accordingly
+     */
     private void exitSelectionMode() {
         inSelectionMode = false;
         itemListAdapter.setSelectionMode(false);

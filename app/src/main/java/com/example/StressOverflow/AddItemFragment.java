@@ -148,6 +148,9 @@ public class AddItemFragment extends DialogFragment{
                 }).create();
     }
 
+    /**
+     * Adds all the tags to the chipGroup
+     */
     private void addTagsToChipGroup(){
         ArrayList <Tag> allTags = AppGlobals.getInstance().getAllTags();
 

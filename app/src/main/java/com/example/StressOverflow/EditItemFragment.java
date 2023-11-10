@@ -151,6 +151,9 @@ public class EditItemFragment extends DialogFragment {
                 }).create();
     }
 
+    /**
+     * Add all the tags of the selected Item to the ChipGroup
+     */
     private void addTagsToChipGroup(){
         ArrayList<Tag> tags = selectedItem.getTags();
         tagChipGroup.removeAllViews();
