@@ -105,6 +105,13 @@ public class SignInActivity extends AppCompatActivity  {
         });
     }
 
+    /**
+     * This tries to authenticates a user using Firestore Authentication
+     * @param login
+     *      login to be used to authenticate a user
+     * @param password
+     *      password to be used to authenticate a user
+     */
     protected void auth(String login, String password) {
         mAuth.signInWithEmailAndPassword(login, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

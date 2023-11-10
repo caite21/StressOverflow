@@ -47,8 +47,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         this.reset_password_button = findViewById(R.id.reset_password_button);
 
         this.back_button.setOnClickListener((v) -> {
-            Intent i = new Intent(ForgotPasswordActivity.this, SignInActivity.class);
-            startActivity(i);
+            finish();
         });
 
         this.reset_password_button.setOnClickListener((v) -> {
@@ -59,26 +58,35 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 email_field.startAnimation(animation);
                 return;
             }
+            sendReset(emailToSend);
 
-            mAuth.sendPasswordResetEmail(emailToSend)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.d("RESET PASSWORD EMAIL STATUS:", "Email sent.");
-                                Intent i = new Intent(ForgotPasswordActivity.this, SignInActivity.class);
-                                startActivity(i);
-                            } else {
-                                Log.w("RESET PASSWORD EMAIL STATUS:", "Reset password:failure", task.getException());
-                                Toast.makeText(ForgotPasswordActivity.this, "Failed to send reset password email.",
-                                        Toast.LENGTH_SHORT).show();
-                                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                                email_field.startAnimation(animation);
-
-                            }
-                        }
-                    });
         });
 
+    }
+
+    /**
+     * This checks the provided email and sends reset password link upon success
+     * @param email
+     *      Email to receive reset password link
+     */
+    protected void sendReset(String email) {
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("RESET PASSWORD EMAIL STATUS:", "Email sent.");
+                            Intent i = new Intent(ForgotPasswordActivity.this, SignInActivity.class);
+                            startActivity(i);
+                        } else {
+                            Log.w("RESET PASSWORD EMAIL STATUS:", "Reset password:failure", task.getException());
+                            Toast.makeText(ForgotPasswordActivity.this, "Failed to send reset password email.",
+                                    Toast.LENGTH_SHORT).show();
+                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                            email_field.startAnimation(animation);
+
+                        }
+                    }
+                });
     }
 }

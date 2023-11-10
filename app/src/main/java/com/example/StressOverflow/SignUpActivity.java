@@ -67,8 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
         this.sign_up_button = findViewById(R.id.sign_up_button);
 
         this.back_button.setOnClickListener((v) -> {
-            Intent i = new Intent(SignUpActivity.this, SignInActivity.class);
-            startActivity(i);
+            finish();
         });
 
         this.sign_up_button.setOnClickListener((v) -> {
@@ -118,32 +117,46 @@ public class SignUpActivity extends AppCompatActivity {
                     Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
                     username_field.startAnimation(animation);
                 } else {
-                    Map<String, Object> updateMap = new HashMap();
-                    updateMap.put("email", newEmail);
-                    db.collection("users").document(newUsername).set(updateMap);
-                    mAuth.createUserWithEmailAndPassword(newEmail, newPassword)
-                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        // Sign in success, update UI with the signed-in user's information
-                                        Log.d("SIGNUP STATUS", "createUserWithEmail:success");
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        Intent i = new Intent(SignUpActivity.this, ListActivity.class);
-                                        startActivity(i);
-                                    } else {
-                                        // If sign in fails, display a message to the user.
-                                        Log.w("SIGNUP STATUS", "createUserWithEmail:failure", task.getException());
-                                        Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                                Toast.LENGTH_SHORT).show();
-                                        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                                        email_field.startAnimation(animation);
-                                    }
-                                }
-                            });
+                    createUser(newUsername, newEmail, newPassword);
                 }
             });
         });
 
+    }
+
+    /**
+     * This creates a new user in Firestore authentication storage and
+     * application's database
+     * @param username
+     *      Username of the new user (unique)
+     * @param email
+     *      Email of the new user
+     * @param password
+     *      Password of the new user
+     */
+    protected void createUser(String username, String email, String password) {
+        Map<String, Object> updateMap = new HashMap();
+        updateMap.put("email", email);
+        db.collection("users").document(username).set(updateMap);
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("SIGNUP STATUS", "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Intent i = new Intent(SignUpActivity.this, ListActivity.class);
+                            startActivity(i);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("SIGNUP STATUS", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+                            email_field.startAnimation(animation);
+                        }
+                    }
+                });
     }
 }

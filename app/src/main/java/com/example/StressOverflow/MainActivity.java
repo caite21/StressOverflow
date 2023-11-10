@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FirebaseAuth instance = FirebaseAuth.getInstance();
         FirebaseUser user = instance.getCurrentUser();
-        // if (false) {         UNCOMMENT TO DEBUG, COMMENT LINE BELOW
+//         if (false) {         // UNCOMMENT TO DEBUG, COMMENT LINE BELOW
         if (user != null) {
             Intent i = new Intent(MainActivity.this, ListActivity.class);
             startActivity(i);
