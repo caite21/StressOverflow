@@ -16,24 +16,37 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddTagFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * This fragment is called when a user wants to create a new tag
  */
 public class AddTagFragment extends DialogFragment {
     private OnFragmentInteractionListener listener;
     private TextView addTagTextView;
 
     private Tag newTag;
+
+    /**
+     * Constructor
+     */
     public AddTagFragment() {
         // Required empty public constructor
     }
 
-
+    /**
+     * Interface for interaction between the AddTagFragment and the hosting activity.
+     */
     public interface OnFragmentInteractionListener {
+        /**
+         * Called when user clicks on OK from dialog
+         * @param newTag the new Tag that was entered in the dialog
+         */
         void onOkPressed(Tag newTag);
     }
 
+    /**
+     * Called when the fragment is attached to a context to ensure that the hosting activity
+     * implements the necessary interaction listener interface.
+     * @param context context to which the fragment is attached
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -45,6 +58,13 @@ public class AddTagFragment extends DialogFragment {
 
     }
 
+    /**
+     * Creates the dialog and its contents
+     * @param savedInstanceState The last saved instance state of the Fragment,
+     * or null if this is a freshly created Fragment.
+     *
+     * @return the created dialog
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -57,9 +77,17 @@ public class AddTagFragment extends DialogFragment {
                 .setTitle("Add Tag")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    /**
+                     * Adds the tag to the tagList
+                     * @param dialog the dialog that received the click
+                     * @param which the button that was clicked (ex.
+                     *              {@link DialogInterface#BUTTON_POSITIVE}) or the position
+                     *              of the item clicked
+                     */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String newTagName = addTagTextView.getText().toString();
+                        //simple error check
                         if (newTagName.isEmpty()){
                             newTagName = "";
                         }

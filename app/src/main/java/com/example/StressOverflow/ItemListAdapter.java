@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,12 +34,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
+/**
+ * An adapter that displays the content in ListActivity
+ */
 public class ItemListAdapter extends ArrayAdapter<Item> {
     private ArrayList<Item> items;
     private Context context;
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Db database = new Db(db);
     private Set<Item> selectedItems = new HashSet<>();
     private boolean inSelectionMode = false;
 
@@ -56,7 +61,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             view = LayoutInflater.from(this.context).inflate(R.layout.listview_item_content, parent, false);
         }
         Item item = items.get(pos);
-        ArrayList<Tag> tags = item.getTags();
         TextView itemTitle = view.findViewById(R.id.listview__item__title);
         TextView itemMakeModel = view.findViewById(R.id.listview__item__model__make);
         TextView itemDescription = view.findViewById(R.id.listview__item__description);
@@ -72,52 +76,39 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         itemDate.setText(item.getDateAsString());
         itemSerial.setText(item.getSerial().toString());
 
+        addTagChips(view, item);
+        applySelectionBackground(view, item);
         // the first picture is shown
         if (item.getPictures().size() > 0) {
             itemPicture.setImageBitmap((item.getPictures().get(0)).getBitmap());
         }
 
-        ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
-        tagChipGroup.removeAllViews();
-        int tagCounter = 0;
-        for (Tag t: tags){
-            if (tagCounter!=3){
-                Chip chip = new Chip(this.context);
-                chip.setText(t.getTagName());
-                chip.setClickable(false);
-                chip.setFocusable(false);
-                chip.setLongClickable(false);
-                chip.setEnabled(false);
-                tagChipGroup.addView(chip);
-                tagCounter++;
-            }else{
-                break;
-            }
-        }
 
-        if (inSelectionMode) {
-            // Handle the selection mode appearance
-            if (selectedItems.contains(item)) {
-                // Change background color or apply other visual cues for selected items
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.lavender));
-            } else {
-                // Restore default appearance for unselected items
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-            }
-        } else {
-            // Normal mode, no selection
-            view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-        }
+
         return view;
     }
 
+    /**
+     * Gets the size of item list
+     * @return size of item list
+     */
     public int getItemListSize(){
         return items.size();
     }
+
+    /**
+     * Changes the selection mode
+     * @param enabled the selection mode to be set to
+     */
     public void setSelectionMode(boolean enabled) {
         inSelectionMode = enabled;
         notifyDataSetChanged(); // Notify the adapter to refresh the view
     }
+
+    /**
+     * Toggle selection and add or remove from selectedItems list
+     * @param pos position of the item that is being selected or unselected
+     */
     public void toggleSelection(int pos) {
         Item item = items.get(pos);
         if (selectedItems.contains(item)) {
@@ -130,6 +121,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         }
         notifyDataSetChanged();
     }
+
+    /**
+     * Gets the list of items that are currently selected
+     * @return list of selected items
+     */
     public ArrayList<Item> getSelectedItems() {
         ArrayList<Item> selected = new ArrayList<>();
         for (Item it : selectedItems) {
@@ -153,6 +149,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
     public void addItem(Item item) {
         this.items.add(item);
+        database.addItem(item);
         this.notifyDataSetChanged();
     }
 
@@ -187,6 +184,53 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.notifyDataSetChanged();
     }
 
+    /**
+     * Add the tags for the item on runtime
+     * @param view gets the current view that it's rendering
+     * @param item gets the current item that it's rendering
+     */
+    private void addTagChips(View view, Item item){
+        ArrayList<Tag> tags = item.getTags();
+        ChipGroup tagChipGroup = view.findViewById(R.id.itemTagChipGroup);
+        tagChipGroup.removeAllViews();
+
+        //display a maximum of 3 tags
+        int tagCounter = 0;
+        for (Tag t: tags){
+            if (tagCounter!=3){
+                Chip chip = new Chip(this.context);
+                chip.setText(t.getTagName());
+                chip.setClickable(false);
+                chip.setFocusable(false);
+                chip.setLongClickable(false);
+                chip.setEnabled(false);
+                tagChipGroup.addView(chip);
+                tagCounter++;
+            }else{
+                break;
+            }
+        }
+    }
+
+    /**
+     * Change the background color depending on its selection mode
+     * @param view gets the current view that it's rendering
+     * @param item gets the item that it's rendering
+     */
+    private void applySelectionBackground(View view, Item item){
+        if (inSelectionMode) {
+            if (selectedItems.contains(item)) {
+                // Change background color for selected items
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.lavender));
+            } else {
+                // Restore default appearance for unselected items
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            }
+        } else {
+            // Normal mode, no selection
+            view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+        }
+    }
     /**
      * Filters the list according to something somehow
      */

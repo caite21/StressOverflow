@@ -64,8 +64,8 @@
         android:layout_margin="30dp"
         android:clickable="true"
         android:focusable="true"
-        app:srcCompat="@android:drawable/ic_input_add"
-        />
+        android:visibility="gone"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/activity__item__list__add__tag__button"

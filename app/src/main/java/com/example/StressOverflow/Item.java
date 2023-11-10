@@ -375,14 +375,16 @@ public class Item {
     public static Item fromFirebaseObject(Map<String, Object> data) {
         try {
             ArrayList<Tag> tags = new ArrayList<>();
-            tags.add(new Tag("Hello!"));
             ArrayList<Image> images = new ArrayList<>();
             UUID uid = new UUID(
                     ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
                     ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
             );
-            @SuppressWarnings({"unchecked", "ConstantConditions"}) // just trust me bro
+            //@SuppressWarnings({"unchecked", "ConstantConditions"}) // just trust me bro
                     // TODO: sunny should not be trusted.
+            for (Map<String, Object> tagName: (ArrayList <Map<String, Object>>) data.get("tags")){
+                tags.add(Tag.fromFirebaseObject(tagName));
+            }
             Item out = new Item(
                     uid,
                     (String) data.get("name"),
