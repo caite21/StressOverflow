@@ -94,7 +94,6 @@ AddImagesFragment.OnFragmentInteractionListener{
         ArrayList<Tag> tags = new ArrayList<Tag>();
         tags.add(new Tag("tag1"));
         tags.add(new Tag("tag2"));
-
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
