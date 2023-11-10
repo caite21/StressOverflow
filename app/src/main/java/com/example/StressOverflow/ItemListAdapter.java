@@ -204,27 +204,32 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
             if (!conditions.get("keywords").stream().allMatch(keyword -> item.getDescription().contains(keyword))) {
                 continue;
+            }
 
-            } else if (!conditions.get("dates").get(0).isEmpty()) {
+            if (!conditions.get("dates").get(0).isEmpty()) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date parsedDate = dateFormat.parse(conditions.get("dates").get(0));
                 GregorianCalendar parseFrom = new GregorianCalendar();
                 parseFrom.setTime(parsedDate);
                 if (!item.getDate().after(parseFrom)) continue;
+            }
 
-            } else if (!conditions.get("dates").get(1).isEmpty()) {
+            if (!conditions.get("dates").get(1).isEmpty()) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date parsedDate = dateFormat.parse(conditions.get("dates").get(1));
                 GregorianCalendar parseTo = new GregorianCalendar();
                 parseTo.setTime(parsedDate);
                 if (!item.getDate().before(parseTo)) continue;
+            }
 
-            } else if (!conditions.get("makes").stream().allMatch(make -> make.contains(item.getMake()))) {
-                continue;
-
-            } else if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().contains(tagList)))) {
+            if (!conditions.get("makes").stream().allMatch(make -> make.contains(item.getMake()))) {
                 continue;
             }
+
+            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().contains(tagList)))) {
+                continue;
+            }
+            
             filtered.add(this.items.get(i));
         }
         return filtered;
