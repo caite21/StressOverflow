@@ -135,15 +135,15 @@ public class SignUpActivity extends AppCompatActivity {
      *      Password of the new user
      */
     protected void createUser(String username, String email, String password) {
-        Map<String, Object> updateMap = new HashMap();
-        updateMap.put("email", email);
-        db.collection("users").document(username).set(updateMap);
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
+                            Map<String, Object> updateMap = new HashMap();
+                            updateMap.put("email", email);
+                            db.collection("users").document(username).set(updateMap);
                             Log.d("SIGNUP STATUS", "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent i = new Intent(SignUpActivity.this, ListActivity.class);
