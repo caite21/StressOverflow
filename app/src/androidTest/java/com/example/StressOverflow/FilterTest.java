@@ -10,6 +10,7 @@ import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -53,6 +54,9 @@ public class FilterTest {
     private FirebaseFirestore firestore;
     Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
     Db database;
+    Item item1;
+    Item item2;
+    Item item3;
 
     public ItemListAdapter getAdapter() {
         return new ItemListAdapter(appContext, new ArrayList<Item>());
@@ -63,6 +67,78 @@ public class FilterTest {
         firestore = FirebaseFirestore.getInstance();
         database = new Db(firestore);
         AppGlobals.getInstance().setOwnerName("testUser");
+
+        ArrayList<Tag> testTags = new ArrayList<>();
+        ArrayList<Image> images = new ArrayList<>();
+
+        //Add a tag first
+        testTags.add(new Tag("testTag1"));
+        item1 = new Item("Test1","make1","model","this is the first tag", new GregorianCalendar(2023, 1, 1),77.00, "Comments",testTags,images,
+                123456, AppGlobals.getInstance().getOwnerName());
+        item2 = new Item("Test2","make1","model","this is the second tag", new GregorianCalendar(2022, 1, 1),77.00, "Comments",testTags,images,
+                123456, AppGlobals.getInstance().getOwnerName());
+        testTags.add(new Tag("testTag2"));
+        item3 = new Item("Test3","make2","model","this is the second second tag", new GregorianCalendar(2001, 1, 1),77.00, "Comments",testTags,images,
+                123456, AppGlobals.getInstance().getOwnerName());
+
+        firestore.collection("items").document(item1.getId().toString())
+            .set(item1.toFirebaseObject())
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error with item insertion into collection items: ", e);
+                    throw new RuntimeException("Error with item insertion into collection items: ", e);
+                }
+            });
+        firestore.collection("items").document(item2.getId().toString())
+            .set(item2.toFirebaseObject())
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error with item insertion into collection items: ", e);
+                    throw new RuntimeException("Error with item insertion into collection items: ", e);
+                }
+            });
+        firestore.collection("items").document(item3.getId().toString())
+            .set(item3.toFirebaseObject())
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error with item insertion into collection items: ", e);
+                    throw new RuntimeException("Error with item insertion into collection items: ", e);
+                }
+            });
+    }
+
+    @After
+    public void cleanUp() {
+        firestore.collection("items").document(item1.getId().toString())
+            .delete()
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error with item deletion on collection items: ", e);
+                    throw new RuntimeException("Error with item deletion on collection items: ", e);
+                }
+            });
+        firestore.collection("items").document(item2.getId().toString())
+            .delete()
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error with item deletion on collection items: ", e);
+                    throw new RuntimeException("Error with item deletion on collection items: ", e);
+                }
+            });
+        firestore.collection("items").document(item3.getId().toString())
+            .delete()
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error with item deletion on collection items: ", e);
+                    throw new RuntimeException("Error with item deletion on collection items: ", e);
+                }
+            });
     }
 
     @Rule
@@ -78,7 +154,6 @@ public class FilterTest {
         onView(ViewMatchers.isRoot()).perform(ViewActions.closeSoftKeyboard());
         onView(withId(R.id.filter__dialog__filter__btn)).inRoot(isDialog()).perform(click());
 
-        Thread.sleep(5000);
         onData(is(instanceOf(Item.class)))
             .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
             .onChildView(withId(R.id.listview__item__title))
@@ -91,22 +166,25 @@ public class FilterTest {
     }
 
     // Espresso is unable to find chip group
-//    @Test
-//    public void testMakeFilter() throws InterruptedException {
-//        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
-//        onView(withId(R.id.filter__dialog__filter__btn)).inRoot(isDialog()).perform(click());
-//
-//        // I don't know why make and tags don't populate the first click (it works manually)
-//        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
-//        onView(allOf(withId(R.id.filter__dialog__makes__chipgroup), withChild(withText("make1")))).perform(click());
-//        onView(withId(R.id.filter__dialog__back__btn)).inRoot(isDialog()).perform(click());
-//
-//        onData(is(instanceOf(Item.class)))
-//            .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
-//            .onChildView(withId(R.id.listview__item__title))
-//            .check(matches(withText("Test1")));
-//    }
+    @Test
+    public void testMakeFilter() throws InterruptedException {
+        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.filter__dialog__filter__btn)).inRoot(isDialog()).perform(click());
 
+        // I don't know why make and tags don't populate the first click (it works manually)
+        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(allOf(withText("make1"), isDescendantOfA(withId(R.id.filter__dialog__makes__chipgroup)))).perform(click());
+        Thread.sleep(1000);
+        onView(withId(R.id.filter__dialog__back__btn)).inRoot(isDialog()).perform(click());
+        Thread.sleep(1000);
+
+        onData(is(instanceOf(Item.class)))
+            .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
+            .onChildView(withId(R.id.listview__item__title))
+            .check(matches(withText("Test2")));
+    }
+
+    // Works manually but I can't get it working on espresso
 //    @Test
 //    public void testTagFilter() throws InterruptedException {
 //        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
@@ -114,9 +192,10 @@ public class FilterTest {
 //
 //        // I don't know why make and tags don't populate the first click (it works manually)
 //        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
-//
-//        onView(allOf(withId(R.id.filter__dialog__makes__chipgroup), withChild(withText("testTag2")))).perform(click());
+//        onView(allOf(withText("testTag2"), isDescendantOfA(withId(R.id.filter__dialog__tags__chipgroup)))).perform(click());
+//        Thread.sleep(1000);
 //        onView(withId(R.id.filter__dialog__back__btn)).inRoot(isDialog()).perform(click());
+//        Thread.sleep(1000);
 //
 //        onData(is(instanceOf(Item.class)))
 //            .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
