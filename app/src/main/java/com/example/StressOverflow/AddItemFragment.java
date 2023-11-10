@@ -17,6 +17,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
@@ -34,9 +37,10 @@ public class AddItemFragment extends DialogFragment{
     private EditText itemYearField;
     private EditText itemValueField;
     private EditText itemCommentsField;
-    private EditText itemTagsField;
     private Button itemPicturesButton;
     private EditText itemSerialField;
+    private ChipGroup tagChipGroup;
+
     private OnFragmentInteractionListener listener;
     private String owner;
 
@@ -74,9 +78,10 @@ public class AddItemFragment extends DialogFragment{
         itemDateField = view.findViewById(R.id.add__item__fragment__edit__date);
         itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
         itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
-        itemTagsField = view.findViewById(R.id.add__item__fragment__edit__tags);
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
+        tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
+        addTagsToChipGroup();
 
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,10 +110,15 @@ public class AddItemFragment extends DialogFragment{
                                 Integer.parseInt(itemDateField.getText().toString()));
                         Double value = Double.parseDouble(itemValueField.getText().toString());
                         String comments = itemCommentsField.getText().toString();
-                        ArrayList<Tag> tags = new ArrayList<>();
+                        ArrayList<Tag> newTags = new ArrayList<>();
                         ArrayList<Image> pictures = new ArrayList<>();
                         String serial = itemSerialField.getText().toString();
 
+                        for (int chipID : tagChipGroup.getCheckedChipIds()){
+                            Chip newChip = tagChipGroup.findViewById(chipID);
+                            Tag newTag = new Tag(newChip.getText().toString());
+                            newTags.add(newTag);
+                        }
                         try {
                             listener.onSubmitAdd(new Item(
                                     title,
@@ -118,7 +128,7 @@ public class AddItemFragment extends DialogFragment{
                                     date,
                                     value,
                                     comments,
-                                    tags,
+                                    newTags,
                                     pictures,
                                     Integer.valueOf(serial),
                                     owner
@@ -136,5 +146,20 @@ public class AddItemFragment extends DialogFragment{
                         }
                     }
                 }).create();
+    }
+
+    private void addTagsToChipGroup(){
+        ArrayList <Tag> allTags = AppGlobals.getInstance().getAllTags();
+
+        //add all the tags as chips in the dialog
+        for (Tag t: allTags){
+            Chip chip = new Chip(getContext());
+            chip.setText(t.getTagName());
+            chip.setCheckedIconVisible(true);
+            chip.setCheckable(true);
+            chip.setActivated(false);
+            tagChipGroup.addView(chip);
+            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
+        }
     }
 }

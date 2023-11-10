@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -30,9 +31,9 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.UUID;
 
-public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener,
-AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener, 
+public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, Db.TagListCallback, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
 AddImagesFragment.OnFragmentInteractionListener{
+
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
@@ -41,12 +42,17 @@ AddImagesFragment.OnFragmentInteractionListener{
     FloatingActionButton deleteItemButton;
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
-    private FirebaseFirestore db;
+    String ownerName;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Db database = new Db(db);
+  //  private FirebaseFirestore db;
     private CollectionReference items;
     ArrayList<Image> addedPictures;
 
     int selected = -1;
     Intent loginIntent;
+
+    private ArrayList<Tag> allTags = new ArrayList<>();
 
     private boolean inSelectionMode = false;
 
@@ -68,17 +74,20 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
         Button showTagListButton = findViewById(R.id.showTagList_button);
-
-        showTagListButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ListActivity.this, TagList.class);
-                startActivity(intent);
-            }
-        });
+        showTagListButton.setOnClickListener(showList);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
+
+        this.ownerName = loginIntent.getStringExtra("login");
+        if(this.ownerName == null){
+            this.ownerName = "testUser";
+        }
+        AppGlobals.getInstance().setOwnerName(this.ownerName);
+
+
+        database.getAllTags( this);
+
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
             Item selected = this.itemListAdapter.getItem(position);
@@ -91,9 +100,8 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
         this.itemList.setAdapter(this.itemListAdapter);
 
-        ArrayList<Tag> tags = new ArrayList<Tag>();
-        tags.add(new Tag("tag1"));
-        tags.add(new Tag("tag2"));
+        this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
+
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
@@ -103,7 +111,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
         this.items
-                .whereEqualTo("owner", this.loginIntent.getStringExtra("login"))
+                .whereEqualTo("owner", this.ownerName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -201,7 +209,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             addTagButton.setVisibility(View.VISIBLE);
-            addItemButton.setVisibility(View.GONE);
+            //addItemButton.setVisibility(View.GONE);
             deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
             itemListAdapter.setSelectionMode(true);
@@ -219,34 +227,63 @@ AddImagesFragment.OnFragmentInteractionListener{
         inSelectionMode = false;
         itemListAdapter.setSelectionMode(false);
         addTagButton.setVisibility(View.GONE);
-        addItemButton.setVisibility(View.VISIBLE);
+        //addItemButton.setVisibility(View.VISIBLE);
         deleteItemButton.setVisibility(View.GONE);
     }
 
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            new AddTagToItemFragment().show(getSupportFragmentManager(), "ADD TAGS");
+            AddTagToItemFragment fragment = new AddTagToItemFragment();
+            fragment.show(getSupportFragmentManager(),"ADD TAGS");
         }
     };
 
 
+    /**
+     * Called when user adds new tags to an item
+     * @param tagsToAdd the tags selected by user
+     */
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
         for (Item i: itemListAdapter.getSelectedItems()){
+            ArrayList <Tag> currentTags = i.getTags();
+            for (Tag newTag : tagsToAdd) {
+                if (currentTags.contains(newTag)) {
+                    tagsToAdd.remove(newTag);
+                }
+            }
             i.addTags(tagsToAdd);
+            this.items
+                    .document(i.getId().toString())
+                    .update(i.toFirebaseObject())
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error with item update on collection items: ", e);
+                            throw new RuntimeException("Error with item update on collection items: ", e);
+                        }
+                    });
+
             itemListAdapter.notifyDataSetChanged();
         }
+        exitSelectionMode();
 
     }
 
+    /**
+     * Gets the list of currently selected items and deletes it
+     */
     private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             ArrayList<Item> itemsToDelete = itemListAdapter.getSelectedItems();
+            //iterate through the selected list and delete from adapter and database
             for (Item i: itemsToDelete){
+                itemListAdapter.remove(i);
                 onSubmitDelete(i);
             }
+            //if there are no more items, exit selection mode
             if (itemListAdapter.getItemListSize()==0){
                 exitSelectionMode();
             }
@@ -254,7 +291,27 @@ AddImagesFragment.OnFragmentInteractionListener{
     };
 
     /**
-     * When user confirms adding images, the updated list
+     * Directs user to the TagList Activity that shows user all the current existing tags
+     */
+    private View.OnClickListener showList = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(ListActivity.this, TagList.class);
+            startActivity(intent);
+        }
+    };
+
+    /**
+     * Gets the list of all the tags on app startup
+     * @param tags array list of tags from the database
+     */
+    @Override
+    public void onTagListReceived(ArrayList<Tag> tags) {
+            AppGlobals.getInstance().setAllTags(tags);
+    }
+
+    /**
+     *When user confirms adding images, the updated list
      * of pictures is passed so that the pictures can be attached
      * when the user is done adding/editing an item,
      *
