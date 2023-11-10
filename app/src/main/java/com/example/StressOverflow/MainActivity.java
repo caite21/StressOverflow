@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FirebaseAuth instance = FirebaseAuth.getInstance();
         FirebaseUser user = instance.getCurrentUser();
+        // If you signed in and want to sign out (log out button not yet implemented), then
+        // wipe data from your emulator and launch the app again
 //         if (false) {         // UNCOMMENT TO DEBUG, COMMENT LINE BELOW
         if (user != null) {
             Intent i = new Intent(MainActivity.this, ListActivity.class);
