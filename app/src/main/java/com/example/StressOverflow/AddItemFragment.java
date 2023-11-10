@@ -101,7 +101,8 @@ public class AddItemFragment extends DialogFragment {
                                     comments,
                                     tags,
                                     pictures,
-                                    Integer.valueOf(serial)
+                                    Integer.valueOf(serial),
+                                    "_"
                             ));
                         } catch (IllegalArgumentException e) {
                             Util.showLongToast(

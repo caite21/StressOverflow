@@ -15,4 +15,38 @@
 
     <string name="activity_item_list_edit_button_text">Edit</string>
     <string name="activity_item_list_filter_button_text">Sort / Filter</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sign_in">Sign In</string>
+    <string name="email_username">Email / Username</string>
+    <string name="example_email_com">example@email.com</string>
+    <string name="password">Password</string>
+    <string name="password_placeholder">************</string>
+    <string name="sign_in_button_text">Sign in</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="reset_password">Reset password</string>
+    <string name="back">Back</string>
+    <string name="email">Email</string>
+    <string name="username">Username</string>
+    <string name="your_username">Your username</string>
+    <string name="re_enter_password">Re-enter password</string>
+
+    <string name="filter__dialog__keywords__header">Keywords</string>
+    <string name="filter__dialog__date__header">Dates</string>
+    <string name="filter__dialog__start__date__hint">From</string>
+    <string name="filter__dialog__end__date__hint">To</string>
+    <string name="filter__dialog__tags__header">Tags</string>
+    <string name="filter__dialog__tags__select__all__text">Select All</string>
+    <string name="filter__dialog__sort__header">Sort</string>
+    <string name="filter__dialog__date__btn__text">Date</string>
+    <string name="filter__dialog__descr__btn__text">Description</string>
+    <string name="filter__dialog__make__btn__text">Make</string>
+    <string name="filter__dialog__value__btn__text">Value</string>
+    <string name="filter__dialog__asc__btn__text">Ascending</string>
+    <string name="filter__dialog__desc__btn__text">Descending</string>
+    <string name="filter__dialog__back__btn__text">Back</string>
+    <string name="filter__dialog__filter__btn__text">Filter</string>
+    <string name="filter__dialog__make__header">Make</string>
+
 </resources>

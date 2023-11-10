@@ -1,9 +1,12 @@
 package com.example.StressOverflow;
 
-public class Tag {
+
+import java.io.Serializable;
+
+public class Tag implements Serializable {
     private String tagName;
 
-    public void Tag(String tagName){
+    public Tag(String tagName){
         this.tagName = tagName;
     }
 

@@ -89,5 +89,13 @@
                 android:orientation="horizontal"
                 ></LinearLayout>
         </LinearLayout>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/itemTagChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="false">
+
+        </com.google.android.material.chip.ChipGroup>
     </LinearLayout>
 </LinearLayout>
