@@ -1,7 +1,7 @@
 /**
  * Alert dialog displayed when user tries to add an item
  */
-package com.example.StressOverflow;
+package com.example.StressOverflow.Item;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,39 +17,41 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.StressOverflow.Image.AddImagesFragment;
+import com.example.StressOverflow.AppGlobals;
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.R;
+import com.example.StressOverflow.Tag.Tag;
 import com.example.StressOverflow.Util;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.UUID;
 
-public class EditItemFragment extends DialogFragment {
+public class AddItemFragment extends DialogFragment{
 
     private EditText itemTitleField;
     private EditText itemMakeField;
     private EditText itemModelField;
     private EditText itemDescriptionField;
     private EditText itemDateField;
-    private EditText itemYearField;
     private EditText itemMonthField;
+    private EditText itemYearField;
     private EditText itemValueField;
     private EditText itemCommentsField;
-    private EditText itemSerialField;
     private Button itemPicturesButton;
+    private EditText itemSerialField;
     private ChipGroup tagChipGroup;
-    private OnFragmentInteractionListener listener;
-    private Item selectedItem;
-    private int pos;
 
-    public EditItemFragment(int pos, Item selectedItem) {
-        this.selectedItem = selectedItem;
-        this.pos = pos;
+    private OnFragmentInteractionListener listener;
+    private String owner;
+
+    public AddItemFragment(String owner) {
+        this.owner = owner;
     }
     public interface OnFragmentInteractionListener {
-        void onSubmitEdit(int id, Item item);
+        void onSubmitAdd(Item item);
     }
 
     @Override
@@ -74,34 +76,21 @@ public class EditItemFragment extends DialogFragment {
         itemMakeField = view.findViewById(R.id.add__item__fragment__edit__make);
         itemModelField = view.findViewById(R.id.add__item__fragment__edit__model);
         itemDescriptionField = view.findViewById(R.id.add__item__fragment__edit__description);
-        itemYearField = view.findViewById(R.id.add__item__fragment__edit__year);
         itemMonthField = view.findViewById(R.id.add__item__fragment__edit__month);
+        itemYearField = view.findViewById(R.id.add__item__fragment__edit__year);
         itemDateField = view.findViewById(R.id.add__item__fragment__edit__date);
         itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
         itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
-        itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
-
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
-
+        itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
         addTagsToChipGroup();
-
-        itemTitleField.setText(this.selectedItem.getName());
-        itemMakeField.setText(this.selectedItem.getMake());
-        itemModelField.setText(this.selectedItem.getModel());
-        itemDescriptionField.setText(this.selectedItem.getDescription());
-        itemValueField.setText(Double.toString(selectedItem.getValue()));
-        itemYearField.setText(this.selectedItem.getDateYear());
-        itemMonthField.setText(this.selectedItem.getDateMonth());
-        itemDateField.setText(this.selectedItem.getDateDate());
-        itemCommentsField.setText(this.selectedItem.getComments());
-        itemSerialField.setText(Integer.toString(selectedItem.getSerial()));
 
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Opens fragment that shows the item's pictures
-                new AddImagesFragment(selectedItem).show(getChildFragmentManager(), "ADD_IMAGES");
+                new AddImagesFragment().show(getChildFragmentManager(), "ADD_IMAGES");
             }
         });
 
@@ -109,7 +98,7 @@ public class EditItemFragment extends DialogFragment {
 
         return builder
                 .setView(view)
-                .setTitle("Edit an item")
+                .setTitle("Add an item")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -118,36 +107,34 @@ public class EditItemFragment extends DialogFragment {
                         String make = itemMakeField.getText().toString();
                         String model = itemModelField.getText().toString();
                         String desc = itemDescriptionField.getText().toString();
-                        ArrayList<Tag> newTags = new ArrayList<>();
                         GregorianCalendar date = new GregorianCalendar(
                                 Integer.parseInt(itemYearField.getText().toString()),
                                 Integer.parseInt(itemMonthField.getText().toString()),
-                                Integer.parseInt(itemDateField.getText().toString())
-                        );
-                        Double value = Double.valueOf(itemValueField.getText().toString());
+                                Integer.parseInt(itemDateField.getText().toString()));
+                        Double value = Double.parseDouble(itemValueField.getText().toString());
                         String comments = itemCommentsField.getText().toString();
-                        Integer serial = Integer.valueOf(itemSerialField.getText().toString());
+                        ArrayList<Tag> newTags = new ArrayList<>();
+                        ArrayList<Image> pictures = new ArrayList<>();
+                        String serial = itemSerialField.getText().toString();
+
                         for (int chipID : tagChipGroup.getCheckedChipIds()){
                             Chip newChip = tagChipGroup.findViewById(chipID);
                             Tag newTag = new Tag(newChip.getText().toString());
                             newTags.add(newTag);
                         }
                         try {
-                            listener.onSubmitEdit(
-                                    pos,
-                                    new Item(
-                                        selectedItem.getId(),
-                                        title,
-                                        make,
-                                        model,
-                                        desc,
-                                        date,
-                                        value,
-                                        comments,
-                                        newTags,
-                                        selectedItem.getPictures(),
-                                        serial,
-                                        selectedItem.getOwner()
+                            listener.onSubmitAdd(new Item(
+                                    title,
+                                    make,
+                                    model,
+                                    desc,
+                                    date,
+                                    value,
+                                    comments,
+                                    newTags,
+                                    pictures,
+                                    Integer.valueOf(serial),
+                                    owner
                             ));
                         } catch (IllegalArgumentException e) {
                             Util.showLongToast(
@@ -165,18 +152,18 @@ public class EditItemFragment extends DialogFragment {
     }
 
     /**
-     * Add all the tags of the selected Item to the ChipGroup
+     * Adds all the tags to the chipGroup
      */
     private void addTagsToChipGroup(){
-        ArrayList<Tag> tags = selectedItem.getTags();
-        tagChipGroup.removeAllViews();
-        for (Tag t: tags){
+        ArrayList <Tag> allTags = AppGlobals.getInstance().getAllTags();
+
+        //add all the tags as chips in the dialog
+        for (Tag t: allTags){
             Chip chip = new Chip(getContext());
             chip.setText(t.getTagName());
             chip.setCheckedIconVisible(true);
             chip.setCheckable(true);
             chip.setActivated(false);
-            chip.setChecked(true);
             tagChipGroup.addView(chip);
             chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
         }

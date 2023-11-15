@@ -1,4 +1,4 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Image;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.StressOverflow.R;
 
 import java.util.ArrayList;
 

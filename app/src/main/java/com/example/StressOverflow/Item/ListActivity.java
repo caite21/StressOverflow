@@ -1,4 +1,4 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Item;
 
 import static android.content.ContentValues.TAG;
 
@@ -16,23 +16,31 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.StressOverflow.Image.AddImagesFragment;
+import com.example.StressOverflow.Tag.AddTagToItemFragment;
+import com.example.StressOverflow.AppGlobals;
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.FilterDialog;
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.R;
+import com.example.StressOverflow.Tag.Tag;
+import com.example.StressOverflow.Tag.TagList;
+import com.example.StressOverflow.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, Db.TagListCallback, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
-AddImagesFragment.OnFragmentInteractionListener{
+        AddImagesFragment.OnFragmentInteractionListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
