@@ -1,21 +1,18 @@
-package com.example.StressOverflow;
-
-import static java.security.AccessController.getContext;
+package com.example.StressOverflow.Tag;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.StressOverflow.AppGlobals;
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,9 +21,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 public class TagList extends AppCompatActivity implements AddTagFragment.OnFragmentInteractionListener {
     ArrayList<Tag> tagList = new ArrayList<>();

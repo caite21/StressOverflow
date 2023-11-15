@@ -5,16 +5,12 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.longClick;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.google.android.material.internal.ContextUtils.getActivity;
-import static com.google.common.base.CharMatcher.any;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.JMock1Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,19 +20,19 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.test.espresso.Espresso;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.Item.Item;
+import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.hamcrest.Matchers;
 import org.junit.After;

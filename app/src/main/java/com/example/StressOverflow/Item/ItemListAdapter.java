@@ -1,25 +1,23 @@
 /**
  * Adapter class for main list view of items
  */
-package com.example.StressOverflow;
+package com.example.StressOverflow.Item;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.text.Layout;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.R;
+import com.example.StressOverflow.Tag.Tag;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,7 +30,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**

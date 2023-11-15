@@ -4,27 +4,21 @@ import static android.content.ContentValues.TAG;
 
 import android.util.Log;
 
+import com.example.StressOverflow.Item.Item;
+import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.protobuf.Any;
 
 import androidx.annotation.NonNull;
 
-import java.security.acl.Owner;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 

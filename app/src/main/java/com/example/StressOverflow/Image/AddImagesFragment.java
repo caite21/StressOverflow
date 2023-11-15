@@ -1,4 +1,4 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Image;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -24,7 +23,6 @@ import androidx.fragment.app.DialogFragment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import android.app.AlertDialog;
@@ -34,6 +32,11 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.Image.ImagesDisplayAdapter;
+import com.example.StressOverflow.Item.Item;
+import com.example.StressOverflow.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 

@@ -1,4 +1,5 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.SignIn;
+import com.example.StressOverflow.Item.ListActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,16 +15,14 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.StressOverflow.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 /**
  * Prompts the user to fill in username/email and password. User is able to
