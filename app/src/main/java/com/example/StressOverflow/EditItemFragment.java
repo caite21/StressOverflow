@@ -18,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.StressOverflow.Util;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +39,7 @@ public class EditItemFragment extends DialogFragment {
     private EditText itemCommentsField;
     private EditText itemSerialField;
     private Button itemPicturesButton;
+    private ChipGroup tagChipGroup;
     private OnFragmentInteractionListener listener;
     private Item selectedItem;
     private int pos;
@@ -77,7 +80,11 @@ public class EditItemFragment extends DialogFragment {
         itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
         itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
+
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
+
+        tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
+        addTagsToChipGroup();
 
         itemTitleField.setText(this.selectedItem.getName());
         itemMakeField.setText(this.selectedItem.getMake());
@@ -111,6 +118,7 @@ public class EditItemFragment extends DialogFragment {
                         String make = itemMakeField.getText().toString();
                         String model = itemModelField.getText().toString();
                         String desc = itemDescriptionField.getText().toString();
+                        ArrayList<Tag> newTags = new ArrayList<>();
                         GregorianCalendar date = new GregorianCalendar(
                                 Integer.parseInt(itemYearField.getText().toString()),
                                 Integer.parseInt(itemMonthField.getText().toString()),
@@ -119,7 +127,11 @@ public class EditItemFragment extends DialogFragment {
                         Double value = Double.valueOf(itemValueField.getText().toString());
                         String comments = itemCommentsField.getText().toString();
                         Integer serial = Integer.valueOf(itemSerialField.getText().toString());
-
+                        for (int chipID : tagChipGroup.getCheckedChipIds()){
+                            Chip newChip = tagChipGroup.findViewById(chipID);
+                            Tag newTag = new Tag(newChip.getText().toString());
+                            newTags.add(newTag);
+                        }
                         try {
                             listener.onSubmitEdit(
                                     pos,
@@ -132,7 +144,7 @@ public class EditItemFragment extends DialogFragment {
                                         date,
                                         value,
                                         comments,
-                                        selectedItem.getTags(),
+                                        newTags,
                                         selectedItem.getPictures(),
                                         serial,
                                         selectedItem.getOwner()
@@ -150,5 +162,23 @@ public class EditItemFragment extends DialogFragment {
                         }
                     }
                 }).create();
+    }
+
+    /**
+     * Add all the tags of the selected Item to the ChipGroup
+     */
+    private void addTagsToChipGroup(){
+        ArrayList<Tag> tags = selectedItem.getTags();
+        tagChipGroup.removeAllViews();
+        for (Tag t: tags){
+            Chip chip = new Chip(getContext());
+            chip.setText(t.getTagName());
+            chip.setCheckedIconVisible(true);
+            chip.setCheckable(true);
+            chip.setActivated(false);
+            chip.setChecked(true);
+            tagChipGroup.addView(chip);
+            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
+        }
     }
 }

@@ -7,31 +7,62 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-public class AddTagToItemFragment extends DialogFragment {
+/**
+ * Called when a user wants to add a tag to an already existing item
+ */
+public class AddTagToItemFragment extends DialogFragment{
     private OnFragmentInteractionListener listener;
     private ChipGroup chipGroup;
     private ArrayList<Tag> newTags = new ArrayList<>();
+    private ArrayList<Tag> allTags = new ArrayList<>();
+    private FirebaseFirestore db;
+    private CollectionReference tagsRef;
+    private Db tagDb;
+    private String ownerName;
+
     public AddTagToItemFragment() {
+        this.ownerName = AppGlobals.getInstance().getOwnerName();
     }
 
+
+    /**
+     * Interface for interaction between the AddTagFragment and the hosting activity
+     */
     public interface OnFragmentInteractionListener{
+        /**
+         * Called when OK on addTagToItem dialog is clicked
+         * @param tagsToAdd the tags selected by user
+         */
         void addTagPressed(ArrayList<Tag> tagsToAdd);
     }
 
+
+    /**
+     * Called when the fragment is attached to a context to ensure that the hosting activity
+     * implements the necessary interaction listener interface.
+     * @param context context to which the fragment is attached
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -42,22 +73,27 @@ public class AddTagToItemFragment extends DialogFragment {
         }
     }
 
+
+    /**
+     * Create dialog and its contents
+     * @param savedInstanceState The last saved instance state of the Fragment,
+     * or null if this is a freshly created Fragment.
+     *
+     * @return
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_tag_to_item, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        //Hardcoded tagList
-        ArrayList<Tag> tags = new ArrayList<>();
-        Tag tag1 = new Tag("Tag1");
-        Tag tag2 = new Tag("Tag2");
-        Tag tag3 = new Tag("Tag3");
-        List<Tag> tagstoAdd = Arrays.asList(tag1,tag2,tag3);
-        tags.addAll(tagstoAdd);
+
         Button makeNewTag = view.findViewById(R.id.makeNewTag_button);
         makeNewTag.setOnClickListener(openTagList);
         chipGroup = view.findViewById(R.id.tagFragment_chipGroup);
 
-        for (Tag t: tags){
+        allTags = AppGlobals.getInstance().getAllTags();
+
+        //add all the tags as chips in the dialog
+        for (Tag t: allTags){
             Chip chip = new Chip(getContext());
             chip.setText(t.getTagName());
             chip.setCheckedIconVisible(true);
@@ -82,6 +118,9 @@ public class AddTagToItemFragment extends DialogFragment {
                 }).create();
     }
 
+    /**
+     * Direct user to master TagList to add new tags.
+     */
     private View.OnClickListener openTagList = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
