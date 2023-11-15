@@ -48,8 +48,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class AddImagesFragment extends DialogFragment  {
     private Uri imageUri;
     private ActivityResultLauncher<Intent> addImagesLauncher;
-    private ArrayList<Bitmap> photos = new ArrayList<>();
-    private FirebaseFirestore db;
     private OnFragmentInteractionListener listener;
     private ContentResolver contentResolver;
     private ArrayList<Image> imagesList;
