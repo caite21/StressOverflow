@@ -29,6 +29,7 @@ import com.example.StressOverflow.Tag.TagList;
 import com.example.StressOverflow.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,8 +45,7 @@ public class ListActivity extends AppCompatActivity implements
         AddItemFragment.OnFragmentInteractionListener,
         AddTagToItemFragment.OnFragmentInteractionListener,
         EditItemFragment.OnFragmentInteractionListener,
-        AddImagesFragment.OnFragmentInteractionListener,
-        Image.OnImageUploadedListener {
+        AddImagesFragment.OnFragmentInteractionListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
@@ -172,6 +172,7 @@ public class ListActivity extends AppCompatActivity implements
      */
     public void onSubmitAdd(Item item) {
         item.setPictures(pictures);
+        item.addPictureURLs(pictureURLs);
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
@@ -204,6 +205,13 @@ public class ListActivity extends AppCompatActivity implements
                             Log.w(TAG, "Error with item deletion on collection items: ", e);
                             throw new RuntimeException("Error with item deletion on collection items: ", e);
                         }
+                    })
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            // TODO: delete associated images from storage
+//                            Image.deletePictures(item.getPictureURLs());
+                        }
                     });
             itemListAdapter.remove(item);
             this.setSumOfItemCosts();
@@ -214,7 +222,11 @@ public class ListActivity extends AppCompatActivity implements
     }
 
     public void onSubmitEdit(int position, Item item) {
-        if (picturesChanged) { item.setPictures(pictures); }
+        if (picturesChanged) {
+            // set, not add, because user may have deleted pictures TODO: nothing is deleting the URLs yet
+            item.setPictureURLs(pictureURLs);
+            item.setPictures(pictures);
+        }
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
@@ -355,24 +367,12 @@ public class ListActivity extends AppCompatActivity implements
      * @param pictures taken with camera or selected from library
      */
     @Override
-    public void onConfirmImages(ArrayList<Image> pictures) {
-        // TODO: change pictures to URLs
+    public void onConfirmImages(ArrayList<Image> pictures, ArrayList<String> pictureURLs) {
         this.pictures = pictures;
-
+        this.pictureURLs = pictureURLs;
         picturesChanged = true;
-        Image.uploadPictures(pictures);
+
         Toast.makeText(this, "Pictures uploaded successfully.", Toast.LENGTH_SHORT).show();
-
-    }
-
-    @Override
-    public void onImageUploaded(String downloadUrl) {
-        this.pictureURLs.add(downloadUrl);
-    }
-
-    @Override
-    public void onUploadFailure(Exception e) {
-        Toast.makeText(this, "Image failed to upload.", Toast.LENGTH_SHORT).show();
     }
 
 }

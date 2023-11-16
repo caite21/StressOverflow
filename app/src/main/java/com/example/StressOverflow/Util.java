@@ -28,7 +28,7 @@ public final class Util {
                 (double) val,
                 String.format("TestComment%s", String.valueOf(val)),
                 new ArrayList<Tag>(),
-                new ArrayList<Image>(),
+                new ArrayList<String>(),
                 (Integer) val,
                 "Test Owner"
         );

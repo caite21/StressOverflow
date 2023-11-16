@@ -114,7 +114,7 @@ public class AddItemFragment extends DialogFragment{
                         Double value = Double.parseDouble(itemValueField.getText().toString());
                         String comments = itemCommentsField.getText().toString();
                         ArrayList<Tag> newTags = new ArrayList<>();
-                        ArrayList<Image> pictures = new ArrayList<>();
+                        ArrayList<String> emptyPictureURLs = new ArrayList<>();
                         String serial = itemSerialField.getText().toString();
 
                         for (int chipID : tagChipGroup.getCheckedChipIds()){
@@ -132,7 +132,7 @@ public class AddItemFragment extends DialogFragment{
                                     value,
                                     comments,
                                     newTags,
-                                    pictures,
+                                    emptyPictureURLs,
                                     Integer.valueOf(serial),
                                     owner
                             ));

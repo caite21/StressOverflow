@@ -82,12 +82,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
         addTagChips(view, item);
         applySelectionBackground(view, item);
+
         // the first picture is shown
         if (item.getPictures().size() > 0) {
             itemPicture.setImageBitmap((item.getPictures().get(0)).getBitmap());
         }
-
-
 
         return view;
     }

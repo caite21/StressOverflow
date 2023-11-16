@@ -146,7 +146,7 @@ public class EditItemFragment extends DialogFragment {
                                         value,
                                         comments,
                                         newTags,
-                                        selectedItem.getPictures(),
+                                        selectedItem.getPictureURLs(),
                                         serial,
                                         selectedItem.getOwner()
                             ));

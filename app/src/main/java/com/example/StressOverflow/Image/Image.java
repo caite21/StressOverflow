@@ -37,6 +37,8 @@ public class Image {
         this.bitmap = bitmap;
     }
 
+
+
     /**
      * Get id
      *
@@ -75,48 +77,67 @@ public class Image {
 
 
     // STATIC METHODS
-    public static void uploadPictures(ArrayList<Image> pictures) {
-        ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
-        for (Image image : pictures) {
-            bitmaps.add(image.getBitmap());
+    /**
+     *
+     * @param pictures
+     * @return
+     */
+    public static ArrayList<String> URLsFromFirebaseObject(Map<String, Object> data) {
+        ArrayList<String> pictureURLs = new ArrayList<String>();
+
+        if (data != null && data.containsKey("pictures")) {
+            Object picturesObject = data.get("pictures");
+            if (picturesObject instanceof ArrayList) {
+                try {
+                    pictureURLs.addAll( (ArrayList<String>) picturesObject );
+                } catch (ClassCastException e) {
+                    Log.d("IMAGE", "Error casting 'pictures' to ArrayList<String>: ", e);
+                }
+            } else {
+                Log.d("IMAGE", "'pictures' is not an ArrayList.'");
+            }
+        } else {
+            Log.d("IMAGE", "Data does not contain 'pictures' field.");
         }
-
-        uploadBitmaps(bitmaps);
+        return pictureURLs;
     }
 
+    public interface OnAllImagesUploadedListener {
+        void onAllImagesUploaded(ArrayList<String> downloadURLs);
+    }
 
-    public static void uploadBitmaps(ArrayList<Bitmap> bitmapList) {
-        ArrayList<String> downloadUrls = new ArrayList<>();
+    public static void uploadPictures(ArrayList<Image> pictures, OnAllImagesUploadedListener listener) {
+        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+        ArrayList<String> downloadURLs = new ArrayList<>();
 
-        // Upload each Bitmap to Firebase Storage and get download URL
-        for (Bitmap bitmap : bitmapList) {
+        // Upload each Bitmap to Storage and get URL
+        for (Image image : pictures) {
+            Bitmap bitmap = image.getBitmap();
             uploadBitmapToStorage(bitmap, new OnImageUploadedListener() {
                 @Override
                 public void onImageUploaded(String downloadUrl) {
-                    downloadUrls.add(downloadUrl);
+                    downloadURLs.add(downloadUrl);
 
-                    // If all images are uploaded, store downloadUrls in Firestore
-                    if (downloadUrls.size() == bitmapList.size()) {
-                        storeDownloadUrlsInFirestore(downloadUrls);
+                    if (downloadURLs.size() == pictures.size()) {
+                        listener.onAllImagesUploaded(downloadURLs);
                     }
                 }
 
                 @Override
                 public void onUploadFailure(Exception e) {
                     Log.w("IMAGES", "Uploading image failed: ", e);
-
                 }
             });
         }
     }
 
+
     public static void uploadBitmapToStorage(Bitmap bitmap, OnImageUploadedListener listener) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
-
-        // Unique filename
+         // unique name
         String filename = "image_" + System.currentTimeMillis() + ".jpg";
 
         // Upload to storage
@@ -140,31 +161,11 @@ public class Image {
         });
     }
 
-    public static void storeDownloadUrlsInFirestore(ArrayList<String> downloadUrls) {
-        // put urls in item's pictures array in database
-
-
-//        // Create a document in Firestore and store the downloadUrls
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("imageUrls", downloadUrls);
-//
-//        db.collection("images")
-//                .add(data)
-//                .addOnSuccessListener(documentReference -> {
-//                    Toast.makeText(this, "Images uploaded successfully", Toast.LENGTH_SHORT).show();
-//                })
-//                .addOnFailureListener(e -> {
-//                    Toast.makeText(this, "Firestore upload failed", Toast.LENGTH_SHORT).show();
-//                });
-
-    }
-
     // Listener interface for image uploads
     public interface OnImageUploadedListener {
         void onImageUploaded(String downloadUrl);
         void onUploadFailure(Exception e);
     }
-
 
 
 }

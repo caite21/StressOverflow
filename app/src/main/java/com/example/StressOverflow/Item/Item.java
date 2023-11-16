@@ -37,7 +37,8 @@ public class Item {
     private Double value;
     private String comments;
     private ArrayList<Tag> tags = new ArrayList<Tag>();
-    private ArrayList<Image> pictures = new ArrayList<Image>();
+    private ArrayList<String> pictureURLs = new ArrayList<>();
+    private ArrayList<Image> pictures = new ArrayList<>();
     private Integer serial;
     private String owner;
 
@@ -52,7 +53,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<Image> pictures,
+            ArrayList<String> pictureURLs,
             Integer serial,
             String owner
     ) {
@@ -65,7 +66,7 @@ public class Item {
         this.setValue(value);
         this.setComments(comments);
         this.addTags(tags);
-        this.addPictures(pictures);
+        this.addPictureURLs(pictureURLs);
         this.setSerial(serial);
         this.setOwner(owner);
     }
@@ -80,7 +81,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<Image> pictures,
+            ArrayList<String> pictureURLs,
             Integer serial,
             String owner
     ) {
@@ -93,7 +94,7 @@ public class Item {
         this.setValue(value);
         this.setComments(comments);
         this.addTags(tags);
-        this.addPictures(pictures);
+        this.addPictureURLs(pictureURLs);
         this.setSerial(serial);
         this.setOwner(owner);
     }
@@ -108,7 +109,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<Image> pictures,
+            ArrayList<String> pictureURLs,
             Integer serial
     ) {
         this.id = UUID.randomUUID();
@@ -120,7 +121,7 @@ public class Item {
         this.setValue(value);
         this.setComments(comments);
         this.addTags(tags);
-        this.addPictures(pictures);
+        this.addPictureURLs(pictureURLs);
         this.setSerial(serial);
     }
 
@@ -218,6 +219,13 @@ public class Item {
         return this.pictures;
     }
 
+    public ArrayList<String> getPictureURLs() {
+        if (this.pictures.size() == 0) {
+            this.pictureURLs = new ArrayList<>();
+        }
+        return this.pictureURLs;
+    }
+
     public Integer getSerial() {
         return this.serial;
     }
@@ -270,9 +278,10 @@ public class Item {
         return out.toString();
     }
 
-    public void setPictures(ArrayList<Image> pictures) {
-        this.pictures = pictures;
+    public void setPictureURLs(ArrayList<String> pictureURLs) {
+        this.pictureURLs = pictureURLs;
     }
+    public void setPictures(ArrayList<Image> pictures) {this.pictures = pictures; }
 
     public void setMake(String make) {
         this.make = make;
@@ -334,8 +343,8 @@ public class Item {
      *
      * @param pictures
      */
-    public void addPictures(@NonNull ArrayList<Image> pictures) {
-        this.pictures.addAll(pictures);
+    public void addPictureURLs(@NonNull ArrayList<String> pictureURLs) {
+        this.pictureURLs.addAll(pictureURLs);
     }
 
     public void setSerial(int serial) {
@@ -362,7 +371,7 @@ public class Item {
         data.put("comments", this.getComments());
         data.put("owner", this.getOwner());
         data.put("serial", this.getSerial());
-        data.put("pictures", this.getPictures());
+        data.put("pictures", this.getPictureURLs());
         data.put("tags", this.getTags());
         return data;
     }
@@ -376,7 +385,6 @@ public class Item {
     public static Item fromFirebaseObject(Map<String, Object> data) {
         try {
             ArrayList<Tag> tags = new ArrayList<>();
-            ArrayList<Image> pictures = new ArrayList<>();
             UUID uid = new UUID(
                     ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
                     ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
@@ -386,6 +394,10 @@ public class Item {
             for (Map<String, Object> tagName: (ArrayList <Map<String, Object>>) data.get("tags")){
                 tags.add(Tag.fromFirebaseObject(tagName));
             }
+
+            // get pictures and catch errors
+            ArrayList<String> pictureURLs = Image.URLsFromFirebaseObject(data);
+
             Item out = new Item(
                     uid,
                     (String) data.get("name"),
@@ -400,7 +412,7 @@ public class Item {
                     (Double) data.get("value"),
                     (String) data.get("comments"),
                     tags,
-                    pictures,
+                    pictureURLs,
                     ((Long) data.get("serial")).intValue(),
                     (String) data.get("owner")
             );

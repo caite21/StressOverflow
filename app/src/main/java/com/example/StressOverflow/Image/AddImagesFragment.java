@@ -30,6 +30,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -61,7 +62,7 @@ public class AddImagesFragment extends DialogFragment  {
      * Fragment listener must receive updated list of images
      */
     public interface OnFragmentInteractionListener {
-        void onConfirmImages(ArrayList<Image> images);
+        void onConfirmImages(ArrayList<Image> images, ArrayList<String> downloadUrls);
     }
 
     public AddImagesFragment() {
@@ -197,7 +198,14 @@ public class AddImagesFragment extends DialogFragment  {
                 .setTitle("Attach Pictures")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Confirm", (dialog, which) -> {
-                    listener.onConfirmImages(imagesList);
+                    // upload list of images then send URLs to ListActivity to be added to an Item
+                    Image.uploadPictures(imagesList, new Image.OnAllImagesUploadedListener() {
+                        @Override
+                        public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                            listener.onConfirmImages(imagesList, downloadURLs);
+                        }
+                    });
+
                 }).create();
     }
 
