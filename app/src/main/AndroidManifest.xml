@@ -13,9 +13,9 @@
         android:theme="@style/Theme.StressOverflow"
         tools:targetApi="31">
         <activity
-            android:name=".TagList"
+            android:name=".Tag.TagList"
             android:exported="false" />
-        <activity android:name=".ListActivity"
+        <activity android:name=".Item.ListActivity"
             android:exported="false"/>
         <activity
             android:name=".FilterDialog"
@@ -24,7 +24,7 @@
             android:name=".ItemView"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".SignIn.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SignInActivity"
+            android:name=".SignIn.SignInActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SignUpActivity"
+            android:name=".SignIn.SignUpActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +51,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".SignIn.ForgotPasswordActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

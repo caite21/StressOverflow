@@ -1,5 +1,7 @@
 package com.example.StressOverflow;
 
+import com.example.StressOverflow.Tag.Tag;
+
 import java.util.ArrayList;
 
 
@@ -16,7 +18,7 @@ public class AppGlobals {
      */
     private AppGlobals() {
         allTags = new ArrayList<>();
-        ownerName = "";
+        ownerName = "testUser";
     }
 
     /**

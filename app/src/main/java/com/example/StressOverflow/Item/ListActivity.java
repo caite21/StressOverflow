@@ -1,4 +1,4 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Item;
 
 import static android.content.ContentValues.TAG;
 
@@ -16,23 +16,31 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.StressOverflow.Image.AddImagesFragment;
+import com.example.StressOverflow.Tag.AddTagToItemFragment;
+import com.example.StressOverflow.AppGlobals;
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.FilterDialog;
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.R;
+import com.example.StressOverflow.Tag.Tag;
+import com.example.StressOverflow.Tag.TagList;
+import com.example.StressOverflow.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, Db.TagListCallback, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
-AddImagesFragment.OnFragmentInteractionListener{
+        AddImagesFragment.OnFragmentInteractionListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
@@ -80,11 +88,11 @@ AddImagesFragment.OnFragmentInteractionListener{
         itemList.setOnItemLongClickListener(selectItems);
 
         this.ownerName = loginIntent.getStringExtra("login");
-        if(this.ownerName == null){
-            this.ownerName = "testUser";
+        if(this.ownerName != null){
+            AppGlobals.getInstance().setOwnerName(this.ownerName);
+        }else{
+            this.ownerName =  AppGlobals.getInstance().getOwnerName();
         }
-        AppGlobals.getInstance().setOwnerName(this.ownerName);
-
 
         database.getAllTags( this);
 
@@ -102,6 +110,9 @@ AddImagesFragment.OnFragmentInteractionListener{
 
         this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
 
+        ArrayList<Tag> tags = new ArrayList<Tag>();
+        tags.add(new Tag("tag1"));
+        tags.add(new Tag("tag2"));
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
@@ -111,7 +122,7 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
         this.items
-                .whereEqualTo("owner", this.ownerName)
+                .whereEqualTo("owner",this.ownerName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -205,6 +216,9 @@ AddImagesFragment.OnFragmentInteractionListener{
         this.sumOfItemCosts.setText(this.itemListAdapter.getTotalValue().toString());
     }
 
+    /**
+     * Called when long clicks are applied to an item
+     */
     private AdapterView.OnItemLongClickListener selectItems = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -223,6 +237,10 @@ AddImagesFragment.OnFragmentInteractionListener{
 
     };
 
+    /**
+     * Called when there are no items anymore and when user exits the addTagToItem fragment
+     * Styles the selected items accordingly
+     */
     private void exitSelectionMode() {
         inSelectionMode = false;
         itemListAdapter.setSelectionMode(false);

@@ -1,7 +1,6 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Tag;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.example.StressOverflow.AppGlobals;
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TagListAdapter extends ArrayAdapter<Tag> {
     private ArrayList<Tag> tags;

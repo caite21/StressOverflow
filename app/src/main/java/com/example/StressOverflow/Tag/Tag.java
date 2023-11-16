@@ -1,18 +1,13 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Tag;
 
 
 import static android.content.ContentValues.TAG;
 
-import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class Tag implements Serializable {
     private String tagName;

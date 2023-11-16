@@ -30,6 +30,19 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    sourceSets {
+        getByName("main") {
+            res {
+                srcDirs("src\\main\\res\\layouts\\Item",
+                    "src\\main\\res\\layouts\\Tag",
+                    "src\\main\\res\\layouts\\Image",
+                    "src\\main\\res\\layouts\\SignIn",
+                    "src\\main\\res\\layouts",
+                    "src\\main\\res", "src\\main\\res", "src\\main\\res\\layouts\\misc"
+                )
+            }
+        }
+    }
 }
 
 dependencies {
@@ -41,9 +54,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
-    implementation("com.google.firebase:firebase-auth")
     androidTestImplementation("org.mockito:mockito-core:2.25.0")
     androidTestImplementation("org.mockito:mockito-inline:2.13.0")
-
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
+    implementation("com.google.firebase:firebase-auth")
 }

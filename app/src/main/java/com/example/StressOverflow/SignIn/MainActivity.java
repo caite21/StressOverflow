@@ -1,12 +1,10 @@
-package com.example.StressOverflow;
-
+package com.example.StressOverflow.SignIn;
+import com.example.StressOverflow.Item.ListActivity;
 import androidx.appcompat.app.AppCompatActivity;
 
 //import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

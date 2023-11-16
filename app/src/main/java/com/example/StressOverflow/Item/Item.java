@@ -5,21 +5,20 @@
  * reminder: tags are not hashable, dont make tags or pictures a HashSet (which also might muck
  * around with mutex's if we require in future)
  */
-package com.example.StressOverflow;
+package com.example.StressOverflow.Item;
 
 import static android.content.ContentValues.TAG;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.Tag.Tag;
 import com.example.StressOverflow.Util;
-import com.google.protobuf.Any;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -350,7 +349,7 @@ public class Item {
         HashMap<String, Object> data = new HashMap<>();
         data.put("id", this.getId());
         data.put("name", this.getName());
-        data.put("make", this.getModel());
+        data.put("make", this.getMake());
         data.put("model", this.getModel());
         data.put("description", this.getDescription());
         // unknown how firebase handles dates, we can fix this later.

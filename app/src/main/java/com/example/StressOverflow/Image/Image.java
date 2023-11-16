@@ -1,4 +1,4 @@
-package com.example.StressOverflow;
+package com.example.StressOverflow.Image;
 
 import android.graphics.Bitmap;
 

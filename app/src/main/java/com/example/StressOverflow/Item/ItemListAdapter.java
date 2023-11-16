@@ -1,25 +1,23 @@
 /**
  * Adapter class for main list view of items
  */
-package com.example.StressOverflow;
+package com.example.StressOverflow.Item;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.text.Layout;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.example.StressOverflow.Db;
+import com.example.StressOverflow.R;
+import com.example.StressOverflow.Tag.Tag;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,7 +30,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -231,12 +228,17 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             view.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         }
     }
+
     /**
-     * Filters the list according to something somehow
+     * Filters the item list by description keywords, dates, makes, and tags.
+     * @param conditions - The string key that describes the filter and the arraylist that
+     *                     species what to filter
+     * @return Arraylist of items that fit the filtering conditions
+     * @throws ParseException
      */
     public ArrayList<Item> filterList(Map<String, ArrayList<String>> conditions) throws ParseException {
-        // Remove Filters
-        if (conditions.get("keywords").isEmpty() & conditions.get("dates").isEmpty() & conditions.get("tags").isEmpty()) {
+        // If there are no filters, return original list
+        if (conditions.get("keywords").isEmpty() & conditions.get("dates").isEmpty() & conditions.get("makes").isEmpty() & conditions.get("tags").isEmpty()) {
             return this.items;
         }
 
@@ -244,31 +246,40 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
         for (int i = 0; i < this.items.size(); i++) {
             Item item = this.items.get(i);
-            int finalI = i;  // I don't really understand why i needs to be final but...
 
+            // Filter by keywords
             if (!conditions.get("keywords").stream().allMatch(keyword -> item.getDescription().contains(keyword))) {
                 continue;
+            }
 
-            } else if (!conditions.get("dates").get(0).isEmpty()) {
+            // Filter by start date
+            if (!conditions.get("dates").get(0).isEmpty()) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date parsedDate = dateFormat.parse(conditions.get("dates").get(0));
                 GregorianCalendar parseFrom = new GregorianCalendar();
                 parseFrom.setTime(parsedDate);
                 if (!item.getDate().after(parseFrom)) continue;
+            }
 
-            } else if (!conditions.get("dates").get(1).isEmpty()) {
+            // Filter by end date
+            if (!conditions.get("dates").get(1).isEmpty()) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 Date parsedDate = dateFormat.parse(conditions.get("dates").get(1));
                 GregorianCalendar parseTo = new GregorianCalendar();
                 parseTo.setTime(parsedDate);
                 if (!item.getDate().before(parseTo)) continue;
+            }
 
-            } else if (!conditions.get("makes").stream().allMatch(make -> make.contains(item.getMake()))) {
-                continue;
-
-            } else if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().contains(tagList)))) {
+            // Filter by make
+            if (!conditions.get("makes").stream().allMatch(make -> make.contains(item.getMake()))) {
                 continue;
             }
+
+            // Filter by tags
+            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().contains(tagList)))) {
+                continue;
+            }
+            
             filtered.add(this.items.get(i));
         }
         return filtered;
