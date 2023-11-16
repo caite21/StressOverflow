@@ -1,4 +1,5 @@
 package com.example.StressOverflow.SignIn;
+import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Item.ListActivity;
 
 import android.content.Intent;
@@ -99,6 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Log.d("SIGNUP STATUS", "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent i = new Intent(SignUpActivity.this, ListActivity.class);
+                            AppGlobals.getInstance().setOwnerName(username);
                             startActivity(i);
                         } else {
                             // If sign in fails, display a message to the user.
