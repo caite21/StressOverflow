@@ -28,6 +28,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private EditText email_field;
     private Button reset_password_button;
     private FirebaseAuth mAuth;
+    private String emailToSend;
     /**
      * Called upon creation of activity. Sets the behavior of buttons and fields.
      * Upon clicking Reset Password button, sends the email from a no-reply address to allow
@@ -38,26 +39,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.forgot_password_page);
-        mAuth = FirebaseAuth.getInstance();
-
-        this.back_button = findViewById(R.id.back_button);
-        this.email_field = findViewById(R.id.email_field);
-        this.reset_password_button = findViewById(R.id.reset_password_button);
+        setup();
 
         this.back_button.setOnClickListener((v) -> {
             finish();
         });
 
         this.reset_password_button.setOnClickListener((v) -> {
-            String emailToSend = email_field.getText().toString();
-            if (emailToSend.isEmpty()) {
-                email_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                email_field.startAnimation(animation);
-                return;
+            if (getData()) {
+                sendReset(emailToSend);
             }
-            sendReset(emailToSend);
-
+            return;
         });
 
     }
@@ -80,11 +72,40 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                             Log.w("RESET PASSWORD EMAIL STATUS:", "Reset password:failure", task.getException());
                             Toast.makeText(ForgotPasswordActivity.this, "Failed to send reset password email.",
                                     Toast.LENGTH_SHORT).show();
-                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                            email_field.startAnimation(animation);
-
+                            shakeError(email_field, "Failed to reset password");
                         }
                     }
                 });
+    }
+    /**
+     * This makes the interactive field shake and display an error message
+     * @param field interactive field to be shaking
+     * @param errorMessage message to be displayed
+     */
+    protected void shakeError(EditText field, String errorMessage) {
+        field.setError(errorMessage);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+        field.startAnimation(animation);
+    }
+    /**
+     * Setup and initialize all variables and interactive elements
+     */
+    protected void setup() {
+        mAuth = FirebaseAuth.getInstance();
+        this.back_button = findViewById(R.id.back_button);
+        this.email_field = findViewById(R.id.email_field);
+        this.reset_password_button = findViewById(R.id.reset_password_button);
+    }
+    /**
+     * This retrieves data from all interactive fields and checks data validity
+     * @return true if all data is valid, false otherwise
+     */
+    protected Boolean getData() {
+        emailToSend = email_field.getText().toString();
+        if (emailToSend.isEmpty()) {
+            shakeError(email_field, "This field cannot be blank");
+            return false;
+        }
+        return true;
     }
 }

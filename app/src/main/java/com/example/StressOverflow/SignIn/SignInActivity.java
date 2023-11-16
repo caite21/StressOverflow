@@ -30,13 +30,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * exists in the database, authenticates the user.
  */
 public class SignInActivity extends AppCompatActivity  {
-    private EditText email_username_field;
-    private EditText password_in_field;
-    private Button sign_in_button;
-    private TextView forgot_password;
-    private TextView sign_up_button;
+    private EditText emailUsernameField;
+    private EditText passwordInField;
+    private Button signInButton;
+    private TextView forgotPassword;
+    private TextView signUpButton;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+
+    private String newUsername;
+    private String newPassword;
 
     /**
      * Called upon creation of activity. Sets the behavior of buttons and fields.
@@ -44,47 +47,24 @@ public class SignInActivity extends AppCompatActivity  {
      * checks if the email and password match, authenticates the user and directs them to
      * ListActivity page.
      */
-    // NEEDS REFACTORING (SAGI)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_in_page);
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        setup();
 
-        this.email_username_field = findViewById(R.id.email_username_field);
-        this.password_in_field = findViewById(R.id.password_field);
-        this.sign_in_button = findViewById(R.id.sign_in_button);
-        this.forgot_password = findViewById(R.id.forgot_password_text);
-        this.sign_up_button = findViewById(R.id.sign_up_text);
-
-        this.sign_up_button.setOnClickListener((v) -> {
+        this.signUpButton.setOnClickListener((v) -> {
             Intent i = new Intent(SignInActivity.this, SignUpActivity.class);
             startActivity(i);
         });
 
-        this.forgot_password.setOnClickListener((v) -> {
+        this.forgotPassword.setOnClickListener((v) -> {
             Intent i = new Intent(SignInActivity.this, ForgotPasswordActivity.class);
             startActivity(i);
         });
 
-        this.sign_in_button.setOnClickListener((v) -> {
-            String newUsername = email_username_field.getText().toString();
-            String newPassword = password_in_field.getText().toString();
-            boolean valid = true;
-            if (newUsername.isEmpty()) {
-                email_username_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                email_username_field.startAnimation(animation);
-                valid = false;
-            }
-            if (newPassword.isEmpty()) {
-                password_in_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                password_in_field.startAnimation(animation);
-                valid = false;
-            }
-            if (!valid) {
+        this.signInButton.setOnClickListener((v) -> {
+            if (!getData()) {
                 return;
             }
             if (!Patterns.EMAIL_ADDRESS.matcher(newUsername).matches()) {
@@ -93,9 +73,7 @@ public class SignInActivity extends AppCompatActivity  {
                     if (doc.exists()) {
                         auth(doc.get("email").toString(), newPassword);
                     } else {
-                        email_username_field.setError("User doesn't exist");
-                        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                        email_username_field.startAnimation(animation);
+                        shakeError(emailUsernameField, "User doesn't exist");
                     }
                 });
             } else {
@@ -127,10 +105,49 @@ public class SignInActivity extends AppCompatActivity  {
                             Log.w("SIGNIN STATUS", "signInWithEmail:failure", task.getException());
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                            password_in_field.startAnimation(animation);
+                            shakeError(passwordInField, "Incorrect Password");
                         }
                     }
                 });
+    }
+    /**
+     * This makes the interactive field shake and display an error message
+     * @param field interactive field to be shaking
+     * @param errorMessage message to be displayed
+     */
+    protected void shakeError(EditText field, String errorMessage) {
+        field.setError(errorMessage);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+        field.startAnimation(animation);
+    }
+    /**
+     * Setup and initialize all variables and interactive elements
+     */
+    protected void setup() {
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        this.emailUsernameField = findViewById(R.id.email_username_field);
+        this.passwordInField = findViewById(R.id.password_field);
+        this.signInButton = findViewById(R.id.sign_in_button);
+        this.forgotPassword = findViewById(R.id.forgot_password_text);
+        this.signUpButton = findViewById(R.id.sign_up_text);
+    }
+    /**
+     * This retrieves data from all interactive fields and checks data validity
+     * @return true if all data is valid, false otherwise
+     */
+    protected Boolean getData() {
+        newUsername = emailUsernameField.getText().toString();
+        newPassword = passwordInField.getText().toString();
+        boolean valid = true;
+        if (newUsername.isEmpty()) {
+            shakeError(emailUsernameField, "This field cannot be blank");
+            valid = false;
+        }
+        if (newPassword.isEmpty()) {
+            shakeError(passwordInField, "This field cannot be blank");
+            valid = false;
+        }
+        return valid;
     }
 }
