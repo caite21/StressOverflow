@@ -37,8 +37,9 @@ android {
                     "src\\main\\res\\layouts\\Tag",
                     "src\\main\\res\\layouts\\Image",
                     "src\\main\\res\\layouts\\SignIn",
+                    "src\\main\\res\\layouts\\misc",
                     "src\\main\\res\\layouts",
-                    "src\\main\\res", "src\\main\\res", "src\\main\\res\\layouts\\misc"
+                    "src\\main\\res"
                 )
             }
         }

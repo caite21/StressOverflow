@@ -40,8 +40,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
-public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, Db.TagListCallback, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
-        AddImagesFragment.OnFragmentInteractionListener, Image.OnImageUploadedListener {
+public class ListActivity extends AppCompatActivity implements
+        AddItemFragment.OnFragmentInteractionListener,
+        AddTagToItemFragment.OnFragmentInteractionListener,
+        EditItemFragment.OnFragmentInteractionListener,
+        AddImagesFragment.OnFragmentInteractionListener,
+        Image.OnImageUploadedListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
@@ -53,12 +57,11 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     TextView sumOfItemCosts;
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    Db database = new Db(db);
-  //  private FirebaseFirestore db;
     private CollectionReference items;
     private ArrayList<Image> pictures = new ArrayList<>();
     private ArrayList<String> pictureURLs = new ArrayList<>();
     private boolean picturesChanged = false;
+    private CollectionReference tagRef;
 
     int selected = -1;
     Intent loginIntent;
@@ -89,15 +92,34 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         itemList.setOnItemLongClickListener(selectItems);
+        this.tagRef = this.db.collection("tags");
 
         this.ownerName = loginIntent.getStringExtra("login");
+
         if(this.ownerName != null){
             AppGlobals.getInstance().setOwnerName(this.ownerName);
         }else{
             this.ownerName =  AppGlobals.getInstance().getOwnerName();
         }
 
-        database.getAllTags( this);
+        ArrayList<Tag> allTags = new ArrayList<>();
+        String ownerName = AppGlobals.getInstance().getOwnerName();
+        this.db.collection("tags")
+                .whereEqualTo("ownerName", ownerName)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> data = document.getData();
+                                allTags.add(Tag.fromFirebaseObject(data));
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
@@ -168,7 +190,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     /**
      * Lol
      *
-     * @param position pos of item to delete
+     *
      */
     public void onSubmitDelete(Item item) {
         try {
@@ -323,14 +345,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
         }
     };
 
-    /**
-     * Gets the list of all the tags on app startup
-     * @param tags array list of tags from the database
-     */
-    @Override
-    public void onTagListReceived(ArrayList<Tag> tags) {
-            AppGlobals.getInstance().setAllTags(tags);
-    }
+
 
     /**
      * When user confirms adding images, the updated list
