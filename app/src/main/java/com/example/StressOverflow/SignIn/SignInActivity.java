@@ -1,4 +1,5 @@
 package com.example.StressOverflow.SignIn;
+import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Item.ListActivity;
 
 import android.content.Intent;
@@ -22,7 +23,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Map;
 
 /**
  * Prompts the user to fill in username/email and password. User is able to
@@ -38,7 +44,7 @@ public class SignInActivity extends AppCompatActivity  {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    private String newUsername;
+    private String newLogin;
     private String newPassword;
 
     /**
@@ -67,30 +73,46 @@ public class SignInActivity extends AppCompatActivity  {
             if (!getData()) {
                 return;
             }
-            if (!Patterns.EMAIL_ADDRESS.matcher(newUsername).matches()) {
-                DocumentReference userRef = db.collection("users").document(newUsername);
+            if (!Patterns.EMAIL_ADDRESS.matcher(newLogin).matches()) {
+                // if login provided is a username
+                DocumentReference userRef = db.collection("users").document(newLogin);
                 userRef.get().addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        auth(doc.get("email").toString(), newPassword);
+                        auth(doc.get("email").toString(), newLogin, newPassword);
                     } else {
                         shakeError(emailUsernameField, "User doesn't exist");
                     }
                 });
             } else {
-                auth(newUsername, newPassword);
+                // if login provided is an email
+                db.collection("users").
+                        whereEqualTo("email", newLogin).
+                        get().
+                        addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                    String username = document.getId();
+                                    auth(newLogin, username, newPassword);
+                                }
+                            }
+                });
             }
         });
     }
 
     /**
      * This tries to authenticates a user using Firestore Authentication
-     * @param login
-     *      login to be used to authenticate a user
+     * @param email
+     *      email to be used to authenticate a user
+     * @param username
+     *      username to be used to authenticate a user
      * @param password
      *      password to be used to authenticate a user
      */
-    protected void auth(String login, String password) {
-        mAuth.signInWithEmailAndPassword(login, password)
+    protected void auth(String email, String username, String password) {
+        mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -99,6 +121,7 @@ public class SignInActivity extends AppCompatActivity  {
                             Log.d("SIGNIN STATUS", "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Intent i = new Intent(SignInActivity.this, ListActivity.class);
+                            AppGlobals.getInstance().setOwnerName(username);
                             startActivity(i);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -137,10 +160,10 @@ public class SignInActivity extends AppCompatActivity  {
      * @return true if all data is valid, false otherwise
      */
     protected Boolean getData() {
-        newUsername = emailUsernameField.getText().toString();
+        newLogin = emailUsernameField.getText().toString();
         newPassword = passwordInField.getText().toString();
         boolean valid = true;
-        if (newUsername.isEmpty()) {
+        if (newLogin.isEmpty()) {
             shakeError(emailUsernameField, "This field cannot be blank");
             valid = false;
         }
