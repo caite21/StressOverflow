@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,7 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, Db.TagListCallback, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
-        AddImagesFragment.OnFragmentInteractionListener {
+        AddImagesFragment.OnFragmentInteractionListener, Image.OnImageUploadedListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
@@ -55,7 +56,9 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     Db database = new Db(db);
   //  private FirebaseFirestore db;
     private CollectionReference items;
-    ArrayList<Image> addedPictures;
+    private ArrayList<Image> pictures = new ArrayList<>();
+    private ArrayList<String> pictureURLs = new ArrayList<>();
+    private boolean picturesChanged = false;
 
     int selected = -1;
     Intent loginIntent;
@@ -146,7 +149,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
      * to the item list adapter.
      */
     public void onSubmitAdd(Item item) {
-        item.setPictures(addedPictures);
+        item.setPictures(pictures);
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
@@ -189,6 +192,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     }
 
     public void onSubmitEdit(int position, Item item) {
+        if (picturesChanged) { item.setPictures(pictures); }
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
@@ -329,7 +333,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     }
 
     /**
-     *When user confirms adding images, the updated list
+     * When user confirms adding images, the updated list
      * of pictures is passed so that the pictures can be attached
      * when the user is done adding/editing an item,
      *
@@ -337,6 +341,23 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
      */
     @Override
     public void onConfirmImages(ArrayList<Image> pictures) {
-        addedPictures = pictures;
+        // TODO: change pictures to URLs
+        this.pictures = pictures;
+
+        picturesChanged = true;
+        Image.uploadPictures(pictures);
+        Toast.makeText(this, "Pictures uploaded successfully.", Toast.LENGTH_SHORT).show();
+
     }
+
+    @Override
+    public void onImageUploaded(String downloadUrl) {
+        this.pictureURLs.add(downloadUrl);
+    }
+
+    @Override
+    public void onUploadFailure(Exception e) {
+        Toast.makeText(this, "Image failed to upload.", Toast.LENGTH_SHORT).show();
+    }
+
 }

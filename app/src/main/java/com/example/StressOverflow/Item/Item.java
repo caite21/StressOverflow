@@ -376,7 +376,7 @@ public class Item {
     public static Item fromFirebaseObject(Map<String, Object> data) {
         try {
             ArrayList<Tag> tags = new ArrayList<>();
-            ArrayList<Image> images = new ArrayList<>();
+            ArrayList<Image> pictures = new ArrayList<>();
             UUID uid = new UUID(
                     ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
                     ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
@@ -400,7 +400,7 @@ public class Item {
                     (Double) data.get("value"),
                     (String) data.get("comments"),
                     tags,
-                    images,
+                    pictures,
                     ((Long) data.get("serial")).intValue(),
                     (String) data.get("owner")
             );

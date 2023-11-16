@@ -58,4 +58,5 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-inline:2.13.0")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
 }

@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -33,8 +34,6 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.example.StressOverflow.Db;
-import com.example.StressOverflow.Image.Image;
-import com.example.StressOverflow.Image.ImagesDisplayAdapter;
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.R;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,7 +46,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  */
 public class AddImagesFragment extends DialogFragment  {
     private Uri imageUri;
-    private ActivityResultLauncher<Intent> addImagesLauncher;
+    private ActivityResultLauncher<Intent> addPicturesLauncher;
     private OnFragmentInteractionListener listener;
     private ContentResolver contentResolver;
     private ArrayList<Image> imagesList;
@@ -64,7 +63,6 @@ public class AddImagesFragment extends DialogFragment  {
     public interface OnFragmentInteractionListener {
         void onConfirmImages(ArrayList<Image> images);
     }
-
 
     public AddImagesFragment() {
         // required
@@ -92,18 +90,10 @@ public class AddImagesFragment extends DialogFragment  {
         this.itemUUID = uuid;
     }
 
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         listener = (OnFragmentInteractionListener) context;
-
-        // do not want to check if the activity is implementing the interface
-//        if (context instanceof AddImagesFragment.OnFragmentInteractionListener) {
-//            listener = (AddImagesFragment.OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context + "OnFragmentInteractionListener is not implemented");
-//        }
     }
 
     /**
@@ -158,11 +148,16 @@ public class AddImagesFragment extends DialogFragment  {
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openImageChooser();
+                try {
+                    openImageChooser();
+                }
+                catch (Exception e) {
+                    Log.d("IMAGES", "Android system picture intents failed: ", e);
+                }
             }
         });
 
-        addImagesLauncher = registerForActivityResult(
+        addPicturesLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -170,8 +165,9 @@ public class AddImagesFragment extends DialogFragment  {
                         Intent data = result.getData();
                         if (data == null) return;
 
+                        // TODO: delete single photo selection logic?
                         if (data.getClipData() != null) {
-                            // One image selected from library
+                            // Pictures selected from library
                             int itemCount = data.getClipData().getItemCount();
                             for (int i = 0; i < itemCount; i++) {
                                 Uri image = data.getClipData().getItemAt(i).getUri();
@@ -179,7 +175,7 @@ public class AddImagesFragment extends DialogFragment  {
                                 imagesList.add(new Image(selectedBitmap));
                             }
                         } else if (data.getData() != null) {
-                            // Multiple images selected from library
+                            // Picture selected from library
                             Uri image = data.getData();
                             Bitmap selectedBitmap = getBitmapFromUri(image);
                             imagesList.add(new Image(selectedBitmap));
@@ -198,7 +194,7 @@ public class AddImagesFragment extends DialogFragment  {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)
-                .setTitle("Attach Images")
+                .setTitle("Attach Pictures")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Confirm", (dialog, which) -> {
                     listener.onConfirmImages(imagesList);
@@ -222,16 +218,16 @@ public class AddImagesFragment extends DialogFragment  {
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         // Intent to pick photo(s)
-        Intent pickPhotosIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        pickPhotosIntent.setType("image/*");
-        pickPhotosIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        Intent pickPicturesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        pickPicturesIntent.setType("image/*");
+        pickPicturesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
         // Intent to choose which intent
         Intent chooser = new Intent(Intent.ACTION_CHOOSER);
-        chooser.putExtra(Intent.EXTRA_INTENT, pickPhotosIntent);
+        chooser.putExtra(Intent.EXTRA_INTENT, pickPicturesIntent);
         chooser.putExtra(Intent.EXTRA_TITLE, "Choose images or take a picture");
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
-        addImagesLauncher.launch(chooser);
+        addPicturesLauncher.launch(chooser);
     }
 
     /**
@@ -246,6 +242,7 @@ public class AddImagesFragment extends DialogFragment  {
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("IMAGES", "Converting picture to bitmap failed: ", e);
             return null;
         }
     }
