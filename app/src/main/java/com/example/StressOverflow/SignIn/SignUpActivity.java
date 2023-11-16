@@ -32,14 +32,18 @@ import java.util.Map;
  * registers the user upon successful completion into the database, encrypts the password
  */
 public class SignUpActivity extends AppCompatActivity {
-    private TextView back_button;
-    private EditText username_field;
-    private EditText email_field;
-    private EditText password_field;
-    private EditText reenter_password_field;
-    private Button sign_up_button;
+    private TextView backButton;
+    private EditText usernameField;
+    private EditText emailField;
+    private EditText passwordField;
+    private EditText reenterPasswordField;
+    private Button signUpButton;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private String newUsername;
+    private String newEmail;
+    private String newPassword;
+    private String newPasswordReenter;
 
     /**
      * Called upon creation of activity. Sets the behavior of buttons and fields.
@@ -47,72 +51,23 @@ public class SignUpActivity extends AppCompatActivity {
      * already exists, checks if the passwords match (password and re-enter password fields),
      * registers the user and directs to the ListActivity page.
      */
-    // NEEDS REFACTORING (SAGI)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_page);
-        mAuth = FirebaseAuth.getInstance();
-
-        db = FirebaseFirestore.getInstance();
-
-        this.back_button = findViewById(R.id.back_button);
-        this.username_field = findViewById(R.id.username_field);
-        this.email_field = findViewById(R.id.email_field);
-        this.password_field = findViewById(R.id.password_field);
-        this.reenter_password_field = findViewById(R.id.reenter_password_field);
-        this.sign_up_button = findViewById(R.id.sign_up_button);
-
-        this.back_button.setOnClickListener((v) -> {
+        setup();
+        this.backButton.setOnClickListener((v) -> {
             finish();
         });
 
-        this.sign_up_button.setOnClickListener((v) -> {
-            String newUsername = username_field.getText().toString();
-            String newEmail = email_field.getText().toString();
-            String newPassword = password_field.getText().toString();
-            String newPasswordReenter = reenter_password_field.getText().toString();
-            boolean valid = true;
-            if (newUsername.isEmpty()) {
-                username_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                username_field.startAnimation(animation);
-                valid = false;
-            }
-            if (newEmail.isEmpty()) {
-                email_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                email_field.startAnimation(animation);
-                valid = false;
-            }
-            if (newPassword.isEmpty()) {
-                password_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                password_field.startAnimation(animation);
-                valid = false;
-            }
-            if (newPasswordReenter.isEmpty()) {
-                reenter_password_field.setError("This field cannot be blank");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                reenter_password_field.startAnimation(animation);
-                valid = false;
-            }
-            if (!newPasswordReenter.equals(newPassword)) {
-                reenter_password_field.setError("Password don't match!");
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                reenter_password_field.startAnimation(animation);
-                password_field.startAnimation(animation);
-                valid = false;
-            }
-            if (!valid) {
+        this.signUpButton.setOnClickListener((v) -> {
+            if (!getData()) {
                 return;
             }
             DocumentReference userRef = db.collection("users").document(newUsername);
             userRef.get().addOnSuccessListener(doc -> {
                 if (doc.exists()) {
-                    username_field.setError("Username is already taken");
-                    Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                    username_field.startAnimation(animation);
+                    shakeError(usernameField, "Username is already taken");
                 } else {
                     createUser(newUsername, newEmail, newPassword);
                 }
@@ -150,10 +105,67 @@ public class SignUpActivity extends AppCompatActivity {
                             Log.w("SIGNUP STATUS", "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
-                            email_field.startAnimation(animation);
+                            shakeError(emailField, "Sign-up failed");
                         }
                     }
                 });
+    }
+
+    /**
+     * This makes the interactive field shake and display an error message
+     * @param field interactive field to be shaking
+     * @param errorMessage message to be displayed
+     */
+    protected void shakeError(EditText field, String errorMessage) {
+        field.setError(errorMessage);
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.basics);
+        field.startAnimation(animation);
+    }
+    /**
+     * Setup and initialize all variables and interactive elements
+     */
+    protected void setup() {
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        this.backButton = findViewById(R.id.back_button);
+        this.usernameField = findViewById(R.id.username_field);
+        this.emailField = findViewById(R.id.email_field);
+        this.passwordField = findViewById(R.id.password_field);
+        this.reenterPasswordField = findViewById(R.id.reenter_password_field);
+        this.signUpButton = findViewById(R.id.sign_up_button);
+    }
+
+    /**
+     * This retrieves data from all interactive fields and checks data validity
+     * @return true if all data is valid, false otherwise
+     */
+    protected Boolean getData() {
+        newUsername = usernameField.getText().toString();
+        newEmail = emailField.getText().toString();
+        newPassword = passwordField.getText().toString();
+        newPasswordReenter = reenterPasswordField.getText().toString();
+        boolean valid = true;
+        if (newUsername.isEmpty()) {
+            shakeError(usernameField, "This field cannot be blank");
+            valid = false;
+        }
+        if (newEmail.isEmpty()) {
+            shakeError(emailField, "This field cannot be blank");
+            valid = false;
+        }
+        if (newPassword.isEmpty()) {
+            shakeError(passwordField, "This field cannot be blank");
+            valid = false;
+        }
+        if (newPasswordReenter.isEmpty()) {
+            shakeError(reenterPasswordField, "This field cannot be blank");
+            valid = false;
+        }
+        if (!newPasswordReenter.equals(newPassword)) {
+            shakeError(reenterPasswordField, "Passwords don't match!");
+            shakeError(passwordField, "Passwords don't match!");
+            valid = false;
+        }
+        return valid;
     }
 }
