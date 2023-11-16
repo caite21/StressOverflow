@@ -1,6 +1,9 @@
 package com.example.StressOverflow.Tag;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +17,18 @@ import androidx.annotation.Nullable;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
 public class TagListAdapter extends ArrayAdapter<Tag> {
     private ArrayList<Tag> tags;
     private Context context;
-    private Db db;
     private String ownerName;
-
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    CollectionReference tagRef;
     /**
      * Constructor for the adapter
      * @param context context of the adapter
@@ -32,9 +38,8 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
         super(context, R.layout.listview_tag_content, tags);
         this.context = context;
         this.tags = tags;
-        this.db = db;
+        this.tagRef = this.db.collection("tags");
         this.ownerName = AppGlobals.getInstance().getOwnerName();
-
     }
 
     /**
@@ -73,7 +78,17 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                 for (Tag t: tags){
                     if (tagName.equals(t.getTagName())){
                         tags.remove(t);
-                        db.deleteTag(tag);
+                        String ownerName = AppGlobals.getInstance().getOwnerName();
+                        tagRef
+                                .document(String.format("%s:%s", ownerName, tagName))
+                                .delete()
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                                        throw new RuntimeException("Error with item deletion into collection items: ", e);
+                                    }
+                                });
                         break;
                     }
                 }
@@ -93,7 +108,19 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      */
     public void addTag(Tag tag) {
         tags.add(tag);
-        db.addTag(tag);
+
+        String ownerName = AppGlobals.getInstance().getOwnerName();
+        String tagName = tag.getTagName();
+        tagRef
+                .document(String.format("%s:%s", ownerName, tagName))
+                .set(tag.toFirebaseObject(ownerName))
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
         notifyDataSetChanged();
     }
 }

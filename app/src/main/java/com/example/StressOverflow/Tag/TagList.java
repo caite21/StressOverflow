@@ -28,7 +28,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     Button back_button;
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
-    private CollectionReference tagsRef;
+    private CollectionReference tagRef;
     private Db tagDb;
     private String ownerName;
     /**
@@ -44,8 +44,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         setContentView(R.layout.activity_tag_list);
 
         db = FirebaseFirestore.getInstance();
-        tagDb = new Db(db);
-        tagsRef = tagDb.getTagsCollectionReference();
+        tagRef = db.collection("tags");
         addTag_button = findViewById(R.id.addTag_button);
         back_button = findViewById(R.id.tagListBack_button);
         addTag_button.setOnClickListener(addTag);
@@ -56,7 +55,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         tagListView.setAdapter(tagAdapter);
 
         //displays on tagList Activity
-        tagsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        tagRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots,
                                 @Nullable FirebaseFirestoreException error) {

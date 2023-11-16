@@ -2,8 +2,11 @@
  * Adapter class for main list view of items
  */
 package com.example.StressOverflow.Item;
+import static android.content.ContentValues.TAG;
 
+import com.example.StressOverflow.Item.ListActivity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +21,10 @@ import androidx.core.content.ContextCompat;
 import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -31,6 +36,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * An adapter that displays the content in ListActivity
@@ -40,7 +46,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
     private Context context;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    Db database = new Db(db);
+    CollectionReference itemRef;
     private Set<Item> selectedItems = new HashSet<>();
     private boolean inSelectionMode = false;
 
@@ -48,6 +54,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         super(context, R.layout.listview_item_content, items);
         this.items = items;
         this.context = context;
+        this.itemRef = db.collection("items");
     }
 
     @NonNull
@@ -146,7 +153,17 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
     public void addItem(Item item) {
         this.items.add(item);
-        database.addItem(item);
+        UUID uuid = item.getId();
+        this.itemRef
+                .document(uuid.toString())
+                .set(item.toFirebaseObject())
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
         this.notifyDataSetChanged();
     }
 
