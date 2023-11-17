@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,12 +30,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.StressOverflow.Db;
-import com.example.StressOverflow.Image.Image;
-import com.example.StressOverflow.Image.ImagesDisplayAdapter;
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.R;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,14 +47,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
  */
 public class AddImagesFragment extends DialogFragment  {
     private Uri imageUri;
-    private ActivityResultLauncher<Intent> addImagesLauncher;
+    private ActivityResultLauncher<Intent> addPicturesLauncher;
     private OnFragmentInteractionListener listener;
     private ContentResolver contentResolver;
     private ArrayList<Image> imagesList;
+    private ArrayList<String> URLs;
     private ArrayAdapter<Image> imageAdapter;
     private GridView imageDisplay;
     private Image clickedImage;
-    private UUID itemUUID;
     private Item item;
 
 
@@ -62,9 +62,8 @@ public class AddImagesFragment extends DialogFragment  {
      * Fragment listener must receive updated list of images
      */
     public interface OnFragmentInteractionListener {
-        void onConfirmImages(ArrayList<Image> images);
+        void onConfirmImages(ArrayList<Image> images, ArrayList<String> downloadUrls);
     }
-
 
     public AddImagesFragment() {
         // required
@@ -78,32 +77,12 @@ public class AddImagesFragment extends DialogFragment  {
     public AddImagesFragment(Item item) {
         // for editing an item
         this.item = item;
-        itemUUID = null;
     }
-
-    /**
-     * View images of a uuid
-     *
-     * @param uuid which is associated with the images
-     */
-    public AddImagesFragment(UUID uuid) {
-        // for editing an item
-        item = null;
-        this.itemUUID = uuid;
-    }
-
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         listener = (OnFragmentInteractionListener) context;
-
-        // do not want to check if the activity is implementing the interface
-//        if (context instanceof AddImagesFragment.OnFragmentInteractionListener) {
-//            listener = (AddImagesFragment.OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context + "OnFragmentInteractionListener is not implemented");
-//        }
     }
 
     /**
@@ -118,11 +97,7 @@ public class AddImagesFragment extends DialogFragment  {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.select_image_fragment, null);
         contentResolver = requireContext().getContentResolver();
-        Db db = new Db(FirebaseFirestore.getInstance());
 
-        if (item == null & itemUUID != null) {
-            item = db.getItem(itemUUID);
-        }
         if (item != null ) {
             // get already attached pictures
             imagesList = item.getPictures();
@@ -150,6 +125,9 @@ public class AddImagesFragment extends DialogFragment  {
                 if (clickedImage != null) {
                     imagesList.remove(clickedImage);
                     imageAdapter.notifyDataSetChanged();
+                    if (clickedImage.getURL() != null) {
+                        Image.deletePictureFromStorage(clickedImage.getURL());
+                    }
                 }
             }
         });
@@ -158,11 +136,16 @@ public class AddImagesFragment extends DialogFragment  {
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openImageChooser();
+                try {
+                    openImageChooser();
+                }
+                catch (Exception e) {
+                    Log.d("IMAGES", "Android system picture intents failed: ", e);
+                }
             }
         });
 
-        addImagesLauncher = registerForActivityResult(
+        addPicturesLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -171,7 +154,7 @@ public class AddImagesFragment extends DialogFragment  {
                         if (data == null) return;
 
                         if (data.getClipData() != null) {
-                            // One image selected from library
+                            // Pictures selected from library
                             int itemCount = data.getClipData().getItemCount();
                             for (int i = 0; i < itemCount; i++) {
                                 Uri image = data.getClipData().getItemAt(i).getUri();
@@ -179,7 +162,7 @@ public class AddImagesFragment extends DialogFragment  {
                                 imagesList.add(new Image(selectedBitmap));
                             }
                         } else if (data.getData() != null) {
-                            // Multiple images selected from library
+                            // Picture selected from library
                             Uri image = data.getData();
                             Bitmap selectedBitmap = getBitmapFromUri(image);
                             imagesList.add(new Image(selectedBitmap));
@@ -198,10 +181,17 @@ public class AddImagesFragment extends DialogFragment  {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)
-                .setTitle("Attach Images")
+                .setTitle("Attach Pictures")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Confirm", (dialog, which) -> {
-                    listener.onConfirmImages(imagesList);
+                    // upload list of images then send URLs to ListActivity to be added to an Item
+                    Image.uploadPictures(imagesList, new Image.OnAllImagesUploadedListener() {
+                        @Override
+                        public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                            listener.onConfirmImages(imagesList, downloadURLs);
+                        }
+                    });
+
                 }).create();
     }
 
@@ -222,16 +212,16 @@ public class AddImagesFragment extends DialogFragment  {
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         // Intent to pick photo(s)
-        Intent pickPhotosIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        pickPhotosIntent.setType("image/*");
-        pickPhotosIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        Intent pickPicturesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        pickPicturesIntent.setType("image/*");
+        pickPicturesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
         // Intent to choose which intent
         Intent chooser = new Intent(Intent.ACTION_CHOOSER);
-        chooser.putExtra(Intent.EXTRA_INTENT, pickPhotosIntent);
+        chooser.putExtra(Intent.EXTRA_INTENT, pickPicturesIntent);
         chooser.putExtra(Intent.EXTRA_TITLE, "Choose images or take a picture");
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
-        addImagesLauncher.launch(chooser);
+        addPicturesLauncher.launch(chooser);
     }
 
     /**
@@ -245,7 +235,7 @@ public class AddImagesFragment extends DialogFragment  {
             InputStream inputStream = contentResolver.openInputStream(uri);
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d("IMAGES", "Converting picture to bitmap failed: ", e);
             return null;
         }
     }

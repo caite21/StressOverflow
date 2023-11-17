@@ -10,12 +10,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
 import com.example.StressOverflow.Util;
@@ -37,6 +39,7 @@ public class EditItemFragment extends DialogFragment {
     private EditText itemValueField;
     private EditText itemCommentsField;
     private EditText itemSerialField;
+    private Button itemPicturesButton;
     private ChipGroup tagChipGroup;
     private OnFragmentInteractionListener listener;
     private Item selectedItem;
@@ -78,6 +81,9 @@ public class EditItemFragment extends DialogFragment {
         itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
         itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
+
+        itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
+
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
         addTagsToChipGroup();
 
@@ -91,6 +97,14 @@ public class EditItemFragment extends DialogFragment {
         itemDateField.setText(this.selectedItem.getDateDate());
         itemCommentsField.setText(this.selectedItem.getComments());
         itemSerialField.setText(Integer.toString(selectedItem.getSerial()));
+
+        itemPicturesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Opens fragment that shows the item's pictures
+                new AddImagesFragment(selectedItem).show(getChildFragmentManager(), "ADD_IMAGES");
+            }
+        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -132,7 +146,7 @@ public class EditItemFragment extends DialogFragment {
                                         value,
                                         comments,
                                         newTags,
-                                        selectedItem.getPictures(),
+                                        selectedItem.getPictureURLs(),
                                         serial,
                                         selectedItem.getOwner()
                             ));

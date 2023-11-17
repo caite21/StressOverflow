@@ -37,7 +37,8 @@ public class Item {
     private Double value;
     private String comments;
     private ArrayList<Tag> tags = new ArrayList<Tag>();
-    private ArrayList<Image> pictures = new ArrayList<Image>();
+    private ArrayList<String> pictureURLs = new ArrayList<>();
+    private ArrayList<Image> pictures = new ArrayList<>();
     private Integer serial;
     private String owner;
 
@@ -52,7 +53,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<Image> pictures,
+            ArrayList<String> pictureURLs,
             Integer serial,
             String owner
     ) {
@@ -65,7 +66,7 @@ public class Item {
         this.setValue(value);
         this.setComments(comments);
         this.addTags(tags);
-        this.addPictures(pictures);
+        this.addPictureURLs(pictureURLs);
         this.setSerial(serial);
         this.setOwner(owner);
     }
@@ -80,7 +81,7 @@ public class Item {
             Double value,
             String comments,
             ArrayList<Tag> tags,
-            ArrayList<Image> pictures,
+            ArrayList<String> pictureURLs,
             Integer serial,
             String owner
     ) {
@@ -93,35 +94,9 @@ public class Item {
         this.setValue(value);
         this.setComments(comments);
         this.addTags(tags);
-        this.addPictures(pictures);
+        this.addPictureURLs(pictureURLs);
         this.setSerial(serial);
         this.setOwner(owner);
-    }
-
-    // added this because of error message TODO: remove this constructor
-    public Item(
-            String name,
-            String make,
-            String model,
-            String description,
-            GregorianCalendar date,
-            Double value,
-            String comments,
-            ArrayList<Tag> tags,
-            ArrayList<Image> pictures,
-            Integer serial
-    ) {
-        this.id = UUID.randomUUID();
-        this.setName(name);
-        this.setMake(make);
-        this.setModel(model);
-        this.setDescription(description);
-        this.setDate(date);
-        this.setValue(value);
-        this.setComments(comments);
-        this.addTags(tags);
-        this.addPictures(pictures);
-        this.setSerial(serial);
     }
 
     public void setName(String name) throws IllegalArgumentException {
@@ -211,9 +186,26 @@ public class Item {
         return this.tags;
     }
 
+    /**
+     * Get image objects that are attached to the item
+     * @return image objects
+     */
     public ArrayList<Image> getPictures() {
-        this.pictures = new ArrayList<>();
-        return this.pictures;
+        if (pictures == null) {
+            setPictures(new ArrayList<>());
+        }
+        return pictures;
+    }
+
+    /**
+     * Get image URLs that are attached to the item
+     * @return URLs of images
+     */
+    public ArrayList<String> getPictureURLs() {
+        if (pictures.size() == 0) {
+            setPictureURLs(new ArrayList<>());
+        }
+        return pictureURLs;
     }
 
     public Integer getSerial() {
@@ -268,8 +260,49 @@ public class Item {
         return out.toString();
     }
 
-    public void setPictures(ArrayList<Image> pictures) {
+    /**
+     * Set URLs of images attached to item and sets Image objects with the URLs.
+     * @param pictureURLs URLs (strings) of pictures in storage
+     */
+    public void setPictureURLs(ArrayList<String> pictureURLs) {
+        this.pictureURLs = pictureURLs;
+        ArrayList<Image> newImages = new ArrayList<>();
+        for (String url : pictureURLs) {
+            newImages.add(new Image(url));
+        }
+        setPictures(newImages);
+    }
+
+    /**
+     * Set image objects attached to item.
+     * Should only be used by setPictureURLs().
+     * @param pictures image objects
+     */
+    private void setPictures(ArrayList<Image> pictures) {
         this.pictures = pictures;
+    }
+
+    /**
+     * TODO: Should we allow duplicate images here??
+     * Add URLs of images attached to item and add Image objects with the URLs.
+     * @param pictureURLs URLs (strings) of pictures in storage
+     */
+    public void addPictureURLs(@NonNull ArrayList<String> pictureURLs) {
+        this.pictureURLs.addAll(pictureURLs);
+        ArrayList<Image> newImages = new ArrayList<>();
+        for (String url : pictureURLs) {
+            newImages.add(new Image(url));
+        }
+        addPictures(newImages);
+    }
+
+    /**
+     * Add image objects attached to item.
+     * Should only be used by addPictureURLs().
+     * @param pictures image objects
+     */
+    private void addPictures(ArrayList<Image> pictures) {
+        this.pictures.addAll(pictures);
     }
 
     public void setMake(String make) {
@@ -327,15 +360,6 @@ public class Item {
         this.tags.removeAll(tags);
     }
 
-    /**
-     * TODO: Should we allow duplicate images here??
-     *
-     * @param pictures
-     */
-    public void addPictures(@NonNull ArrayList<Image> pictures) {
-        this.pictures.addAll(pictures);
-    }
-
     public void setSerial(int serial) {
         this.serial = serial;
     }
@@ -360,7 +384,7 @@ public class Item {
         data.put("comments", this.getComments());
         data.put("owner", this.getOwner());
         data.put("serial", this.getSerial());
-        data.put("pictures", this.getPictures());
+        data.put("pictures", this.getPictureURLs());
         data.put("tags", this.getTags());
         return data;
     }
@@ -374,7 +398,6 @@ public class Item {
     public static Item fromFirebaseObject(Map<String, Object> data) {
         try {
             ArrayList<Tag> tags = new ArrayList<>();
-            ArrayList<Image> images = new ArrayList<>();
             UUID uid = new UUID(
                     ((Map<String, Long>) data.get("id")).get("mostSignificantBits"),
                     ((Map<String, Long>) data.get("id")).get("leastSignificantBits")
@@ -384,6 +407,10 @@ public class Item {
             for (Map<String, Object> tagName: (ArrayList <Map<String, Object>>) data.get("tags")){
                 tags.add(Tag.fromFirebaseObject(tagName));
             }
+
+            // get pictures and catch errors
+            ArrayList<String> pictureURLs = Image.URLsFromFirebaseObject(data);
+
             Item out = new Item(
                     uid,
                     (String) data.get("name"),
@@ -398,7 +425,7 @@ public class Item {
                     (Double) data.get("value"),
                     (String) data.get("comments"),
                     tags,
-                    images,
+                    pictureURLs,
                     ((Long) data.get("serial")).intValue(),
                     (String) data.get("owner")
             );

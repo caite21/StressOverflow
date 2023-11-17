@@ -4,6 +4,7 @@
 package com.example.StressOverflow.Item;
 import static android.content.ContentValues.TAG;
 
+import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.Item.ListActivity;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -28,6 +29,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -73,7 +75,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         TextView itemPrice = view.findViewById(R.id.listview__item__price);
         TextView itemDate = view.findViewById(R.id.listview__item__date);
         TextView itemSerial = view.findViewById(R.id.listview__item__serial__number);
-        ImageView itemPicture = view.findViewById(R.id.listview__item__picture);
+        ImageView pictureImageView = view.findViewById(R.id.listview__item__picture);
 
         itemTitle.setText(item.getName());
         itemMakeModel.setText(item.getMakeModel());
@@ -84,12 +86,12 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
         addTagChips(view, item);
         applySelectionBackground(view, item);
-        // the first picture is shown
-        if (item.getPictures().size() > 0) {
-            itemPicture.setImageBitmap((item.getPictures().get(0)).getBitmap());
+
+        // first picture is shown on list
+        if (item.getPictureURLs().size() > 0) {
+            Image image = item.getPictures().get(0);
+            Image.displayImage(image, pictureImageView);
         }
-
-
 
         return view;
     }

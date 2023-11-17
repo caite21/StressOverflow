@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,7 @@ import com.example.StressOverflow.Tag.TagList;
 import com.example.StressOverflow.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,7 +41,10 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
-public class ListActivity extends AppCompatActivity implements AddItemFragment.OnFragmentInteractionListener, AddTagToItemFragment.OnFragmentInteractionListener, EditItemFragment.OnFragmentInteractionListener,
+public class ListActivity extends AppCompatActivity implements
+        AddItemFragment.OnFragmentInteractionListener,
+        AddTagToItemFragment.OnFragmentInteractionListener,
+        EditItemFragment.OnFragmentInteractionListener,
         AddImagesFragment.OnFragmentInteractionListener {
 
     ListView itemList;
@@ -53,8 +58,10 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference items;
+    private ArrayList<Image> pictures = new ArrayList<>();
+    private ArrayList<String> pictureURLs = new ArrayList<>();
+    private boolean picturesChanged = false;
     private CollectionReference tagRef;
-    ArrayList<Image> addedPictures;
 
     int selected = -1;
     Intent loginIntent;
@@ -158,7 +165,7 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
      * to the item list adapter.
      */
     public void onSubmitAdd(Item item) {
-        item.setPictures(addedPictures);
+        item.addPictureURLs(pictureURLs);
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
@@ -191,6 +198,15 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
                             Log.w(TAG, "Error with item deletion on collection items: ", e);
                             throw new RuntimeException("Error with item deletion on collection items: ", e);
                         }
+                    })
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            // delete associated images from storage
+                            for (String URL : item.getPictureURLs()) {
+                                Image.deletePictureFromStorage(URL);
+                            }
+                        }
                     });
             itemListAdapter.remove(item);
             this.setSumOfItemCosts();
@@ -201,6 +217,9 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
     }
 
     public void onSubmitEdit(int position, Item item) {
+        if (picturesChanged) {
+            item.setPictureURLs(pictureURLs);
+        }
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
@@ -334,14 +353,18 @@ public class ListActivity extends AppCompatActivity implements AddItemFragment.O
 
 
     /**
-     *When user confirms adding images, the updated list
+     * When user confirms adding images, the updated list
      * of pictures is passed so that the pictures can be attached
      * when the user is done adding/editing an item,
      *
      * @param pictures taken with camera or selected from library
      */
     @Override
-    public void onConfirmImages(ArrayList<Image> pictures) {
-        addedPictures = pictures;
+    public void onConfirmImages(ArrayList<Image> pictures, ArrayList<String> pictureURLs) {
+        this.pictures = pictures;
+        this.pictureURLs = pictureURLs;
+        picturesChanged = true;
+//        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
     }
+
 }
