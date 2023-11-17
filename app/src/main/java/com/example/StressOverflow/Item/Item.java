@@ -212,18 +212,26 @@ public class Item {
         return this.tags;
     }
 
+    /**
+     * Get image objects that are attached to the item
+     * @return image objects
+     */
     public ArrayList<Image> getPictures() {
-        if (this.pictures == null) {
-            this.pictures = new ArrayList<>();
+        if (pictures == null) {
+            setPictures(new ArrayList<>());
         }
-        return this.pictures;
+        return pictures;
     }
 
+    /**
+     * Get image URLs that are attached to the item
+     * @return URLs of images
+     */
     public ArrayList<String> getPictureURLs() {
-        if (this.pictures.size() == 0) {
-            this.pictureURLs = new ArrayList<>();
+        if (pictures.size() == 0) {
+            setPictureURLs(new ArrayList<>());
         }
-        return this.pictureURLs;
+        return pictureURLs;
     }
 
     public Integer getSerial() {
@@ -278,10 +286,50 @@ public class Item {
         return out.toString();
     }
 
+    /**
+     * Set URLs of images attached to item and sets Image objects with the URLs.
+     * @param pictureURLs URLs (strings) of pictures in storage
+     */
     public void setPictureURLs(ArrayList<String> pictureURLs) {
         this.pictureURLs = pictureURLs;
+        ArrayList<Image> newImages = new ArrayList<>();
+        for (String url : pictureURLs) {
+            newImages.add(new Image(url));
+        }
+        setPictures(newImages);
     }
-    public void setPictures(ArrayList<Image> pictures) {this.pictures = pictures; }
+
+    /**
+     * Set image objects attached to item.
+     * Should only be used by setPictureURLs().
+     * @param pictures image objects
+     */
+    private void setPictures(ArrayList<Image> pictures) {
+        this.pictures = pictures;
+    }
+
+    /**
+     * TODO: Should we allow duplicate images here??
+     * Add URLs of images attached to item and add Image objects with the URLs.
+     * @param pictureURLs URLs (strings) of pictures in storage
+     */
+    public void addPictureURLs(@NonNull ArrayList<String> pictureURLs) {
+        this.pictureURLs.addAll(pictureURLs);
+        ArrayList<Image> newImages = new ArrayList<>();
+        for (String url : pictureURLs) {
+            newImages.add(new Image(url));
+        }
+        addPictures(newImages);
+    }
+
+    /**
+     * Add image objects attached to item.
+     * Should only be used by addPictureURLs().
+     * @param pictures image objects
+     */
+    private void addPictures(ArrayList<Image> pictures) {
+        this.pictures.addAll(pictures);
+    }
 
     public void setMake(String make) {
         this.make = make;
@@ -336,15 +384,6 @@ public class Item {
      */
     public void removeTags(@NonNull ArrayList<Tag> tags) {
         this.tags.removeAll(tags);
-    }
-
-    /**
-     * TODO: Should we allow duplicate images here??
-     *
-     * @param pictures
-     */
-    public void addPictureURLs(@NonNull ArrayList<String> pictureURLs) {
-        this.pictureURLs.addAll(pictureURLs);
     }
 
     public void setSerial(int serial) {

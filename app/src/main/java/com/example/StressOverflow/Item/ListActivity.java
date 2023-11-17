@@ -171,7 +171,6 @@ public class ListActivity extends AppCompatActivity implements
      * to the item list adapter.
      */
     public void onSubmitAdd(Item item) {
-        item.setPictures(pictures);
         item.addPictureURLs(pictureURLs);
         this.itemListAdapter.add(item);
 
@@ -225,7 +224,6 @@ public class ListActivity extends AppCompatActivity implements
         if (picturesChanged) {
             // set, not add, because user may have deleted pictures TODO: nothing is deleting the URLs yet
             item.setPictureURLs(pictureURLs);
-            item.setPictures(pictures);
         }
         try {
             this.itemListAdapter.editItem(position, item);

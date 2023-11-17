@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import com.example.StressOverflow.R;
 
 import java.util.ArrayList;
+import com.squareup.picasso.Picasso;
 
 /**
  * Creates grid which displays an item's images
@@ -53,7 +54,11 @@ public class ImagesDisplayAdapter extends ArrayAdapter<Image> {
 
         Image image = images.get(position);
         ImageView imageView = view.findViewById(R.id.image);
-        imageView.setImageBitmap(image.getBitmap());
+        if (image.getURL() == null) {
+            imageView.setImageBitmap(image.getBitmap());
+        } else {
+            Picasso.get().load(image.getURL()).into(imageView);
+        }
 
         return view;
     }

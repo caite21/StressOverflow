@@ -26,22 +26,44 @@ import com.google.firebase.storage.UploadTask;
 public class Image {
     private UUID id;
     private Bitmap bitmap;
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String URL;
+
 
     /**
      * Create image by passing image bitmap
-     *
      * @param bitmap of image
      */
     public Image(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
 
+    /**
+     * Create image by passing URL of stored image
+     * @param URL of stored image
+     */
+    public Image(String URL) {
+        this.URL = URL;
+    }
 
 
     /**
+     * Get URL of stored image
+     * @return URL as a string
+     */
+    public String getURL() {
+        return URL;
+    }
+
+    /**
+     * Set URL of stored image
+     * @param URL of stored image
+     */
+    public void setURL(String URL) {
+        this.URL = URL;
+    }
+
+    /**
      * Get id
-     *
      * @return id of image
      */
     public UUID getId() {
@@ -50,7 +72,6 @@ public class Image {
 
     /**
      * Set id of image
-     *
      * @param id of image
      */
     public void setId(UUID id) {
@@ -59,7 +80,6 @@ public class Image {
 
     /**
      * Get bitmap of image. Can be used to display image.
-     *
      * @return bitmap of image
      */
     public Bitmap getBitmap() {
@@ -68,7 +88,6 @@ public class Image {
 
     /**
      * Change bitmap of image
-     *
      * @param bitmap of new image
      */
     public void setBitmap(Bitmap bitmap) {

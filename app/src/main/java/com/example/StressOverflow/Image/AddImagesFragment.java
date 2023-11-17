@@ -51,10 +51,10 @@ public class AddImagesFragment extends DialogFragment  {
     private OnFragmentInteractionListener listener;
     private ContentResolver contentResolver;
     private ArrayList<Image> imagesList;
+    private ArrayList<String> URLs;
     private ArrayAdapter<Image> imageAdapter;
     private GridView imageDisplay;
     private Image clickedImage;
-    private UUID itemUUID;
     private Item item;
 
 
@@ -77,18 +77,6 @@ public class AddImagesFragment extends DialogFragment  {
     public AddImagesFragment(Item item) {
         // for editing an item
         this.item = item;
-        itemUUID = null;
-    }
-
-    /**
-     * View images of a uuid
-     *
-     * @param uuid which is associated with the images
-     */
-    public AddImagesFragment(UUID uuid) {
-        // for editing an item
-        item = null;
-        this.itemUUID = uuid;
     }
 
     @Override
@@ -109,11 +97,7 @@ public class AddImagesFragment extends DialogFragment  {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.select_image_fragment, null);
         contentResolver = requireContext().getContentResolver();
-        Db db = new Db(FirebaseFirestore.getInstance());
 
-        if (item == null & itemUUID != null) {
-            item = db.getItem(itemUUID);
-        }
         if (item != null ) {
             // get already attached pictures
             imagesList = item.getPictures();
