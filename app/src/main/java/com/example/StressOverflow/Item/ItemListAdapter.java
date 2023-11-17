@@ -88,11 +88,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         // first picture is shown on list
         if (item.getPictureURLs().size() > 0) {
             Image image = item.getPictures().get(0);
-            if (image.getURL() == null) {
-                pictureImageView.setImageBitmap(image.getBitmap());
-            } else {
-                Picasso.get().load(image.getURL()).into(pictureImageView);
-            }
+            Image.displayImage(image, pictureImageView);
         }
 
         return view;

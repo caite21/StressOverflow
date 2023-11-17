@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.StressOverflow.Item.Item;
@@ -13,11 +14,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.example.StressOverflow.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 /**
  * Represents an image which is displayed and stored using a Bitmap
@@ -97,11 +103,21 @@ public class Image {
 
     // STATIC METHODS
 
-    /**
-     *
-     * @param pictures
-     * @return
-     */
+    public static void displayImage(Image image, ImageView imageView) {
+        if (image.getURL() == null) {
+            imageView.setImageBitmap(image.getBitmap());
+        } else {
+            try {
+                Picasso.get()
+                        .load(image.getURL())
+                        .error(R.drawable.ic_error_image)
+                        .into(imageView);
+            } catch (Exception e) {
+                Log.d("IMAGES", "Unexpected error displaying URL.", e);
+            }
+        }
+    }
+
     public static ArrayList<String> URLsFromFirebaseObject(Map<String, Object> data) {
         ArrayList<String> pictureURLs = new ArrayList<String>();
 
@@ -122,6 +138,17 @@ public class Image {
         return pictureURLs;
     }
 
+    /**
+     * Listener interface for when an image has been uploaded
+     */
+    public interface OnImageUploadedListener {
+        void onImageUploaded(String downloadUrl);
+        void onUploadFailure(Exception e);
+    }
+
+    /**
+     * Listener interface for when all images have been uploaded
+     */
     public interface OnAllImagesUploadedListener {
         void onAllImagesUploaded(ArrayList<String> downloadURLs);
     }
@@ -132,22 +159,32 @@ public class Image {
 
         // Upload each Bitmap to Storage and get URL
         for (Image image : pictures) {
-            Bitmap bitmap = image.getBitmap();
-            uploadBitmapToStorage(bitmap, new OnImageUploadedListener() {
-                @Override
-                public void onImageUploaded(String downloadUrl) {
-                    downloadURLs.add(downloadUrl);
+            if (image.getURL() != null) {
+                // already uploaded
+                downloadURLs.add(image.getURL());
+            }
+            else {
+                Bitmap bitmap = image.getBitmap();
+                uploadBitmapToStorage(bitmap, new OnImageUploadedListener() {
+                    @Override
+                    public void onImageUploaded(String downloadUrl) {
+                        downloadURLs.add(downloadUrl);
 
-                    if (downloadURLs.size() == pictures.size()) {
-                        listener.onAllImagesUploaded(downloadURLs);
+                        if (downloadURLs.size() == pictures.size()) {
+                            listener.onAllImagesUploaded(downloadURLs);
+                        }
                     }
-                }
 
-                @Override
-                public void onUploadFailure(Exception e) {
-                    Log.w("IMAGES", "Uploading image failed: ", e);
-                }
-            });
+                    @Override
+                    public void onUploadFailure(Exception e) {
+                        Log.w("IMAGES", "Uploading image failed: ", e);
+                    }
+                });
+            }
+        }
+        // if no new pictures are uploaded
+        if (downloadURLs.size() == pictures.size()) {
+            listener.onAllImagesUploaded(downloadURLs);
         }
     }
 
@@ -180,11 +217,12 @@ public class Image {
         });
     }
 
-    // Listener interface for image uploads
-    public interface OnImageUploadedListener {
-        void onImageUploaded(String downloadUrl);
-        void onUploadFailure(Exception e);
+    public static void deletePictureFromStorage(String URL) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(URL);
+        storageRef.delete()
+                .addOnFailureListener(e -> {
+                    Log.d("IMAGE", "Failed to delete picture from Storage.");
+                });
     }
-
 
 }

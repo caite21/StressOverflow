@@ -125,6 +125,9 @@ public class AddImagesFragment extends DialogFragment  {
                 if (clickedImage != null) {
                     imagesList.remove(clickedImage);
                     imageAdapter.notifyDataSetChanged();
+                    if (clickedImage.getURL() != null) {
+                        Image.deletePictureFromStorage(clickedImage.getURL());
+                    }
                 }
             }
         });
@@ -233,7 +236,6 @@ public class AddImagesFragment extends DialogFragment  {
             InputStream inputStream = contentResolver.openInputStream(uri);
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
             Log.d("IMAGES", "Converting picture to bitmap failed: ", e);
             return null;
         }

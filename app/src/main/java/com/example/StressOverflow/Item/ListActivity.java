@@ -202,8 +202,10 @@ public class ListActivity extends AppCompatActivity implements
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            // TODO: delete associated images from storage
-//                            Image.deletePictures(item.getPictureURLs());
+                            // delete associated images from storage
+                            for (String URL : item.getPictureURLs()) {
+                                Image.deletePictureFromStorage(URL);
+                            }
                         }
                     });
             itemListAdapter.remove(item);
@@ -364,7 +366,7 @@ public class ListActivity extends AppCompatActivity implements
         this.pictureURLs = pictureURLs;
         picturesChanged = true;
 
-        Toast.makeText(this, "Pictures uploaded successfully.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
     }
 
 }
