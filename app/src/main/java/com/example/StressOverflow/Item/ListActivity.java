@@ -94,13 +94,7 @@ public class ListActivity extends AppCompatActivity implements
         itemList.setOnItemLongClickListener(selectItems);
         this.tagRef = this.db.collection("tags");
 
-        this.ownerName = loginIntent.getStringExtra("login");
-
-        if(this.ownerName != null){
-            AppGlobals.getInstance().setOwnerName(this.ownerName);
-        }else{
-            this.ownerName =  AppGlobals.getInstance().getOwnerName();
-        }
+        this.ownerName =  AppGlobals.getInstance().getOwnerName();
 
         ArrayList<Tag> allTags = new ArrayList<>();
         String ownerName = AppGlobals.getInstance().getOwnerName();
@@ -127,13 +121,13 @@ public class ListActivity extends AppCompatActivity implements
             new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
         });
         this.editButton.setOnClickListener((v) -> {
-            new AddItemFragment(this.loginIntent.getStringExtra("login")).show(getSupportFragmentManager(), "ADD_ITEM");
+            new AddItemFragment(this.ownerName).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
         this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
         this.itemList.setAdapter(this.itemListAdapter);
 
-        this.sumOfItemCosts.setText(loginIntent.getStringExtra("login"));
+        this.sumOfItemCosts.setText(this.ownerName);
 
         ArrayList<Tag> tags = new ArrayList<Tag>();
         tags.add(new Tag("tag1"));
