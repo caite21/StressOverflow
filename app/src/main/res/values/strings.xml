@@ -55,4 +55,7 @@
     <string name="filter__dialog__filter__btn__text">Filter</string>
     <string name="filter__dialog__make__header">Make</string>
 
+    <string name = "activity_tag_list_add_btn_text">Add</string>
+    <string name = "activity_tag_list_back_btn_text">Back</string>
+
 </resources>

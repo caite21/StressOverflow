@@ -63,9 +63,9 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_tag_content, parent,false);
         }
         Tag tag = getItem(position);
-        TextView tagName = convertView.findViewById(R.id.tagContent);
+        TextView tagName = convertView.findViewById(R.id.listview_tag_content_textView);
         tagName.setText(tag.getTagName());
-        Button deleteButton = convertView.findViewById(R.id.deleteTag_button);
+        Button deleteButton = convertView.findViewById(R.id.listview_delete_tag_button);
 
         /**
          * Is called when the deleteButton is clicked on for a tag

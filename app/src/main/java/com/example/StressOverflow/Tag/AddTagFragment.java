@@ -68,7 +68,7 @@ public class AddTagFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_tag,null);
-        addTagTextView = view.findViewById(R.id.addTagTextView);
+        addTagTextView = view.findViewById(R.id.fragment_add_tag_textView);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder

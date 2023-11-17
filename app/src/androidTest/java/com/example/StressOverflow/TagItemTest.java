@@ -98,7 +98,7 @@ public class TagItemTest {
     @Test
     public void ListActivitytoTagList(){
         onView(withId(R.id.showTagList_button)).perform(click());
-        onView(ViewMatchers.withId(R.id.addTag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
@@ -113,8 +113,8 @@ public class TagItemTest {
                 .perform(longClick());
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
-        onView(ViewMatchers.withId(R.id.makeNewTag_button)).perform(click());
-        onView(ViewMatchers.withId(R.id.tagListView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_make_new_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class TagItemTest {
                 .perform(longClick());
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
-        int chipGroupID = R.id.tagFragment_chipGroup;
+        int chipGroupID = R.id.fragment_add_tag_to_item_tag_chipGroup;
 
         onView(allOf(withText("tag 1"), isDescendantOfA(withId(chipGroupID))))
                 .perform(click());

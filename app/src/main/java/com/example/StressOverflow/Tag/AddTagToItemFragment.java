@@ -82,9 +82,9 @@ public class AddTagToItemFragment extends DialogFragment{
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_tag_to_item, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-        Button makeNewTag = view.findViewById(R.id.makeNewTag_button);
+        Button makeNewTag = view.findViewById(R.id.fragment_add_tag_to_item_make_new_tag_button);
         makeNewTag.setOnClickListener(openTagList);
-        chipGroup = view.findViewById(R.id.tagFragment_chipGroup);
+        chipGroup = view.findViewById(R.id.fragment_add_tag_to_item_tag_chipGroup);
 
         allTags = AppGlobals.getInstance().getAllTags();
 

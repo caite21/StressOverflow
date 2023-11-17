@@ -22,8 +22,6 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import com.example.StressOverflow.Item.Item;
-import com.example.StressOverflow.Tag.Tag;
 import com.example.StressOverflow.Tag.TagList;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -77,11 +75,11 @@ public class TagListTest {
     @Test
     public void cancelAddToTagList() throws InterruptedException {
         testTagName = "cancelTestTag";
-        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
         onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
         onView(withText("Cancel")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.addTagTextView)).check(doesNotExist());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
         // Perform the query with a callback
         final boolean[] bool = new boolean[1];
@@ -104,11 +102,11 @@ public class TagListTest {
     @Test
     public void addToTagList() throws InterruptedException {
         testTagName = "testTag";
-        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
         onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
         onView(withText("OK")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.addTagTextView)).check(doesNotExist());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
         // Perform the query with a callback
         // Perform the query with a callback
@@ -134,14 +132,14 @@ public class TagListTest {
     @Test
     public void deleteFromTagList() throws InterruptedException {
         testTagName = "deleteTag";
-        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
         onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
         onView(withText("OK")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.addTagTextView)).check(doesNotExist());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
-        int listViewId = R.id.tagListView;
-        int deleteButtonId = R.id.deleteTag_button;
+        int listViewId = R.id.activity_tag_list_listView;
+        int deleteButtonId = R.id.listview_delete_tag_button;
 
         // Perform a click on the delete button in the first row of the ListView.
         Espresso.onData(Matchers.anything())

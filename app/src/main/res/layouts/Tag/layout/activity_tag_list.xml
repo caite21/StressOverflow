@@ -8,20 +8,21 @@
     tools:visibility="visible">
 
     <ListView
-        android:id="@+id/tagListView"
+        android:id="@+id/activity_tag_list_listView"
         android:layout_width="366dp"
         android:layout_height="558dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="20dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/tagListBack_button"
+        android:id="@+id/activity_tag_list_back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="Back"
+        android:text="@string/activity_tag_list_back_btn_text"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,12 +30,12 @@
         app:backgroundTint="@null"/>
 
     <Button
-        android:id="@+id/addTag_button"
+        android:id="@+id/activity_tag_list_add_tag_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:text="Add"
+        android:text="@string/activity_tag_list_add_btn_text"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

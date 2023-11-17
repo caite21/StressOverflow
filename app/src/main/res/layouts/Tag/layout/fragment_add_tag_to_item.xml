@@ -20,13 +20,13 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/tagFragment_chipGroup"
+                android:id="@+id/fragment_add_tag_to_item_tag_chipGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </androidx.cardview.widget.CardView>
 
         <Button
-            android:id="@+id/makeNewTag_button"
+            android:id="@+id/fragment_add_tag_to_item_make_new_tag_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"

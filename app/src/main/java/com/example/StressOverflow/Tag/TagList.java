@@ -45,11 +45,11 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
 
         db = FirebaseFirestore.getInstance();
         tagRef = db.collection("tags");
-        addTag_button = findViewById(R.id.addTag_button);
-        back_button = findViewById(R.id.tagListBack_button);
+        addTag_button = findViewById(R.id.activity_tag_list_add_tag_button);
+        back_button = findViewById(R.id.activity_tag_list_back_button);
         addTag_button.setOnClickListener(addTag);
         back_button.setOnClickListener(backToMain);
-        ListView tagListView = findViewById(R.id.tagListView);
+        ListView tagListView = findViewById(R.id.activity_tag_list_listView);
         this.ownerName = AppGlobals.getInstance().getOwnerName();
         tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb);
         tagListView.setAdapter(tagAdapter);
