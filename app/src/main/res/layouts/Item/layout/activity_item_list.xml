@@ -18,41 +18,47 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8sp">
 
             <Button
                 android:id="@+id/activity__item__list__edit__item__button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="2.5dp"
-                android:layout_marginEnd="2.5dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:text="@string/activity_item_list_edit_button_text"
                 android:textSize="15sp"
                 tools:ignore="SpUsage"
-                />
+                android:background="@drawable/sagi_button"
+                app:backgroundTint="@null" />
 
             <Button
                 android:id="@+id/activity__item__list__filter__item__button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="2.5dp"
-                android:layout_marginEnd="2.5dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:text="@string/activity_item_list_filter_button_text"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:background="@drawable/sagi_button"
+                app:backgroundTint="@null"/>
 
             <Button
                 android:id="@+id/showTagList_button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="2.5dp"
-                android:layout_marginEnd="2.5dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:textSize="15sp"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="Show Tags" />
+                android:text="Show Tags"
+                android:background="@drawable/sagi_button"
+                app:backgroundTint="@null"/>
 
     </LinearLayout>
 
@@ -95,9 +101,13 @@
         android:layout_height="56dp"
         android:layout_gravity="bottom|center"
         android:layout_margin="30dp"
-        android:background="@color/lavender"
         android:text="hello there"
+        android:paddingTop="8sp"
+        android:paddingBottom="8sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
         android:textAlignment="center"
-        android:textSize="30sp" />
+        android:textSize="28sp"
+        android:background="@drawable/sagi_textview"/>
 
 </FrameLayout>
