@@ -97,7 +97,8 @@
             android:id="@+id/itemTagChipGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="false">
+            android:clickable="false"
+            android:paddingLeft="8sp">
 
         </com.google.android.material.chip.ChipGroup>
     </LinearLayout>

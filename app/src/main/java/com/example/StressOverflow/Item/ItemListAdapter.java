@@ -7,6 +7,8 @@ import static android.content.ContentValues.TAG;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.Item.ListActivity;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -215,6 +217,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         for (Tag t: tags){
             if (tagCounter!=3){
                 Chip chip = new Chip(this.context);
+                chip.setChipBackgroundColorResource(R.color.lavender);
+                chip.setTextColor(Color.BLACK);
                 chip.setText(t.getTagName());
                 chip.setClickable(false);
                 chip.setFocusable(false);

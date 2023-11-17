@@ -24,7 +24,9 @@
         android:text="Back"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/sagi_round_button"
+        app:backgroundTint="@null"/>
 
     <Button
         android:id="@+id/addTag_button"
@@ -35,6 +37,8 @@
         android:text="Add"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/sagi_round_button"
+        app:backgroundTint="@null"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

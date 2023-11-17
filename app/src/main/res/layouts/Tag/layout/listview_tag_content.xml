@@ -16,13 +16,18 @@
             android:layout_width="288dp"
             android:layout_height="56dp"
             android:text="Tag"
-            android:textSize="34sp" />
+            android:textSize="34sp"
+            android:paddingLeft="8sp"
+            android:textAlignment="center" />
 
         <Button
             android:id="@+id/deleteTag_button"
-            android:layout_width="match_parent"
+            android:layout_width="64sp"
             android:layout_height="wrap_content"
-            app:icon="@android:drawable/ic_delete" />
+            app:icon="@android:drawable/ic_delete"
+            android:background="@drawable/sagi_round_button"
+            app:backgroundTint="@null"
+            android:textAlignment="center"/>
     </LinearLayout>
 
 </LinearLayout>
