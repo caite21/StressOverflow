@@ -51,6 +51,20 @@ public class Image {
         this.URL = URL;
     }
 
+    /**
+     * Listener interface for when an image has been uploaded
+     */
+    public interface OnImageUploadedListener {
+        void onImageUploaded(String downloadUrl);
+        void onUploadFailure(Exception e);
+    }
+
+    /**
+     * Listener interface for when all images have been uploaded
+     */
+    public interface OnAllImagesUploadedListener {
+        void onAllImagesUploaded(ArrayList<String> downloadURLs);
+    }
 
     /**
      * Get URL of stored image
@@ -103,6 +117,11 @@ public class Image {
 
     // STATIC METHODS
 
+    /**
+     * Sets an ImageView to display an Image object.
+     * @param image Image of picture
+     * @param imageView where to display picture
+     */
     public static void displayImage(Image image, ImageView imageView) {
         if (image.getURL() == null) {
             imageView.setImageBitmap(image.getBitmap());
@@ -118,6 +137,11 @@ public class Image {
         }
     }
 
+    /**
+     * Get all URLs of pictures from an Item as a Firebase object.
+     * @param data Firebase object of an Item
+     * @return URLs of all pictures in the item
+     */
     public static ArrayList<String> URLsFromFirebaseObject(Map<String, Object> data) {
         ArrayList<String> pictureURLs = new ArrayList<String>();
 
@@ -138,21 +162,12 @@ public class Image {
         return pictureURLs;
     }
 
-    /**
-     * Listener interface for when an image has been uploaded
-     */
-    public interface OnImageUploadedListener {
-        void onImageUploaded(String downloadUrl);
-        void onUploadFailure(Exception e);
-    }
 
     /**
-     * Listener interface for when all images have been uploaded
+     * Upload pictures to Firebase Storage.
+     * @param pictures Image objects to upload
+     * @param listener for when all images are done uploading
      */
-    public interface OnAllImagesUploadedListener {
-        void onAllImagesUploaded(ArrayList<String> downloadURLs);
-    }
-
     public static void uploadPictures(ArrayList<Image> pictures, OnAllImagesUploadedListener listener) {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
         ArrayList<String> downloadURLs = new ArrayList<>();
@@ -188,7 +203,11 @@ public class Image {
         }
     }
 
-
+    /**
+     * Upload bitmap to Firebase Storage.
+     * @param bitmap bitmap of picture
+     * @param listener for when picture is done uploading
+     */
     public static void uploadBitmapToStorage(Bitmap bitmap, OnImageUploadedListener listener) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -217,6 +236,10 @@ public class Image {
         });
     }
 
+    /**
+     * Delete picture in database using its URL.
+     * @param URL link to picture in database
+     */
     public static void deletePictureFromStorage(String URL) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl(URL);
         storageRef.delete()

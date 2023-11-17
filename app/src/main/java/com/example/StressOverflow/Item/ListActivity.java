@@ -218,7 +218,6 @@ public class ListActivity extends AppCompatActivity implements
 
     public void onSubmitEdit(int position, Item item) {
         if (picturesChanged) {
-            // set, not add, because user may have deleted pictures TODO: nothing is deleting the URLs yet
             item.setPictureURLs(pictureURLs);
         }
         try {
@@ -365,8 +364,7 @@ public class ListActivity extends AppCompatActivity implements
         this.pictures = pictures;
         this.pictureURLs = pictureURLs;
         picturesChanged = true;
-
-        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -153,7 +153,6 @@ public class AddImagesFragment extends DialogFragment  {
                         Intent data = result.getData();
                         if (data == null) return;
 
-                        // TODO: delete single photo selection logic?
                         if (data.getClipData() != null) {
                             // Pictures selected from library
                             int itemCount = data.getClipData().getItemCount();

@@ -99,32 +99,6 @@ public class Item {
         this.setOwner(owner);
     }
 
-    // added this because of error message TODO: remove this constructor
-    public Item(
-            String name,
-            String make,
-            String model,
-            String description,
-            GregorianCalendar date,
-            Double value,
-            String comments,
-            ArrayList<Tag> tags,
-            ArrayList<String> pictureURLs,
-            Integer serial
-    ) {
-        this.id = UUID.randomUUID();
-        this.setName(name);
-        this.setMake(make);
-        this.setModel(model);
-        this.setDescription(description);
-        this.setDate(date);
-        this.setValue(value);
-        this.setComments(comments);
-        this.addTags(tags);
-        this.addPictureURLs(pictureURLs);
-        this.setSerial(serial);
-    }
-
     public void setName(String name) throws IllegalArgumentException {
         if (name.equals("")) {
             throw new IllegalArgumentException("empty name not allowed");
