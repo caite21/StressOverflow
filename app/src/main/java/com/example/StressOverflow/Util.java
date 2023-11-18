@@ -3,9 +3,12 @@ package com.example.StressOverflow;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.Item.Item;
+import com.example.StressOverflow.Tag.Tag;
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.UUID;
 
 public final class Util {
 
@@ -25,7 +28,7 @@ public final class Util {
                 (double) val,
                 String.format("TestComment%s", String.valueOf(val)),
                 new ArrayList<Tag>(),
-                new ArrayList<Image>(),
+                new ArrayList<String>(),
                 (Integer) val,
                 "Test Owner"
         );

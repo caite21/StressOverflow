@@ -30,6 +30,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    sourceSets {
+        getByName("main") {
+            res {
+                srcDirs("src\\main\\res\\layouts\\Item",
+                    "src\\main\\res\\layouts\\Tag",
+                    "src\\main\\res\\layouts\\Image",
+                    "src\\main\\res\\layouts\\SignIn",
+                    "src\\main\\res\\layouts\\misc",
+                    "src\\main\\res\\layouts",
+                    "src\\main\\res"
+                )
+            }
+        }
+    }
 }
 
 dependencies {
@@ -45,4 +59,6 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-inline:2.13.0")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
+    implementation ("com.squareup.picasso:picasso:2.71828")
 }

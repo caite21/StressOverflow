@@ -1,5 +1,6 @@
 package com.example.StressOverflow;
 
+import static android.content.ContentValues.TAG;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
@@ -12,21 +13,21 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import android.view.View;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.test.espresso.Espresso;
-import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
+import com.example.StressOverflow.Tag.TagList;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import org.hamcrest.Matchers;
@@ -40,20 +41,31 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TagListTest {
-    private CollectionReference tagsRef;
-    private FirebaseFirestore firestore;
+    private FirebaseFirestore db;
     private String testTagName;
-    Db database;
+    private CollectionReference tagRef;
+    private String ownerName;
     @Before
     public void setUp() {
-        firestore = FirebaseFirestore.getInstance();
-        database = new Db(firestore);
+        db = FirebaseFirestore.getInstance();
+        tagRef = db.collection("tags");
         AppGlobals.getInstance().setOwnerName("testUser");
+        ownerName = "testUser";
+
     }
 
     @After
     public void cleanUp(){
-        database.deleteTag(new Tag(testTagName));
+        tagRef
+                .document(String.format("%s:%s", ownerName, testTagName))
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                        throw new RuntimeException("Error with item deletion into collection items: ", e);
+                    }
+                });
     }
 
     @Rule
@@ -63,52 +75,71 @@ public class TagListTest {
     @Test
     public void cancelAddToTagList() throws InterruptedException {
         testTagName = "cancelTestTag";
-        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
         onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
         onView(withText("Cancel")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.addTagTextView)).check(doesNotExist());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
         // Perform the query with a callback
-        database.checkTagExist(new Tag(testTagName), new Db.TagExistCallback() {
-            @Override
-            public void onTagExist(boolean exists) {
-                // Assert that the document exists
-                assertFalse(exists);
-            }
-        });
+        final boolean[] bool = new boolean[1];
+        tagRef
+                .whereEqualTo("documentID", String.format("%s:%s", ownerName, testTagName))
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots.isEmpty()){
+                            bool[0] = false;
+                        }else{
+                            bool[0] = true;
+                        }
+                    }
+
+                });
+        assertTrue(bool[0]);
     }
     @Test
     public void addToTagList() throws InterruptedException {
         testTagName = "testTag";
-        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
         onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
         onView(withText("OK")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.addTagTextView)).check(doesNotExist());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
         // Perform the query with a callback
-        database.checkTagExist(new Tag(testTagName), new Db.TagExistCallback() {
-            @Override
-            public void onTagExist(boolean exists) {
-                // Assert that the document exists
-                assertTrue(exists);
-            }
-        });
+        // Perform the query with a callback
+        final boolean[] bool = new boolean[1];
+        tagRef
+                .whereEqualTo("documentID", String.format("%s:%s", ownerName, testTagName))
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots.isEmpty()){
+                            bool[0] = false;
+                        }else{
+                            bool[0] = true;
+                        }
+                    }
+
+                });
+        assertTrue(bool[0]);
     }
 
 
     @Test
     public void deleteFromTagList() throws InterruptedException {
         testTagName = "deleteTag";
-        onView(ViewMatchers.withId(R.id.addTag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
         onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
-        onView(ViewMatchers.withId(R.id.addTagTextView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
         onView(withText("OK")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.addTagTextView)).check(doesNotExist());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
-        int listViewId = R.id.tagListView;
-        int deleteButtonId = R.id.deleteTag_button;
+        int listViewId = R.id.activity_tag_list_listView;
+        int deleteButtonId = R.id.listview_delete_tag_button;
 
         // Perform a click on the delete button in the first row of the ListView.
         Espresso.onData(Matchers.anything())
@@ -118,13 +149,23 @@ public class TagListTest {
                 .perform(click());
 
         // Perform the query with a callback
-        database.checkTagExist(new Tag(testTagName), new Db.TagExistCallback() {
-            @Override
-            public void onTagExist(boolean exists) {
-                // Assert that the document doesn't exist after deleting
-                assertFalse(exists);
-            }
-        });
+        // Perform the query with a callback
+        final boolean[] bool = new boolean[1];
+        tagRef
+                .whereEqualTo("documentID", String.format("%s:%s", ownerName, testTagName))
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots.isEmpty()){
+                            bool[0] = false;
+                        }else{
+                            bool[0] = true;
+                        }
+                    }
+
+                });
+        assertFalse(bool[0]);
     }
 
 

@@ -1,20 +1,16 @@
 package com.example.StressOverflow;
-
+import com.example.StressOverflow.Item.ListActivity;
 import static android.content.ContentValues.TAG;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.longClick;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static com.google.android.material.internal.ContextUtils.getActivity;
-import static com.google.common.base.CharMatcher.any;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.JMock1Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,19 +20,20 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.test.espresso.Espresso;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.Item.Item;
+import com.example.StressOverflow.Item.ListActivity;
+import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -101,7 +98,7 @@ public class TagItemTest {
     @Test
     public void ListActivitytoTagList(){
         onView(withId(R.id.showTagList_button)).perform(click());
-        onView(ViewMatchers.withId(R.id.addTag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
@@ -116,8 +113,8 @@ public class TagItemTest {
                 .perform(longClick());
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
-        onView(ViewMatchers.withId(R.id.makeNewTag_button)).perform(click());
-        onView(ViewMatchers.withId(R.id.tagListView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_make_new_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
@@ -132,7 +129,7 @@ public class TagItemTest {
                 .perform(longClick());
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
-        int chipGroupID = R.id.tagFragment_chipGroup;
+        int chipGroupID = R.id.fragment_add_tag_to_item_tag_chipGroup;
 
         onView(allOf(withText("tag 1"), isDescendantOfA(withId(chipGroupID))))
                 .perform(click());
