@@ -16,10 +16,19 @@ import androidx.annotation.Nullable;
 
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Db;
+import com.example.StressOverflow.Item.Item;
+import com.example.StressOverflow.Item.ItemListAdapter;
 import com.example.StressOverflow.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -89,6 +98,30 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                                         throw new RuntimeException("Error with item deletion into collection items: ", e);
                                     }
                                 });
+                        CollectionReference items = db.collection("items");
+                        Query query = items.whereEqualTo("owner", ownerName).whereArrayContains("tags", tagName);
+                        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        // Remove the tag from the 'tags' array in 'items' collection
+                                        DocumentReference docRef = items.document(document.getId());
+                                        docRef.update("tags", FieldValue.arrayRemove(tagName))
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error updating document: ", e);
+                                                        throw new RuntimeException("Error updating document: ", e);
+                                                    }
+                                                });
+
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting documents: ", task.getException());
+                                }
+                            }
+                        });
                         break;
                     }
                 }

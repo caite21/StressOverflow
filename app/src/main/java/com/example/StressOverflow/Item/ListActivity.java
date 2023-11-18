@@ -12,15 +12,14 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.FilterDialog;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -32,8 +31,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -51,15 +52,17 @@ public class ListActivity extends AppCompatActivity implements
     ItemListAdapter itemListAdapter;
     Button editButton;
     Button filterButton;
+    Button showTagListButton;
     FloatingActionButton addItemButton;
     FloatingActionButton deleteItemButton;
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference items;
+    private CollectionReference itemRef;
     private ArrayList<Image> pictures = new ArrayList<>();
     private ArrayList<String> pictureURLs = new ArrayList<>();
+    private ArrayList<Item> items = new ArrayList<>();
     private boolean picturesChanged = false;
     private CollectionReference tagRef;
 
@@ -77,7 +80,7 @@ public class ListActivity extends AppCompatActivity implements
 
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
-        this.items = this.db.collection("items");
+        this.itemRef = this.db.collection("items");
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
@@ -87,17 +90,14 @@ public class ListActivity extends AppCompatActivity implements
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-        Button showTagListButton = findViewById(R.id.showTagList_button);
-        showTagListButton.setOnClickListener(showList);
+        this.showTagListButton = findViewById(R.id.showTagList_button);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
+        this.showTagListButton.setOnClickListener(showList);
         itemList.setOnItemLongClickListener(selectItems);
         this.tagRef = this.db.collection("tags");
 
         this.ownerName =  AppGlobals.getInstance().getOwnerName();
-
-        ArrayList<Tag> allTags = new ArrayList<>();
-        String ownerName = AppGlobals.getInstance().getOwnerName();
         this.db.collection("tags")
                 .whereEqualTo("ownerName", ownerName)
                 .get()
@@ -114,6 +114,7 @@ public class ListActivity extends AppCompatActivity implements
                         }
                     }
                 });
+        AppGlobals.getInstance().setAllTags(allTags);
 
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
@@ -124,14 +125,11 @@ public class ListActivity extends AppCompatActivity implements
             new AddItemFragment(this.ownerName).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
-        this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
+        this.itemListAdapter = new ItemListAdapter(this, items);
         this.itemList.setAdapter(this.itemListAdapter);
 
         this.sumOfItemCosts.setText(this.ownerName);
 
-        ArrayList<Tag> tags = new ArrayList<Tag>();
-        tags.add(new Tag("tag1"));
-        tags.add(new Tag("tag2"));
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
@@ -140,24 +138,29 @@ public class ListActivity extends AppCompatActivity implements
         filterButton.setClickable(true);
         this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
 
-        this.items
+        this.itemRef
                 .whereEqualTo("owner",this.ownerName)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (error != null){
+                            Log.e("Firestore", error.toString());
+                            return;
+                        }
+                        if (value != null){
+                            items.clear();
+                            for (QueryDocumentSnapshot document : value) {
                                 Map<String, Object> data = document.getData();
                                 Item item = Item.fromFirebaseObject(data);
-                                onSubmitAdd(item);
+                                items.add(item);
                             }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                            itemListAdapter.notifyDataSetChanged();
                         }
                     }
+
                 });
     }
+
 
     @Override
     /**
@@ -169,7 +172,7 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
-        this.items
+        this.itemRef
                 .document(item.getId().toString())
                 .set(item.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
@@ -189,7 +192,7 @@ public class ListActivity extends AppCompatActivity implements
     public void onSubmitDelete(Item item) {
         try {
             UUID id_to_delete = item.getId();
-            this.items
+            this.itemRef
                     .document(id_to_delete.toString())
                     .delete()
                     .addOnFailureListener(new OnFailureListener() {
@@ -223,7 +226,7 @@ public class ListActivity extends AppCompatActivity implements
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
-            this.items
+            this.itemRef
                     .document(item.getId().toString())
                     .update(item.toFirebaseObject())
                     .addOnFailureListener(new OnFailureListener() {
@@ -303,7 +306,7 @@ public class ListActivity extends AppCompatActivity implements
                 }
             }
             i.addTags(tagsToAdd);
-            this.items
+            this.itemRef
                     .document(i.getId().toString())
                     .update(i.toFirebaseObject())
                     .addOnFailureListener(new OnFailureListener() {
