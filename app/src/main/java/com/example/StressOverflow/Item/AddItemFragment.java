@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,10 @@ import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Tag.AddTagFragment;
+import com.example.StressOverflow.Tag.AddTagToItemFragment;
 import com.example.StressOverflow.Tag.Tag;
+import com.example.StressOverflow.Tag.TagList;
 import com.example.StressOverflow.Util;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -44,12 +48,17 @@ public class AddItemFragment extends DialogFragment{
     private EditText itemSerialField;
     private ChipGroup tagChipGroup;
 
+    private Button addTagButton;
+    private Button refreshTagButton;
     private OnFragmentInteractionListener listener;
     private String owner;
 
     public AddItemFragment(String owner) {
         this.owner = owner;
     }
+
+
+
     public interface OnFragmentInteractionListener {
         void onSubmitAdd(Item item);
     }
@@ -62,6 +71,7 @@ public class AddItemFragment extends DialogFragment{
         } else {
             throw new RuntimeException("activity lacks implementation of OnFragmentInteractionListener");
         }
+
     }
 
     @NonNull
@@ -84,6 +94,8 @@ public class AddItemFragment extends DialogFragment{
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
+        addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
+        refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
         addTagsToChipGroup();
 
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +103,20 @@ public class AddItemFragment extends DialogFragment{
             public void onClick(View view) {
                 // Opens fragment that shows the item's pictures
                 new AddImagesFragment().show(getChildFragmentManager(), "ADD_IMAGES");
+            }
+        });
+        addTagButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), TagList.class);
+                startActivity(intent);
+            }
+        });
+
+        refreshTagButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTagsToChipGroup();
             }
         });
 
@@ -156,7 +182,7 @@ public class AddItemFragment extends DialogFragment{
      */
     private void addTagsToChipGroup(){
         ArrayList <Tag> allTags = AppGlobals.getInstance().getAllTags();
-
+        tagChipGroup.removeAllViews();
         //add all the tags as chips in the dialog
         for (Tag t: allTags){
             Chip chip = new Chip(getContext());

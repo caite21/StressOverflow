@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
+import com.example.StressOverflow.Tag.TagList;
 import com.example.StressOverflow.Util;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -41,6 +44,7 @@ public class EditItemFragment extends DialogFragment {
     private EditText itemSerialField;
     private Button itemPicturesButton;
     private ChipGroup tagChipGroup;
+    private Button addTagButton;
     private OnFragmentInteractionListener listener;
     private Item selectedItem;
     private int pos;
@@ -67,7 +71,7 @@ public class EditItemFragment extends DialogFragment {
     @Override
     /**
      * Called when the floating action button to create an item is pressed
-     * Ya
+     *
      */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_edit_item, null);
@@ -85,6 +89,7 @@ public class EditItemFragment extends DialogFragment {
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
 
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
+        addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
         addTagsToChipGroup();
 
         itemTitleField.setText(this.selectedItem.getName());
@@ -105,7 +110,13 @@ public class EditItemFragment extends DialogFragment {
                 new AddImagesFragment(selectedItem).show(getChildFragmentManager(), "ADD_IMAGES");
             }
         });
-
+        addTagButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), TagList.class);
+                startActivity(intent);
+            }
+        });
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         return builder
@@ -169,15 +180,18 @@ public class EditItemFragment extends DialogFragment {
      * Add all the tags of the selected Item to the ChipGroup
      */
     private void addTagsToChipGroup(){
-        ArrayList<Tag> tags = selectedItem.getTags();
+        ArrayList<Tag> tags = AppGlobals.getInstance().getAllTags();
+        ArrayList<Tag> selectedTags = selectedItem.getTags();
         tagChipGroup.removeAllViews();
         for (Tag t: tags){
             Chip chip = new Chip(getContext());
             chip.setText(t.getTagName());
+            if (selectedTags.contains(t)){
+                chip.setChecked(true);
+            }
             chip.setCheckedIconVisible(true);
             chip.setCheckable(true);
             chip.setActivated(false);
-            chip.setChecked(true);
             tagChipGroup.addView(chip);
             chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
         }
