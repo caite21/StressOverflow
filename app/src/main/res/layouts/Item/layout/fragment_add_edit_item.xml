@@ -137,7 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_edit_text"
-                android:hint="2023"
+                android:hint="YYYY"
                 android:paddingStart="12dp"
                 />
         </LinearLayout>
@@ -160,7 +160,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_edit_text"
-                android:hint="11"
+                android:hint="MM"
                 android:paddingStart="12dp"
                 />
         </LinearLayout>
@@ -183,7 +183,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_edit_text"
-                android:hint="16"
+                android:hint="DD"
                 android:paddingStart="12dp"
                 />
         </LinearLayout>

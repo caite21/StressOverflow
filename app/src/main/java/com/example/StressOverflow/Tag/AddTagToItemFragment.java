@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -33,7 +32,6 @@ public class AddTagToItemFragment extends DialogFragment{
     private ArrayList<Tag> allTags = new ArrayList<>();
     private FirebaseFirestore db;
     private CollectionReference tagsRef;
-    private Db tagDb;
     private String ownerName;
 
 
