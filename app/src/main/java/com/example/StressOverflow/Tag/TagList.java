@@ -31,8 +31,9 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     private CollectionReference tagRef;
     private Db tagDb;
     private String ownerName;
+
     /**
-     * sets up the event listeners of the different views on this activtiy
+     * sets up the event listeners of the different views on this activity
      * @param savedInstanceState If the activity is being re-initialized after
      *     previously being shut down then this Bundle contains the data it most
      *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>

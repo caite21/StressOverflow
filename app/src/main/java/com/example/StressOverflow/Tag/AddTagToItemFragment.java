@@ -83,23 +83,22 @@ public class AddTagToItemFragment extends DialogFragment{
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         Button makeNewTag = view.findViewById(R.id.fragment_add_tag_to_item_make_new_tag_button);
+        Button refreshTag = view.findViewById(R.id.fragment_add_tag_to_item_refresh_tag_button);
+
         makeNewTag.setOnClickListener(openTagList);
         chipGroup = view.findViewById(R.id.fragment_add_tag_to_item_tag_chipGroup);
 
         allTags = AppGlobals.getInstance().getAllTags();
+        addTagsToChipGroup();
+        refreshTag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTagsToChipGroup();
+            }
+        });
 
-        //add all the tags as chips in the dialog
-        for (Tag t: allTags){
-            Chip chip = new Chip(getContext());
-            chip.setText(t.getTagName());
-            chip.setCheckedIconVisible(true);
-            chip.setCheckable(true);
-            chip.setActivated(false);
-            chipGroup.addView(chip);
-            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
-        }
         return builder.setView(view)
-                .setTitle("AddTag")
+                .setTitle("Add Tag")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener(){
                     @Override
@@ -114,6 +113,20 @@ public class AddTagToItemFragment extends DialogFragment{
                 }).create();
     }
 
+    private void addTagsToChipGroup(){
+        allTags = AppGlobals.getInstance().getAllTags();
+        chipGroup.removeAllViews();
+        //add all the tags as chips in the dialog
+        for (Tag t: allTags){
+            Chip chip = new Chip(getContext());
+            chip.setText(t.getTagName());
+            chip.setCheckedIconVisible(true);
+            chip.setCheckable(true);
+            chip.setActivated(false);
+            chipGroup.addView(chip);
+            chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
+        }
+    }
     /**
      * Direct user to master TagList to add new tags.
      */

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -370,6 +371,11 @@ public class Item {
      * @return stuff i guess
      */
     public HashMap<String, Object> toFirebaseObject() {
+        List<Tag> tagsList = this.getTags();
+        ArrayList<String> tagNamesArrayList = new ArrayList<>();
+        for (Tag tag : tagsList) {
+            tagNamesArrayList.add(tag.getTagName());
+        }
         HashMap<String, Object> data = new HashMap<>();
         data.put("id", this.getId());
         data.put("name", this.getName());
@@ -385,7 +391,7 @@ public class Item {
         data.put("owner", this.getOwner());
         data.put("serial", this.getSerial());
         data.put("pictures", this.getPictureURLs());
-        data.put("tags", this.getTags());
+        data.put("tags", tagNamesArrayList);
         return data;
     }
 
@@ -404,8 +410,8 @@ public class Item {
             );
             //@SuppressWarnings({"unchecked", "ConstantConditions"}) // just trust me bro
                     // TODO: sunny should not be trusted.
-            for (Map<String, Object> tagName: (ArrayList <Map<String, Object>>) data.get("tags")){
-                tags.add(Tag.fromFirebaseObject(tagName));
+            for (String tagName:(ArrayList<String>) data.get("tags")){
+                tags.add(new Tag(tagName));
             }
 
             // get pictures and catch errors
