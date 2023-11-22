@@ -3,7 +3,6 @@ package com.example.StressOverflow.Item;
 import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
+import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.FilterDialog;
 import com.example.StressOverflow.Image.Image;
@@ -38,6 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
@@ -46,7 +47,8 @@ public class ListActivity extends AppCompatActivity implements
         AddItemFragment.OnFragmentInteractionListener,
         AddTagToItemFragment.OnFragmentInteractionListener,
         EditItemFragment.OnFragmentInteractionListener,
-        AddImagesFragment.OnFragmentInteractionListener {
+        AddImagesFragment.OnFragmentInteractionListener,
+        FilterItemsFragment.OnFragmentInteractionListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
@@ -99,20 +101,20 @@ public class ListActivity extends AppCompatActivity implements
 
         this.ownerName =  AppGlobals.getInstance().getOwnerName();
         this.db.collection("tags")
-                .whereEqualTo("ownerName", ownerName)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Map<String, Object> data = document.getData();
-                                allTags.add(Tag.fromFirebaseObject(data));
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+            .whereEqualTo("ownerName", ownerName)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Map<String, Object> data = document.getData();
+                            allTags.add(Tag.fromFirebaseObject(data));
                         }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
+
                 });
         AppGlobals.getInstance().setAllTags(allTags);
 
@@ -133,10 +135,10 @@ public class ListActivity extends AppCompatActivity implements
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
-        Dialog filterDialog = new Dialog(ListActivity.this);
 
-        filterButton.setClickable(true);
-        this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
+        this.filterButton.setOnClickListener(v -> {
+            new FilterItemsFragment(this.itemList, this.itemListAdapter).show(getSupportFragmentManager(), "FILTER");
+        });
 
         this.itemRef
                 .whereEqualTo("owner",this.ownerName)
@@ -368,6 +370,22 @@ public class ListActivity extends AppCompatActivity implements
         this.pictureURLs = pictureURLs;
         picturesChanged = true;
 //        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFilterPressed(Map<String, ArrayList<String>> filterConds) {
+        ArrayList<Item> filteredList;
+        try {
+            filteredList = this.itemListAdapter.filterList(filterConds);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        ItemListAdapter filtereditemListAdapter = new ItemListAdapter(this, filteredList);
+
+        this.itemList.setAdapter(filtereditemListAdapter);
+        this.setSumOfItemCosts();
+        this.itemListAdapter.notifyDataSetChanged();
     }
 
 }
