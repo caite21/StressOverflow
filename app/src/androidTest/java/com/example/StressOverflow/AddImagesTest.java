@@ -43,12 +43,10 @@ public class AddImagesTest {
     private CollectionReference tagsRef;
     private FirebaseFirestore firestore;
     private String testTagName;
-    Db database;
 
     @Before
     public void setUp() {
         firestore = FirebaseFirestore.getInstance();
-        database = new Db(firestore);
 
 //        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
     }

@@ -11,7 +11,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
@@ -29,7 +28,6 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
     private CollectionReference tagRef;
-    private Db tagDb;
     private String ownerName;
 
     /**
@@ -52,7 +50,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         back_button.setOnClickListener(backToMain);
         ListView tagListView = findViewById(R.id.activity_tag_list_listView);
         this.ownerName = AppGlobals.getInstance().getOwnerName();
-        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb);
+        tagAdapter = new TagListAdapter(TagList.this, tagList);
         tagListView.setAdapter(tagAdapter);
 
         //displays on tagList Activity

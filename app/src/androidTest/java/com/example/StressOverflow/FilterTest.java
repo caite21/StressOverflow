@@ -59,7 +59,6 @@ import java.util.GregorianCalendar;
 public class FilterTest {
     private FirebaseFirestore firestore;
     Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    Db database;
     Item item1;
     Item item2;
     Item item3;

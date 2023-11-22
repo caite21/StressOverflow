@@ -15,9 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
-import com.example.StressOverflow.Item.Item;
-import com.example.StressOverflow.Item.ItemListAdapter;
 import com.example.StressOverflow.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,7 +40,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      * @param context context of the adapter
      * @param tags list of all tags
      */
-    public TagListAdapter(Context context, ArrayList<Tag> tags,Db db) {
+    public TagListAdapter(Context context, ArrayList<Tag> tags) {
         super(context, R.layout.listview_tag_content, tags);
         this.context = context;
         this.tags = tags;

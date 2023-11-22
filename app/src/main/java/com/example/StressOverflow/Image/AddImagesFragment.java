@@ -24,20 +24,16 @@ import androidx.fragment.app.DialogFragment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.R;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 
 /**
