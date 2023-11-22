@@ -45,6 +45,8 @@ public class EditItemFragment extends DialogFragment {
     private Button itemPicturesButton;
     private ChipGroup tagChipGroup;
     private Button addTagButton;
+    private Button refreshTagButton;
+
     private OnFragmentInteractionListener listener;
     private Item selectedItem;
     private int pos;
@@ -90,6 +92,7 @@ public class EditItemFragment extends DialogFragment {
 
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
+        refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
         addTagsToChipGroup();
 
         itemTitleField.setText(this.selectedItem.getName());
@@ -117,6 +120,13 @@ public class EditItemFragment extends DialogFragment {
                 startActivity(intent);
             }
         });
+        refreshTagButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTagsToChipGroup();
+            }
+        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         return builder
@@ -186,12 +196,16 @@ public class EditItemFragment extends DialogFragment {
         for (Tag t: tags){
             Chip chip = new Chip(getContext());
             chip.setText(t.getTagName());
+
+            chip.setCheckable(true);
             if (selectedTags.contains(t)){
                 chip.setChecked(true);
+                chip.setActivated(true);
+            }else{
+                chip.setChecked(false);
+                chip.setActivated(false);
             }
             chip.setCheckedIconVisible(true);
-            chip.setCheckable(true);
-            chip.setActivated(false);
             tagChipGroup.addView(chip);
             chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
         }

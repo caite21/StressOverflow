@@ -8,6 +8,7 @@ import android.util.Log;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Tag implements Serializable {
     private String tagName;
@@ -47,6 +48,14 @@ public class Tag implements Serializable {
         data.put("tagName", this.tagName);
         data.put("ownerName", ownerName);
         return data;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Tag otherTag = (Tag) obj;
+        return Objects.equals(tagName, otherTag.tagName);
     }
 
     /**
