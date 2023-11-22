@@ -18,7 +18,7 @@
         <activity android:name=".Item.ListActivity"
             android:exported="false"/>
         <activity
-            android:name=".FilterDialog"
+            android:name=".Item.FilterDialog"
             android:exported="false" />
         <activity
             android:name=".ItemView"

@@ -31,6 +31,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -45,7 +47,7 @@ import java.util.UUID;
 /**
  * An adapter that displays the content in ListActivity
  */
-public class ItemListAdapter extends ArrayAdapter<Item> {
+public class ItemListAdapter extends ArrayAdapter<Item> {//implements Comparator<Item> {
     private ArrayList<Item> items;
     private Context context;
 
@@ -197,8 +199,13 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
      *
      * @param cmp provides rules for how to sort the ArrayList
      */
-    public void sortList(Comparator<Item> cmp) {
-        this.items.sort(cmp);
+//    @Override
+//    public int compareDate(Item firstItem, Item secondItem) {
+    public void compareDate(String compareType) {
+        List itemlist = (List) this.items;
+        if (compareType == "description") {
+            itemlist.sort(Sort.descriptionComparator);
+        }
         this.notifyDataSetChanged();
     }
 
@@ -294,12 +301,12 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             }
 
             // Filter by make
-            if (!conditions.get("makes").stream().allMatch(make -> make.contains(item.getMake()))) {
+            if (!conditions.get("makes").stream().allMatch(make -> make.equals(item.getMake()))) {
                 continue;
             }
 
             // Filter by tags
-            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().contains(tagList)))) {
+            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().equals(tagList)))) {
                 continue;
             }
             
@@ -307,4 +314,49 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         }
         return filtered;
     }
+}
+
+class Sort implements Comparable<Item> {
+
+    private Item val;
+    private String name;
+
+    public Sort(Item val, String name){
+        this.val = val;
+        this.name = name;
+    }
+
+    @Override
+    public int compareTo(Item i) {
+        if (val.getDate().after(i.getDate())) return 1;
+        else if (val.getDate().before(i.getDate())) return -1;
+        else return 0;
+    }
+
+    public static Comparator<Sort> descriptionComparator = new Comparator<Sort>() {
+        @Override
+        public int compare(Sort s1, Sort s2) {
+            return s1.val.getDescription().compareTo(s2.val.getDescription());
+        }
+    };
+
+    public static Comparator<Sort> makeComparator = new Comparator<Sort>() {
+        @Override
+        public int compare(Sort s1, Sort s2) {
+            return s1.val.getMake().compareTo(s2.val.getMake());
+        }
+    };
+
+    public static Comparator<Sort> valueComparator = new Comparator<Sort>() {
+        @Override
+        public int compare(Sort s1, Sort s2) {
+            return Double.compare(s1.val.getValue(), s2.val.getValue());
+        }
+    };
+
+    @Override
+    public String toString(){
+        return this.name;
+    }
+
 }
