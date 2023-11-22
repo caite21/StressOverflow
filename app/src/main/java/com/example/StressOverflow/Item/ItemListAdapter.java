@@ -5,9 +5,8 @@ package com.example.StressOverflow.Item;
 import static android.content.ContentValues.TAG;
 
 import com.example.StressOverflow.Image.Image;
-import com.example.StressOverflow.Item.ListActivity;
+
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,7 +27,6 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Array;
 import java.text.ParseException;
@@ -61,6 +58,10 @@ public class ItemListAdapter extends ArrayAdapter<Item> {//implements Comparator
         this.items = items;
         this.context = context;
         this.itemRef = db.collection("items");
+    }
+
+    public void clearItems(){
+        this.items.clear();
     }
 
     @NonNull
