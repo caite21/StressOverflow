@@ -20,7 +20,6 @@ import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
 import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.FilterDialog;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
@@ -114,7 +113,7 @@ public class ListActivity extends AppCompatActivity implements
                     } else {
                         Log.d(TAG, "Error getting documents: ", task.getException());
                     }
-
+                }
                 });
         AppGlobals.getInstance().setAllTags(allTags);
 
