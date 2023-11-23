@@ -39,7 +39,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements
@@ -248,7 +251,8 @@ public class ListActivity extends AppCompatActivity implements
      *
      */
     public void setSumOfItemCosts() {
-        this.sumOfItemCosts.setText(this.itemListAdapter.getTotalValue().toString());
+        ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
+        this.sumOfItemCosts.setText(adapter.getTotalValue().toString());
     }
 
     /**
@@ -372,7 +376,7 @@ public class ListActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFilterPressed(Map<String, ArrayList<String>> filterConds) {
+    public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
         ArrayList<Item> filteredList;
         try {
             filteredList = this.itemListAdapter.filterList(filterConds);
@@ -380,11 +384,42 @@ public class ListActivity extends AppCompatActivity implements
             throw new RuntimeException(e);
         }
 
-        ItemListAdapter filtereditemListAdapter = new ItemListAdapter(this, filteredList);
+        if (!Objects.equals(sortType, "No Sort")) sortBy(sortType, filteredList, isAsc);
 
-        this.itemList.setAdapter(filtereditemListAdapter);
+        ItemListAdapter filteredItemListAdapter = new ItemListAdapter(this, filteredList);
+
+        this.itemList.setAdapter(filteredItemListAdapter);
         this.setSumOfItemCosts();
+
         this.itemListAdapter.notifyDataSetChanged();
+    }
+
+    public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
+        Collections.sort(list, comparator);
+    }
+
+    public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
+        sort(unsortedList, new Comparator<Item>() {
+            @Override
+            public int compare(Item obj1, Item obj2) {
+                int result;
+                if (Objects.equals(sortType, "Date")) {
+                    result = obj1.getDate().compareTo(obj2.getDate());
+                } else if (Objects.equals(sortType, "Desc")) {
+                    result = obj1.getDescription().compareTo(obj2.getDescription());
+                } else if (Objects.equals(sortType, "Make")) {
+                    result = obj1.getMake().compareTo(obj2.getMake());
+                } else if (Objects.equals(sortType, "Value")) {
+                    result = obj1.getValue().compareTo(obj2.getValue());
+                } else if (Objects.equals(sortType, "Tags")) {
+                    result = obj1.getTags().get(0).getTagName().compareTo(obj2.getTags().get(0).getTagName());
+                } else {
+                    result = 0;
+                }
+
+                return isAsc ? result : -result;
+            }
+        });
     }
 
 }
