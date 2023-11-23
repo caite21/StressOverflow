@@ -112,6 +112,9 @@ public class ItemListAdapter extends ArrayAdapter<Item> {//implements Comparator
      * @param enabled the selection mode to be set to
      */
     public void setSelectionMode(boolean enabled) {
+        if (enabled == false){
+            selectedItems.clear();
+        }
         inSelectionMode = enabled;
         notifyDataSetChanged(); // Notify the adapter to refresh the view
     }
