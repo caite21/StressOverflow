@@ -15,11 +15,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -34,7 +40,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
      * @param context context of the adapter
      * @param tags list of all tags
      */
-    public TagListAdapter(Context context, ArrayList<Tag> tags,Db db) {
+    public TagListAdapter(Context context, ArrayList<Tag> tags) {
         super(context, R.layout.listview_tag_content, tags);
         this.context = context;
         this.tags = tags;
@@ -63,9 +69,9 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_tag_content, parent,false);
         }
         Tag tag = getItem(position);
-        TextView tagName = convertView.findViewById(R.id.tagContent);
+        TextView tagName = convertView.findViewById(R.id.listview_tag_content_textView);
         tagName.setText(tag.getTagName());
-        Button deleteButton = convertView.findViewById(R.id.deleteTag_button);
+        Button deleteButton = convertView.findViewById(R.id.listview_delete_tag_button);
 
         /**
          * Is called when the deleteButton is clicked on for a tag
@@ -89,9 +95,34 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                                         throw new RuntimeException("Error with item deletion into collection items: ", e);
                                     }
                                 });
+                        CollectionReference items = db.collection("items");
+                        Query query = items.whereEqualTo("owner", ownerName).whereArrayContains("tags", tagName);
+                        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        // Remove the tag from the 'tags' array in 'items' collection
+                                        DocumentReference docRef = items.document(document.getId());
+                                        docRef.update("tags", FieldValue.arrayRemove(tagName))
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error updating document: ", e);
+                                                        throw new RuntimeException("Error updating document: ", e);
+                                                    }
+                                                });
+
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting documents: ", task.getException());
+                                }
+                            }
+                        });
                         break;
                     }
                 }
+                AppGlobals.getInstance().setAllTags(tags);
                 notifyDataSetChanged();
             }
         });

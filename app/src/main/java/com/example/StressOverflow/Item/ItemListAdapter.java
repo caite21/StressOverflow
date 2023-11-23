@@ -5,9 +5,8 @@ package com.example.StressOverflow.Item;
 import static android.content.ContentValues.TAG;
 
 import com.example.StressOverflow.Image.Image;
-import com.example.StressOverflow.Item.ListActivity;
+
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,16 +27,19 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -59,6 +60,10 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.items = items;
         this.context = context;
         this.itemRef = db.collection("items");
+    }
+
+    public void clearItems(){
+        this.items.clear();
     }
 
     @NonNull
@@ -109,6 +114,9 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
      * @param enabled the selection mode to be set to
      */
     public void setSelectionMode(boolean enabled) {
+        if (enabled == false){
+            selectedItems.clear();
+        }
         inSelectionMode = enabled;
         notifyDataSetChanged(); // Notify the adapter to refresh the view
     }
@@ -192,15 +200,20 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.notifyDataSetChanged();
     }
 
-    /**
-     * Sorts the list with the provided comparator that uses Item as a template.
-     *
-     * @param cmp provides rules for how to sort the ArrayList
-     */
-    public void sortList(Comparator<Item> cmp) {
-        this.items.sort(cmp);
-        this.notifyDataSetChanged();
-    }
+//    /**
+//     * Sorts the list with the provided comparator that uses Item as a template.
+//     *
+//     * @param cmp provides rules for how to sort the ArrayList
+//     */
+////    @Override
+////    public int compareDate(Item firstItem, Item secondItem) {
+//    public void compareDate(String compareType) {
+//        List itemlist = (List) this.items;
+//        if (compareType == "description") {
+//            itemlist.sort(Sort.descriptionComparator);
+//        }
+//        this.notifyDataSetChanged();
+//    }
 
     /**
      * Add the tags for the item on runtime
@@ -266,7 +279,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         }
 
         ArrayList<Item> filtered = new ArrayList<Item>();
-
         for (int i = 0; i < this.items.size(); i++) {
             Item item = this.items.get(i);
 
@@ -294,15 +306,14 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
             }
 
             // Filter by make
-            if (!conditions.get("makes").stream().allMatch(make -> make.contains(item.getMake()))) {
+            if (!conditions.get("makes").stream().allMatch(make -> make.equals(item.getMake()))) {
                 continue;
             }
 
             // Filter by tags
-            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().contains(tagList)))) {
+            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().equals(tagList)))) {
                 continue;
             }
-            
             filtered.add(this.items.get(i));
         }
         return filtered;

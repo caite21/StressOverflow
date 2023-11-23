@@ -11,7 +11,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
 import com.example.StressOverflow.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
@@ -29,10 +28,10 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
     TagListAdapter tagAdapter;
     private FirebaseFirestore db;
     private CollectionReference tagRef;
-    private Db tagDb;
     private String ownerName;
+
     /**
-     * sets up the event listeners of the different views on this activtiy
+     * sets up the event listeners of the different views on this activity
      * @param savedInstanceState If the activity is being re-initialized after
      *     previously being shut down then this Bundle contains the data it most
      *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
@@ -45,13 +44,13 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
 
         db = FirebaseFirestore.getInstance();
         tagRef = db.collection("tags");
-        addTag_button = findViewById(R.id.addTag_button);
-        back_button = findViewById(R.id.tagListBack_button);
+        addTag_button = findViewById(R.id.activity_tag_list_add_tag_button);
+        back_button = findViewById(R.id.activity_tag_list_back_button);
         addTag_button.setOnClickListener(addTag);
         back_button.setOnClickListener(backToMain);
-        ListView tagListView = findViewById(R.id.tagListView);
+        ListView tagListView = findViewById(R.id.activity_tag_list_listView);
         this.ownerName = AppGlobals.getInstance().getOwnerName();
-        tagAdapter = new TagListAdapter(TagList.this, tagList, tagDb);
+        tagAdapter = new TagListAdapter(TagList.this, tagList);
         tagListView.setAdapter(tagAdapter);
 
         //displays on tagList Activity

@@ -9,7 +9,7 @@
 
 
     <EditText
-        android:id="@+id/addTagTextView"
+        android:id="@+id/fragment_add_tag_textView"
         android:layout_width="332dp"
         android:layout_height="74dp"
         android:layout_marginStart="20dp"

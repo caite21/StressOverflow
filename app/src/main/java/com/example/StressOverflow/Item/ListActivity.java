@@ -3,7 +3,6 @@ package com.example.StressOverflow.Item;
 import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,16 +11,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
+import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Db;
-import com.example.StressOverflow.FilterDialog;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
@@ -32,34 +30,43 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ListActivity extends AppCompatActivity implements
         AddItemFragment.OnFragmentInteractionListener,
         AddTagToItemFragment.OnFragmentInteractionListener,
         EditItemFragment.OnFragmentInteractionListener,
-        AddImagesFragment.OnFragmentInteractionListener {
+        AddImagesFragment.OnFragmentInteractionListener,
+        FilterItemsFragment.OnFragmentInteractionListener {
 
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
     Button filterButton;
+    Button showTagListButton;
     FloatingActionButton addItemButton;
     FloatingActionButton deleteItemButton;
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference items;
+    private CollectionReference itemRef;
     private ArrayList<Image> pictures = new ArrayList<>();
     private ArrayList<String> pictureURLs = new ArrayList<>();
+    private ArrayList<Item> items = new ArrayList<>();
     private boolean picturesChanged = false;
     private CollectionReference tagRef;
 
@@ -77,7 +84,7 @@ public class ListActivity extends AppCompatActivity implements
 
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
-        this.items = this.db.collection("items");
+        this.itemRef = this.db.collection("items");
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
@@ -87,33 +94,31 @@ public class ListActivity extends AppCompatActivity implements
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-        Button showTagListButton = findViewById(R.id.showTagList_button);
-        showTagListButton.setOnClickListener(showList);
+        this.showTagListButton = findViewById(R.id.showTagList_button);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
+        this.showTagListButton.setOnClickListener(showList);
         itemList.setOnItemLongClickListener(selectItems);
         this.tagRef = this.db.collection("tags");
 
         this.ownerName =  AppGlobals.getInstance().getOwnerName();
-
-        ArrayList<Tag> allTags = new ArrayList<>();
-        String ownerName = AppGlobals.getInstance().getOwnerName();
         this.db.collection("tags")
-                .whereEqualTo("ownerName", ownerName)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Map<String, Object> data = document.getData();
-                                allTags.add(Tag.fromFirebaseObject(data));
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+            .whereEqualTo("ownerName", ownerName)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Map<String, Object> data = document.getData();
+                            allTags.add(Tag.fromFirebaseObject(data));
                         }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
+                }
                 });
+        AppGlobals.getInstance().setAllTags(allTags);
 
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
@@ -124,40 +129,42 @@ public class ListActivity extends AppCompatActivity implements
             new AddItemFragment(this.ownerName).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
-        this.itemListAdapter = new ItemListAdapter(this, new ArrayList<Item>());
+        this.itemListAdapter = new ItemListAdapter(this, items);
         this.itemList.setAdapter(this.itemListAdapter);
 
         this.sumOfItemCosts.setText(this.ownerName);
 
-        ArrayList<Tag> tags = new ArrayList<Tag>();
-        tags.add(new Tag("tag1"));
-        tags.add(new Tag("tag2"));
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
-        Dialog filterDialog = new Dialog(ListActivity.this);
 
-        filterButton.setClickable(true);
-        this.filterButton.setOnClickListener(v -> new FilterDialog(filterDialog, this.itemListAdapter, this.itemList));
+        this.filterButton.setOnClickListener(v -> {
+            new FilterItemsFragment(this.itemList, this.itemListAdapter).show(getSupportFragmentManager(), "FILTER");
+        });
 
-        this.items
+        this.itemRef
                 .whereEqualTo("owner",this.ownerName)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (error != null){
+                            Log.e("Firestore", error.toString());
+                            return;
+                        }
+                        if (value != null){
+                            items.clear();
+                            for (QueryDocumentSnapshot document : value) {
                                 Map<String, Object> data = document.getData();
                                 Item item = Item.fromFirebaseObject(data);
-                                onSubmitAdd(item);
+                                items.add(item);
                             }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                            itemListAdapter.notifyDataSetChanged();
                         }
                     }
+
                 });
     }
+
 
     @Override
     /**
@@ -169,7 +176,7 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
-        this.items
+        this.itemRef
                 .document(item.getId().toString())
                 .set(item.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
@@ -189,7 +196,7 @@ public class ListActivity extends AppCompatActivity implements
     public void onSubmitDelete(Item item) {
         try {
             UUID id_to_delete = item.getId();
-            this.items
+            this.itemRef
                     .document(id_to_delete.toString())
                     .delete()
                     .addOnFailureListener(new OnFailureListener() {
@@ -223,7 +230,7 @@ public class ListActivity extends AppCompatActivity implements
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
-            this.items
+            this.itemRef
                     .document(item.getId().toString())
                     .update(item.toFirebaseObject())
                     .addOnFailureListener(new OnFailureListener() {
@@ -244,7 +251,8 @@ public class ListActivity extends AppCompatActivity implements
      *
      */
     public void setSumOfItemCosts() {
-        this.sumOfItemCosts.setText(this.itemListAdapter.getTotalValue().toString());
+        ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
+        this.sumOfItemCosts.setText(adapter.getTotalValue().toString());
     }
 
     /**
@@ -303,7 +311,7 @@ public class ListActivity extends AppCompatActivity implements
                 }
             }
             i.addTags(tagsToAdd);
-            this.items
+            this.itemRef
                     .document(i.getId().toString())
                     .update(i.toFirebaseObject())
                     .addOnFailureListener(new OnFailureListener() {
@@ -365,6 +373,53 @@ public class ListActivity extends AppCompatActivity implements
         this.pictureURLs = pictureURLs;
         picturesChanged = true;
 //        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
+        ArrayList<Item> filteredList;
+        try {
+            filteredList = this.itemListAdapter.filterList(filterConds);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (!Objects.equals(sortType, "No Sort")) sortBy(sortType, filteredList, isAsc);
+
+        ItemListAdapter filteredItemListAdapter = new ItemListAdapter(this, filteredList);
+
+        this.itemList.setAdapter(filteredItemListAdapter);
+        this.setSumOfItemCosts();
+
+        this.itemListAdapter.notifyDataSetChanged();
+    }
+
+    public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
+        Collections.sort(list, comparator);
+    }
+
+    public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
+        sort(unsortedList, new Comparator<Item>() {
+            @Override
+            public int compare(Item obj1, Item obj2) {
+                int result;
+                if (Objects.equals(sortType, "Date")) {
+                    result = obj1.getDate().compareTo(obj2.getDate());
+                } else if (Objects.equals(sortType, "Desc")) {
+                    result = obj1.getDescription().compareTo(obj2.getDescription());
+                } else if (Objects.equals(sortType, "Make")) {
+                    result = obj1.getMake().compareTo(obj2.getMake());
+                } else if (Objects.equals(sortType, "Value")) {
+                    result = obj1.getValue().compareTo(obj2.getValue());
+                } else if (Objects.equals(sortType, "Tags")) {
+                    result = obj1.getTags().get(0).getTagName().compareTo(obj2.getTags().get(0).getTagName());
+                } else {
+                    result = 0;
+                }
+
+                return isAsc ? result : -result;
+            }
+        });
     }
 
 }

@@ -59,7 +59,6 @@ import java.util.GregorianCalendar;
 public class FilterTest {
     private FirebaseFirestore firestore;
     Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    Db database;
     Item item1;
     Item item2;
     Item item3;
@@ -71,11 +70,10 @@ public class FilterTest {
     @Before
     public void setUp() {
         firestore = FirebaseFirestore.getInstance();
-        database = new Db(firestore);
         AppGlobals.getInstance().setOwnerName("testUser");
 
         ArrayList<Tag> testTags = new ArrayList<>();
-        ArrayList<Image> images = new ArrayList<>();
+        ArrayList<String> images = new ArrayList<>();
 
         //Add a tag first
         testTags.add(new Tag("testTag1"));
@@ -87,33 +85,7 @@ public class FilterTest {
         item3 = new Item("Test3","make2","model","this is the second second tag", new GregorianCalendar(2001, 1, 1),77.00, "Comments",testTags,images,
                 123456, AppGlobals.getInstance().getOwnerName());
 
-        firestore.collection("items").document(item1.getId().toString())
-            .set(item1.toFirebaseObject())
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error with item insertion into collection items: ", e);
-                    throw new RuntimeException("Error with item insertion into collection items: ", e);
-                }
-            });
-        firestore.collection("items").document(item2.getId().toString())
-            .set(item2.toFirebaseObject())
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error with item insertion into collection items: ", e);
-                    throw new RuntimeException("Error with item insertion into collection items: ", e);
-                }
-            });
-        firestore.collection("items").document(item3.getId().toString())
-            .set(item3.toFirebaseObject())
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error with item insertion into collection items: ", e);
-                    throw new RuntimeException("Error with item insertion into collection items: ", e);
-                }
-            });
+
     }
 
     @After
