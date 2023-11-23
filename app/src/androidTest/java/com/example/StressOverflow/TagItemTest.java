@@ -58,7 +58,7 @@ public class TagItemTest {
         AppGlobals.getInstance().setOwnerName("testUser");
 
         ArrayList<Tag> testTags = new ArrayList<>();
-        ArrayList<Image> images = new ArrayList<>();
+        ArrayList<String> images = new ArrayList<>();
 
         //Add a tag first
         testTags.add(new Tag("testTag1"));
