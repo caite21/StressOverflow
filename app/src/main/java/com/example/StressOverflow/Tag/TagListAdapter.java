@@ -122,6 +122,7 @@ public class TagListAdapter extends ArrayAdapter<Tag> {
                         break;
                     }
                 }
+                AppGlobals.getInstance().setAllTags(tags);
                 notifyDataSetChanged();
             }
         });
