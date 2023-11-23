@@ -38,22 +38,18 @@
     <string name="your_username">Your username</string>
     <string name="re_enter_password">Re-enter password</string>
 
-    <string name="filter__dialog__keywords__header">Keywords</string>
-    <string name="filter__dialog__date__header">Dates</string>
-    <string name="filter__dialog__start__date__hint">From</string>
-    <string name="filter__dialog__end__date__hint">To</string>
-    <string name="filter__dialog__tags__header">Tags</string>
-    <string name="filter__dialog__tags__select__all__text">Select All</string>
-    <string name="filter__dialog__sort__header">Sort</string>
-    <string name="filter__dialog__date__btn__text">Date</string>
-    <string name="filter__dialog__descr__btn__text">Description</string>
-    <string name="filter__dialog__make__btn__text">Make</string>
-    <string name="filter__dialog__value__btn__text">Value</string>
-    <string name="filter__dialog__asc__btn__text">Ascending</string>
-    <string name="filter__dialog__desc__btn__text">Descending</string>
-    <string name="filter__dialog__back__btn__text">Back</string>
-    <string name="filter__dialog__filter__btn__text">Filter</string>
-    <string name="filter__dialog__make__header">Make</string>
+    <string name="fragment_filter_items_keywords_header">Keywords</string>
+    <string name="fragment_filter_items_date_header">Dates</string>
+    <string name="fragment_filter_items_start_date_hint">From</string>
+    <string name="fragment_filter_items_end_date_hint">To</string>
+    <string name="fragment_filter_items_make_header">Make</string>
+    <string name="fragment_filter_items_tags_header">Tags</string>
+    <string name="fragment_filter_items_select_all_text">Select All</string>
+    <string name="fragment_filter_items_sort_header">Sort</string>
+    <string name="fragment_filter_items_date_btn_text">Date</string>
+    <string name="fragment_filter_items_descr_btn_text">Desc</string>
+    <string name="fragment_filter_items_make_btn_text">Make</string>
+    <string name="fragment_filter_items_value_btn_text">Value</string>
 
     <string name = "activity_tag_list_add_btn_text">Add</string>
     <string name = "activity_tag_list_back_btn_text">Back</string>

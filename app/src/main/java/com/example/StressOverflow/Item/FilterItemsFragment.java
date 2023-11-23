@@ -1,5 +1,8 @@
 package com.example.StressOverflow.Item;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -15,12 +18,14 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Tag.Tag;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -35,9 +40,9 @@ public class FilterItemsFragment extends DialogFragment {
 
     private FilterItemsFragment.OnFragmentInteractionListener listener;
     private View view;
-    private ListView itemList;
     private ItemListAdapter itemAdapter;
 
+    private ListView itemList;
     private AutoCompleteTextView keywordInput;
     private ChipGroup keywordChips;
     private EditText startDateInput;
@@ -46,16 +51,8 @@ public class FilterItemsFragment extends DialogFragment {
     private CheckBox checkAllTags;
     private ChipGroup tagChips;
     private MaterialButtonToggleGroup sortField;
-    private Button sortByDate;
-    private Button sortByDescription;
-    private Button sortByMake;
-    private Button sortByValue;
-    private Button sortByTag;
     private MaterialButtonToggleGroup sortOrder;
     private Button sortAsc;
-    private Button sortDec;
-//    private Button backBtn;
-//    private Button FilterBtn;
 
     /**
      * Constructor for passing in variables from the activity
@@ -71,7 +68,7 @@ public class FilterItemsFragment extends DialogFragment {
      * Interface for interaction between the AddTagFragment and the hosting activity.
      */
     public interface OnFragmentInteractionListener {
-        void onFilterPressed(Map<String, ArrayList<String>> filterConds);
+        void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc);
     }
 
     /**
@@ -108,16 +105,8 @@ public class FilterItemsFragment extends DialogFragment {
         this.checkAllTags = view.findViewById(R.id.fragment_filter_items_all_tags_checkbox);
         this.tagChips = view.findViewById(R.id.fragment_filter_items_tags_chipgroup);
         this.sortField = view.findViewById(R.id.fragment_filter_items_sort_type_buttongroup);
-        this.sortByDate = view.findViewById(R.id.fragment_filter_items_date_sort_button);
-        this.sortByDescription = view.findViewById(R.id.fragment_filter_items_description_sort_button);
-        this.sortByMake = view.findViewById(R.id.fragment_filter_items_make_sort_button);
-        this.sortByValue = view.findViewById(R.id.fragment_filter_items_value_sort_button);
-        this.sortByTag = view.findViewById(R.id.fragment_filter_items_tag_sort_button);
         this.sortOrder = view.findViewById(R.id.fragment_filter_items_sort_order_buttongroup);
         this.sortAsc = view.findViewById(R.id.fragment_filter_items_asc_sort_button);
-        this.sortDec = view.findViewById(R.id.fragment_filter_items_dec_sort_button);
-//        this.backBtn = view.findViewById(R.id.fragment_filter_items_back_button);
-//        this.FilterBtn = view.findViewById(R.id.fragment_filter_items_filter_button);
 
         setupKeywordInput();
 
@@ -128,21 +117,32 @@ public class FilterItemsFragment extends DialogFragment {
 
         setupTagChipGroup();
 
+        setupSortListeners();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
             .setView(view)
             .setTitle("Filter")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Filter", (dialog, which) -> {
-                // upload list of images then send URLs to ListActivity to be added to an Item
                 Map<String, ArrayList<String>> filterConds = new HashMap<String, ArrayList<String>>();
-
                 filterConds.put("keywords", getCheckedChips(this.keywordChips));
                 filterConds.put("dates", getDateInputs());
                 filterConds.put("makes", getCheckedChips(this.makeChips));
                 filterConds.put("tags", getCheckedChips(this.tagChips));
 
-                listener.onFilterPressed(filterConds);
+                String sortType;
+                if (sortField.getCheckedButtonIds().size() == 1) {
+                    MaterialButton checkedSortField = sortField.findViewById(sortField.getCheckedButtonId());
+                    sortType = checkedSortField.getText().toString();
+                } else {
+                    sortType = "No Sort";
+                }
+
+                MaterialButton checkedSortOrder = sortOrder.findViewById(sortOrder.getCheckedButtonId());
+                boolean isAsc = (checkedSortOrder == sortAsc);
+
+                listener.onFilterPressed(filterConds, sortType, isAsc);
             }).create();
     }
 
@@ -173,6 +173,9 @@ public class FilterItemsFragment extends DialogFragment {
                     Chip chip = new Chip(getContext());
                     chip.setText(keywordInput.getText());
                     chip.setCloseIconVisible(true);
+                    chip.setCheckable(true);
+                    chip.setChecked(true);
+                    chip.setActivated(true);
                     chip.setOnClickListener(v1 -> keywordChips.removeView(chip));
                     keywordChips.addView(chip);
                     keywordInput.setText("");
@@ -209,7 +212,7 @@ public class FilterItemsFragment extends DialogFragment {
         chip.setCheckedIconVisible(true);
         chip.setCheckable(true);
         chip.setActivated(false);
-        chip.setVisibility(View.VISIBLE);
+        chip.setVisibility(VISIBLE);
         chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
         group.addView(chip);
     }
@@ -250,6 +253,28 @@ public class FilterItemsFragment extends DialogFragment {
                 }
             }
         }
+    }
+
+    private void setupSortListeners() {
+        sortField.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked && sortOrder.getVisibility()==View.INVISIBLE) {
+                sortOrder.setVisibility(View.VISIBLE);
+                if (sortOrder.getCheckedButtonIds().size()==0) {
+                    sortAsc.setActivated(true);
+                    sortAsc.performClick();
+                }
+            } else if (group.getCheckedButtonIds().size()==0){
+                sortOrder.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        sortOrder.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (group.getCheckedButtonIds().size()==0 && group.getVisibility()==View.VISIBLE) {
+                Button button = view.findViewById(checkedId);
+                button.setActivated(true);
+                button.performClick();
+            }
+        });
     }
 
     private ArrayList<String> getCheckedChips(ChipGroup group) {
