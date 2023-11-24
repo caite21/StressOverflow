@@ -195,14 +195,19 @@ public class ListActivity extends AppCompatActivity implements
      */
     @Override
     public void onSubmitAdd(Item item) {
-        // wait for pictures to upload before adding item to database
-        Image.uploadPictures(pictures, new Image.OnAllImagesUploadedListener() {
-            @Override
-            public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
-                item.addPictureURLs(downloadURLs);
-                addItem(item);
-            }
-        });
+        if (!picturesChanged) {
+            addItem(item);
+            resetPictureVars();
+        } else {
+            Image.uploadPictures(pictures, new Image.OnAllImagesUploadedListener() {
+                @Override
+                public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                    item.addPictureURLs(downloadURLs);
+                    addItem(item);
+                    resetPictureVars();
+                }
+            });
+        }
     }
 
     /**
@@ -269,11 +274,12 @@ public class ListActivity extends AppCompatActivity implements
      */
     @Override
     public void onSubmitEdit(int position, Item item) {
-        //
         if (!picturesChanged) {
             editItem(position, item);
         } else {
-            Image.uploadPictures(pictures, new Image.OnAllImagesUploadedListener() {
+            ArrayList<Image> pics = new ArrayList<>();
+            pics.addAll(pictures);
+            Image.uploadPictures(pics, new Image.OnAllImagesUploadedListener() {
                 @Override
                 public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
                     item.setPictureURLs(downloadURLs);
@@ -285,6 +291,7 @@ public class ListActivity extends AppCompatActivity implements
                 Image.deletePictureFromStorage(URL);
             }
         }
+        resetPictureVars();
     }
 
     @SuppressLint("SetTextI18n") // ?? man
