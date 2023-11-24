@@ -290,24 +290,28 @@
       <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:paddingBottom="2dp"
             >
             <TextView
                 android:id="@+id/add__item__fragment__picture__header"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/add_item_fragment_picture_header"
                 android:textSize="20dp"
                 android:textStyle="bold"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
                 />
             <Button
                 android:id="@+id/add__item__fragment__edit__pictures"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_button"
                 android:text="@string/add_item_fragment_picture_button_text"
                 app:backgroundTint="@null"
+                android:layout_weight="2"
+                android:layout_marginStart="10dp"
                 />
 
     </LinearLayout>

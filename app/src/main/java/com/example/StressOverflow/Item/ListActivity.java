@@ -64,8 +64,8 @@ public class ListActivity extends AppCompatActivity implements
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference itemRef;
-    private ArrayList<Image> pictures = new ArrayList<>();
-    private ArrayList<String> pictureURLs = new ArrayList<>();
+    private ArrayList<String> pictureURLsToDelete;
+    private ArrayList<Image> pictures;
     private ArrayList<Item> items = new ArrayList<>();
     private boolean picturesChanged = false;
     private CollectionReference tagRef;
@@ -123,9 +123,11 @@ public class ListActivity extends AppCompatActivity implements
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
             Item selected = this.itemListAdapter.getItem(position);
+            resetPictureVars();
             new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
         });
         this.editButton.setOnClickListener((v) -> {
+            resetPictureVars();
             new AddItemFragment(this.ownerName).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
@@ -166,13 +168,11 @@ public class ListActivity extends AppCompatActivity implements
     }
 
 
-    @Override
     /**
      * Receives the Item produced by the item addition dialog fragment, and adds the item
      * to the item list adapter.
      */
-    public void onSubmitAdd(Item item) {
-        item.addPictureURLs(pictureURLs);
+    public void addItem(Item item) {
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
@@ -186,6 +186,23 @@ public class ListActivity extends AppCompatActivity implements
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
                 });
+    }
+
+    /**
+     * Wait for pictures to upload and to receive download URL
+     * before setting item in database.
+     * @param item to add
+     */
+    @Override
+    public void onSubmitAdd(Item item) {
+        // wait for pictures to upload before adding item to database
+        Image.uploadPictures(pictures, new Image.OnAllImagesUploadedListener() {
+            @Override
+            public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                item.addPictureURLs(downloadURLs);
+                addItem(item);
+            }
+        });
     }
 
     /**
@@ -223,10 +240,7 @@ public class ListActivity extends AppCompatActivity implements
         this.setSumOfItemCosts();
     }
 
-    public void onSubmitEdit(int position, Item item) {
-        if (picturesChanged) {
-            item.setPictureURLs(pictureURLs);
-        }
+    public void editItem(int position, Item item) {
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
@@ -246,6 +260,33 @@ public class ListActivity extends AppCompatActivity implements
             Util.showShortToast(this.getApplicationContext(), "Something wrong happened");
         }
     }
+
+    /**
+     * Wait for pictures to upload and to receive download URL
+     * before setting item in database.
+     * @param position of item to edit
+     * @param item to edit
+     */
+    @Override
+    public void onSubmitEdit(int position, Item item) {
+        //
+        if (!picturesChanged) {
+            editItem(position, item);
+        } else {
+            Image.uploadPictures(pictures, new Image.OnAllImagesUploadedListener() {
+                @Override
+                public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                    item.setPictureURLs(downloadURLs);
+                    editItem(position, item);
+                }
+            });
+
+            for (String URL : pictureURLsToDelete) {
+                Image.deletePictureFromStorage(URL);
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n") // ?? man
     /**
      *
@@ -361,18 +402,27 @@ public class ListActivity extends AppCompatActivity implements
 
 
     /**
-     * When user confirms adding images, the updated list
-     * of pictures is passed so that the pictures can be attached
-     * when the user is done adding/editing an item,
+     * When user confirms adding images, picture updates are
+     * passed so that the pictures can be attached
+     * when the user confirms adding/editing an item
      *
-     * @param pictures taken with camera or selected from library
+     * @param imagesList pictures that should be attached to image
+     * @param deleteURLs picture URLs that need to be removed from Storage
      */
     @Override
-    public void onConfirmImages(ArrayList<Image> pictures, ArrayList<String> pictureURLs) {
-        this.pictures = pictures;
-        this.pictureURLs = pictureURLs;
+    public void onConfirmImages(ArrayList<Image> imagesList, ArrayList<String> deleteURLs) {
+        this.pictureURLsToDelete.addAll(deleteURLs);
+        this.pictures = imagesList;
         picturesChanged = true;
-//        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * At each new add/edit fragment, reset variables involving pictures
+     */
+    private void resetPictureVars() {
+        this.pictures = new ArrayList<>();
+        this.pictureURLsToDelete = new ArrayList<>();
+        this.picturesChanged = false;
     }
 
     @Override

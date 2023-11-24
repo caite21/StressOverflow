@@ -29,6 +29,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -48,6 +49,7 @@ public class AddImagesFragment extends DialogFragment  {
     private ContentResolver contentResolver;
     private ArrayList<Image> imagesList;
     private ArrayList<String> URLs;
+    private ArrayList<String> URLsToDelete;
     private ArrayAdapter<Image> imageAdapter;
     private GridView imageDisplay;
     private Image clickedImage;
@@ -58,7 +60,7 @@ public class AddImagesFragment extends DialogFragment  {
      * Fragment listener must receive updated list of images
      */
     public interface OnFragmentInteractionListener {
-        void onConfirmImages(ArrayList<Image> images, ArrayList<String> downloadUrls);
+        void onConfirmImages(ArrayList<Image> imagesList, ArrayList<String> deleteURLs);
     }
 
     public AddImagesFragment() {
@@ -93,13 +95,12 @@ public class AddImagesFragment extends DialogFragment  {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.select_image_fragment, null);
         contentResolver = requireContext().getContentResolver();
+        URLsToDelete = new ArrayList<>();
 
+        imagesList = new ArrayList<>();
         if (item != null ) {
             // get already attached pictures
-            imagesList = item.getPictures();
-        } else {
-            // new item
-            imagesList = new ArrayList<>();
+            imagesList.addAll(item.getPictures());
         }
 
         imageDisplay = view.findViewById(R.id.images_area);
@@ -122,11 +123,25 @@ public class AddImagesFragment extends DialogFragment  {
                     imagesList.remove(clickedImage);
                     imageAdapter.notifyDataSetChanged();
                     if (clickedImage.getURL() != null) {
-                        Image.deletePictureFromStorage(clickedImage.getURL());
+                        URLsToDelete.add(clickedImage.getURL());
                     }
+                    clickedImage = null;
                 }
             }
         });
+
+        final Button iconButton = view.findViewById(R.id.icon_button);
+        iconButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (clickedImage != null) {
+                    imagesList.remove(clickedImage);
+                    imagesList.add(0, clickedImage);
+                    imageAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+
 
         final Button addImageButton = view.findViewById(R.id.add_image_button);
         addImageButton.setOnClickListener(new View.OnClickListener() {
@@ -179,15 +194,10 @@ public class AddImagesFragment extends DialogFragment  {
                 .setView(view)
                 .setTitle("Attach Pictures")
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("Confirm", (dialog, which) -> {
+                .setPositiveButton("OK", (dialog, which) -> {
+                    item.setPictures(imagesList);
                     // upload list of images then send URLs to ListActivity to be added to an Item
-                    Image.uploadPictures(imagesList, new Image.OnAllImagesUploadedListener() {
-                        @Override
-                        public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
-                            listener.onConfirmImages(imagesList, downloadURLs);
-                        }
-                    });
-
+                    listener.onConfirmImages(imagesList, URLsToDelete);
                 }).create();
     }
 
