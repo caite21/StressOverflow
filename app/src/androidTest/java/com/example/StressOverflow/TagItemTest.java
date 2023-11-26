@@ -5,12 +5,19 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.longClick;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,23 +25,25 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.Item.Item;
-import com.example.StressOverflow.Item.ListActivity;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
@@ -45,26 +54,46 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 public class TagItemTest {
-    private FirebaseFirestore firestore;
-    private String testTagName;
+    private FirebaseFirestore db;
     Item item;
+    private CollectionReference tagRef;
+    private CollectionReference itemRef;
+    private String ownerName;
+    private String testTagName;
     Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Before
     public void setUp() {
-        firestore = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         AppGlobals.getInstance().setOwnerName("testUser");
 
         ArrayList<Tag> testTags = new ArrayList<>();
         ArrayList<String> images = new ArrayList<>();
-
+        tagRef = db.collection("tags");
+        itemRef = db.collection("items");
+        ownerName = "testUser";
+        AppGlobals.getInstance().setOwnerName(ownerName);
+        testTagName = "testTag1";
         //Add a tag first
-        testTags.add(new Tag("testTag1"));
-        item = new Item("deleteItemTest","make","model","description", new GregorianCalendar(),77.00, "Comments",testTags,images,
+        Tag newTag = new Tag(testTagName);
+        testTags.add(newTag);
+        tagRef.document(String.format("%s:%s", ownerName, testTagName))
+                .set(newTag.toFirebaseObject(ownerName))
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
+
+        ArrayList<Tag> emptyTagArrayList = new ArrayList<>();
+        item = new Item("deleteItemTest","make","model","description", new GregorianCalendar(),77.00, "Comments",emptyTagArrayList,images,
                 123456, AppGlobals.getInstance().getOwnerName());
-        firestore.collection("items").document(item.getId().toString())
+        itemRef.document(item.getId().toString())
                 .set(item.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -79,7 +108,7 @@ public class TagItemTest {
     @After
     public void cleanUp(){
         UUID uuid = item.getId();
-        this.firestore.collection("items")
+        itemRef
                 .document(uuid.toString())
                 .delete()
                 .addOnFailureListener(new OnFailureListener() {
@@ -90,6 +119,17 @@ public class TagItemTest {
                     }
                 });
 
+        tagRef
+                .document(String.format("%s:%s", ownerName, testTagName))
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                        throw new RuntimeException("Error with item deletion into collection items: ", e);
+                    }
+                });
+
     }
     @Rule
     public ActivityScenarioRule<ListActivity> listActivityRule =
@@ -97,12 +137,13 @@ public class TagItemTest {
 
     @Test
     public void ListActivitytoTagList(){
-        onView(withId(R.id.showTagList_button)).perform(click());
+        onView(withId(R.id.activity_item_list_show_tags_button)).perform(click());
         onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
-    public void AddTagToTagList(){
+    public void addTagAndBack(){
+        //checks that addTag by long selecting opens up TagList Activity
         int listViewId = R.id.activity__item__list__item__list;
         SystemClock.sleep(2000);
 
@@ -115,6 +156,18 @@ public class TagItemTest {
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
         onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_make_new_tag_button)).perform(click());
         onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        //return back to dialog
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void showTagListAndBack(){
+        onView(ViewMatchers.withId(R.id.activity_item_list_show_tags_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity__item__list__item__list)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
     }
 
     @Test
@@ -131,14 +184,15 @@ public class TagItemTest {
         onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
         int chipGroupID = R.id.fragment_add_tag_to_item_tag_chipGroup;
 
-        onView(allOf(withText("tag 1"), isDescendantOfA(withId(chipGroupID))))
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
                 .perform(click());
 
         onView(withText("OK")).inRoot(isDialog()).perform(click());
 
+        final CountDownLatch latch = new CountDownLatch(1);
 
         final Item[] itemInfo = new Item[1];
-        this.firestore.collection("items")
+        itemRef
                 .document(item.getId().toString())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -150,12 +204,17 @@ public class TagItemTest {
                             Item item = Item.fromFirebaseObject(data);
                             itemInfo[0] = item;
                         }
+                        latch.countDown();
                     }
                 });
-        SystemClock.sleep(2000);
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         boolean tagExists = false;
         for (Tag t: itemInfo[0].getTags()){
-            if (t.getTagName().equals("tag 1")){
+            if (t.getTagName().equals(testTagName)){
                 tagExists = true;
                 break;
             }
@@ -163,6 +222,70 @@ public class TagItemTest {
 
         assertTrue(tagExists);
     }
+
+    @Test
+    public void addDuplicateTag(){
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
+
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(longClick());
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+        int chipGroupID = R.id.fragment_add_tag_to_item_tag_chipGroup;
+
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        //add second time
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(longClick());
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final Item[] itemInfo = new Item[1];
+        itemRef
+                .document(item.getId().toString())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> data = document.getData();
+                            Item item = Item.fromFirebaseObject(data);
+                            itemInfo[0] = item;
+                        }
+                        latch.countDown();
+                    }
+                });
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean tagExists = false;
+        if (itemInfo[0].getTags().size()==1){
+            tagExists = true;
+        }
+
+        assertTrue(tagExists);
+    }
+
     @Test
     public void deleteItem(){
         int listViewId = R.id.activity__item__list__item__list;
@@ -179,7 +302,7 @@ public class TagItemTest {
 
 
         final boolean[] itemBool = new boolean[1];
-        this.firestore.collection("items")
+        itemRef
                 .document(item.getId().toString())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -200,7 +323,279 @@ public class TagItemTest {
         assertFalse(itemBool[0]);
     }
 
+    @Test
+    public void deleteTagCascade(){
+        //add tag to item first
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
 
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(longClick());
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+        int chipGroupID = R.id.fragment_add_tag_to_item_tag_chipGroup;
+
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        //Go to tag listview
+        onView(ViewMatchers.withId(R.id.activity_item_list_show_tags_button)).perform(click());
+
+        int deleteButtonId = R.id.listview_delete_tag_button;
+        int tagListId = R.id.activity_tag_list_listView;
+        // Perform a click on the delete button in the first row of the ListView.
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(tagListId))
+                .atPosition(0)
+                .onChildView(withId(deleteButtonId))
+                .perform(click());
+
+        //Go back to itemList
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+
+        final Item[] itemInfo = new Item[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        itemRef
+                .document(item.getId().toString())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> data = document.getData();
+                            Item item = Item.fromFirebaseObject(data);
+                            itemInfo[0] = item;
+                        }
+                        latch.countDown();
+                    }
+                });
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        boolean tagExists = true;
+        if (itemInfo[0].getTags().size()==0){
+            tagExists = false;
+        }
+
+        assertFalse(tagExists);
+    }
+
+    @Test
+    public void RefreshTagsFromAddTags(){
+        //checks refresh button on addTag Dialog by long selecting refreshes
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
+
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(longClick());
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_make_new_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        int deleteButtonId = R.id.listview_delete_tag_button;
+        int tagListViewId = R.id.activity_tag_list_listView;
+
+        //Delete existing tag
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(tagListViewId))
+                .atPosition(0)
+                .onChildView(withId(deleteButtonId))
+                .perform(click());
+
+        //return back to dialog
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
+
+        //Click on refresh button
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_refresh_tag_button)).perform(click());
+
+        //Check to see that chipGroup is empty
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_tag_chipGroup)).check(matches(hasChildCount(0)));
+    }
+
+    @Test
+    public void addItemWithTags(){
+        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+
+    }
+
+    @Test
+    public void addItemRefreshTags(){
+
+    }
+
+    @Test
+    public void addItemToTagList(){
+
+    }
+
+    @Test
+    public void editItemCheckTags(){
+        //add tag, and look at it again to make sure that the tag is checked
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
+
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__title)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        int chipGroupID = R.id.add__item__fragment__chipGroup;
+
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        //click on item again to check that chip is checked
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+
+        onView(ViewMatchers.withId(chipGroupID)).check(matches(withCheckedChipAndText(testTagName)));
+
+    }
+
+    private static Matcher<View> withCheckedChipAndText(final String chipText) {
+        return withChild(allOf(withText(chipText), isChecked()));
+    }
+
+    @Test
+    public void editItemUnselectTags(){
+        //add tag, click on item, unselect tag
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
+
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__title)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        int chipGroupID = R.id.add__item__fragment__chipGroup;
+
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        //click on item again
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+
+        //unselect tag
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+        final Item[] itemInfo = new Item[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        itemRef
+                .document(item.getId().toString())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> data = document.getData();
+                            Item item = Item.fromFirebaseObject(data);
+                            itemInfo[0] = item;
+                        }
+                        latch.countDown();
+                    }
+                });
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        boolean tagExists = true;
+        if (itemInfo[0].getTags().size()==0){
+            tagExists = false;
+        }
+
+        assertFalse(tagExists);
+    }
+
+    @Test
+    public void editItemToTagList(){
+        //click on item, click add tags, click back 
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
+
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        //Click to add tag on tagList View
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        //Click on back button to go back
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+    }
+
+    @Test
+    public void editItemToRefreshButton(){
+        //click on item, click add tags, click back
+        int listViewId = R.id.activity__item__list__item__list;
+        int tagListViewId = R.id.activity_tag_list_listView;
+        int deleteButtonId = R.id.listview_delete_tag_button;
+
+        SystemClock.sleep(2000);
+
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        //Click to add tag on tagList View
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        //Delete existing tag
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(tagListViewId))
+                .atPosition(0)
+                .onChildView(withId(deleteButtonId))
+                .perform(click());
+
+        //Click on back button to go back
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        //Click on refresh button
+        onView(ViewMatchers.withId(R.id.add_item_fragment_refresh_tags_button)).perform(click());
+
+        //Check to see that chipGroup is empty
+        onView(ViewMatchers.withId(R.id.add__item__fragment__chipGroup)).check(matches(hasChildCount(0)));
+
+    }
 
 
 }

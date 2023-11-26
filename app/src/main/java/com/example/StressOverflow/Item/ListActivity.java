@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
-import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -94,7 +93,7 @@ public class ListActivity extends AppCompatActivity implements
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-        this.showTagListButton = findViewById(R.id.showTagList_button);
+        this.showTagListButton = findViewById(R.id.activity_item_list_show_tags_button);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         this.showTagListButton.setOnClickListener(showList);
@@ -216,6 +215,7 @@ public class ListActivity extends AppCompatActivity implements
                         }
                     });
             itemListAdapter.remove(item);
+            exitSelectionMode();
             this.setSumOfItemCosts();
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");

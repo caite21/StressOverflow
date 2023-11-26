@@ -74,8 +74,9 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                                 tagList.add(new Tag(tagName));
                             }
                         }
-                        AppGlobals.getInstance().setAllTags(tagList);
+
                     }
+                    AppGlobals.getInstance().setAllTags(tagList);
                     tagAdapter.notifyDataSetChanged();
                 }
             }
