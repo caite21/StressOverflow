@@ -127,10 +127,10 @@ public class FilterTest {
     public void testKeywordFilter() throws InterruptedException {
         onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
 
-        onView(withId(R.id.filter__dialog__keywords__textedit)).perform(typeText("second"));
-        onView(withId(R.id.filter__dialog__keywords__textedit)).perform(pressImeActionButton());
+        onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(typeText("second"));
+        onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(pressImeActionButton());
         onView(ViewMatchers.isRoot()).perform(ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.filter__dialog__filter__btn)).inRoot(isDialog()).perform(click());
+        onView(withText("Filter")).inRoot(isDialog()).perform(click());
 
         onData(is(instanceOf(Item.class)))
             .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)

@@ -375,6 +375,14 @@ public class ListActivity extends AppCompatActivity implements
 //        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Catches the output of the filter dialog fragment and passes output as arguments to filter and
+     * sort methods. Then updates sum of costs and list adapter.
+     *
+     * @param filterConds map of field to filter by as keys and strings to filter by as values
+     * @param sortType field to sort by. "No Sort" if a sort field was not selected.
+     * @param isAsc boolean true for ascending order and false for descending
+     */
     @Override
     public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
         ArrayList<Item> filteredList;
@@ -394,10 +402,25 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sorts the elements of the given ArrayList using the provided Comparator.
+     *
+     * @param list arraylist to be sorted
+     * @param comparator comparator to determine order of elements
+     * @param <T> type of elements in list
+     */
     public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
         Collections.sort(list, comparator);
     }
 
+    /**
+     * Sorts an ArrayList of items based on the specified sort type and order.
+     *
+     * @param sortType field by which unsortedList should be sorted ("Date", "Desc", "Make",
+     *                 "Value", or "Tags")
+     * @param unsortedList ArrayList of items to be sorted
+     * @param isAsc boolean true for ascending order and false for descending
+     */
     public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
         sort(unsortedList, new Comparator<Item>() {
             @Override

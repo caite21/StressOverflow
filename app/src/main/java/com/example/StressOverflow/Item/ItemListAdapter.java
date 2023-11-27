@@ -200,21 +200,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.notifyDataSetChanged();
     }
 
-//    /**
-//     * Sorts the list with the provided comparator that uses Item as a template.
-//     *
-//     * @param cmp provides rules for how to sort the ArrayList
-//     */
-////    @Override
-////    public int compareDate(Item firstItem, Item secondItem) {
-//    public void compareDate(String compareType) {
-//        List itemlist = (List) this.items;
-//        if (compareType == "description") {
-//            itemlist.sort(Sort.descriptionComparator);
-//        }
-//        this.notifyDataSetChanged();
-//    }
-
     /**
      * Add the tags for the item on runtime
      * @param view gets the current view that it's rendering
@@ -267,8 +252,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
     /**
      * Filters the item list by description keywords, dates, makes, and tags.
-     * @param conditions - The string key that describes the filter and the arraylist that
-     *                     species what to filter
+     * @param conditions string key that describes the filter and the arraylist that specifies
+     *                   what to filter
      * @return Arraylist of items that fit the filtering conditions
      * @throws ParseException
      */
