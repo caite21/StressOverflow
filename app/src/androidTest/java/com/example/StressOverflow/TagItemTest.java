@@ -1,6 +1,7 @@
 package com.example.StressOverflow;
 import com.example.StressOverflow.Item.ListActivity;
 import static android.content.ContentValues.TAG;
+import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -18,6 +19,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +31,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -38,10 +41,14 @@ import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -107,15 +114,36 @@ public class TagItemTest {
 
     @After
     public void cleanUp(){
-        UUID uuid = item.getId();
         itemRef
-                .document(uuid.toString())
-                .delete()
+                .whereEqualTo("owner", "testUser")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            documentSnapshot.getReference().delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Deletion successful
+                                            Log.d(TAG, "Document successfully deleted");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // Handle deletion failure
+                                            Log.w(TAG, "Error deleting document", e);
+                                        }
+                                    });
+                        }
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error with item insertion into collection items: ", e);
-                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                        // Handle query failure
+                        Log.w(TAG, "Error getting documents: ", e);
                     }
                 });
 
@@ -424,21 +452,163 @@ public class TagItemTest {
 
         //Check to see that chipGroup is empty
         onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_tag_chipGroup)).check(matches(hasChildCount(0)));
+
     }
 
     @Test
     public void addItemWithTags(){
-        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+        SystemClock.sleep(2000);
+        onView(ViewMatchers.withId(R.id.activity__item__list__edit__item__button)).perform(click());
+
+        //title
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__title)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__title))
+                .perform(ViewActions.typeText("TestItem2"));
+        closeSoftKeyboard();
+
+        //make
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__make)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__make))
+                .perform(ViewActions.typeText("Make1"));
+        closeSoftKeyboard();
+
+        //model
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__model)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__model))
+                .perform(ViewActions.typeText("Model1"));
+        closeSoftKeyboard();
+
+        //description
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__description)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__description))
+                .perform(ViewActions.typeText("Description1"));
+        closeSoftKeyboard();
+
+        //Year month day
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__year)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__year))
+                .perform(ViewActions.typeText("2022"));
+        closeSoftKeyboard();
+
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__month)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__month))
+                .perform(ViewActions.typeText("03"));
+        closeSoftKeyboard();
+
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__date)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__date))
+                .perform(ViewActions.typeText("11"));
+        closeSoftKeyboard();
+
+        //Value
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__value)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__value))
+                .perform(ViewActions.typeText("55"));
+        closeSoftKeyboard();
+
+        //tag
+        int chipGroupID = R.id.add__item__fragment__chipGroup;
+
+        onView(allOf(withText(testTagName), isDescendantOfA(withId(chipGroupID))))
+                .perform(click());
+        //Serial number
+        onView(withId(R.id.add__item__fragment__edit__serial))
+                .perform(ViewActions.scrollTo());
+        onView(ViewMatchers.withId(R.id.add__item__fragment__edit__serial)).perform(click());
+        onView(withId(R.id.add__item__fragment__edit__serial))
+                .perform(ViewActions.typeText("98765"));
+        closeSoftKeyboard();
+
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+
+        final Item[] itemInfo = new Item[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        itemRef
+                .whereEqualTo("owner", "testUser")
+                .whereEqualTo("name", "TestItem2")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> data = document.getData();
+                                Item item = Item.fromFirebaseObject(data);
+                                itemInfo[0] = item;
+                            }
+                        }
+                        latch.countDown();
+                    }
+                });
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        boolean tagExists = true;
+        if (itemInfo[0].getTags().size()==0){
+            tagExists = false;
+        }
+        assertTrue(tagExists);
 
     }
 
     @Test
     public void addItemRefreshTags(){
+        SystemClock.sleep(2000);
+        onView(ViewMatchers.withId(R.id.activity__item__list__edit__item__button)).perform(click());
+        int tagListViewId = R.id.activity_tag_list_listView;
+        int deleteButtonId = R.id.listview_delete_tag_button;
 
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        //Delete existing tag
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(tagListViewId))
+                .atPosition(0)
+                .onChildView(withId(deleteButtonId))
+                .perform(click());
+
+        //Click on back button to go back
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        //Click on refresh button
+        onView(ViewMatchers.withId(R.id.add_item_fragment_refresh_tags_button)).perform(click());
+//
+//        //Check to see that chipGroup is empty
+
+
+        onView(withId(R.id.add__item__fragment__chipGroup))
+                .check((view, noViewFoundException) -> {
+                    if (view instanceof ChipGroup) {
+                        ChipGroup chipGroup = (ChipGroup) view;
+                        int chipCount = chipGroup.getChildCount();
+                        assertThat(chipCount, is(0));
+                    } else {
+                        throw new IllegalStateException("The asserted view is not a ChipGroup");
+                    }
+                });
     }
 
     @Test
     public void addItemToTagList(){
+        //click on item, click add tags, click back
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(2000);
+
+        onView(ViewMatchers.withId(R.id.activity__item__list__edit__item__button)).perform(click());
+
+        //Click to add tag on tagList View
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+
+        //Click on back button to go back
+        onView(ViewMatchers.withId(R.id.activity_tag_list_back_button)).perform(click());
+        onView(ViewMatchers.withId(R.id.add_item_fragment_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
 
     }
 
@@ -593,8 +763,16 @@ public class TagItemTest {
         onView(ViewMatchers.withId(R.id.add_item_fragment_refresh_tags_button)).perform(click());
 
         //Check to see that chipGroup is empty
-        onView(ViewMatchers.withId(R.id.add__item__fragment__chipGroup)).check(matches(hasChildCount(0)));
-
+        onView(withId(R.id.add__item__fragment__chipGroup))
+                .check((view, noViewFoundException) -> {
+                    if (view instanceof ChipGroup) {
+                        ChipGroup chipGroup = (ChipGroup) view;
+                        int chipCount = chipGroup.getChildCount();
+                        assertThat(chipCount, is(0));
+                    } else {
+                        throw new IllegalStateException("The asserted view is not a ChipGroup");
+                    }
+                });
     }
 
 
