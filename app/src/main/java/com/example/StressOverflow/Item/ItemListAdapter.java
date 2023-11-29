@@ -92,10 +92,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         addTagChips(view, item);
         applySelectionBackground(view, item);
 
-        // first picture is shown on list
         if (item.getPictureURLs().size() > 0) {
             Image image = item.getPictures().get(0);
-            Image.displayImage(image, pictureImageView);
+            image.displayImage(pictureImageView);
+        } else {
+            pictureImageView.setImageResource(R.drawable.default_image);
         }
 
         return view;
