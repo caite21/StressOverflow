@@ -51,6 +51,8 @@ public class AddItemFragment extends DialogFragment{
     private Button itemPicturesButton;
     private Button serialScanButton;
     private Button descriptionScanButton;
+    ActivityResultLauncher<ScanOptions> serialLauncher;
+    ActivityResultLauncher<ScanOptions> descriptionLauncher;
     private EditText itemSerialField;
     private ChipGroup tagChipGroup;
 
@@ -77,7 +79,45 @@ public class AddItemFragment extends DialogFragment{
         } else {
             throw new RuntimeException("activity lacks implementation of OnFragmentInteractionListener");
         }
+        serialLauncher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                itemSerialField.setText(result.getContents());
+            }
+        });
+        descriptionLauncher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                final boolean[] overwrite = {false};
+                // result.getContents is the scanned serial number
+                // logic for getting description from it goes here
 
+                // if there is already data in the field, ask user if it wants to be overwritten
+                if (!itemDescriptionField.getText().toString().equals("")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Attention");
+                    builder.setMessage("Overwrite existing description data?");
+                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            overwrite[0] = true;
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                } else {
+                    overwrite[0] = true;
+                }
+                if (overwrite[0]) {
+                    // change this
+                    itemDescriptionField.setText(result.getContents());
+                }
+            }
+        });
     }
 
     @NonNull
@@ -205,13 +245,7 @@ public class AddItemFragment extends DialogFragment{
     private void scanSerial() {
         ScanOptions o = new ScanOptions();
         o.setCaptureActivity(ScanSerialActivity.class);
-        ActivityResultLauncher<ScanOptions> launcher;
-        launcher = registerForActivityResult(new ScanContract(), result -> {
-            if (result.getContents() != null) {
-                itemSerialField.setText(result.getContents());
-            }
-        });
-        launcher.launch(o);
+        serialLauncher.launch(o);
     }
 
     /**
@@ -221,41 +255,7 @@ public class AddItemFragment extends DialogFragment{
     private void scanForDescription() {
         ScanOptions o = new ScanOptions();
         o.setCaptureActivity(ScanSerialActivity.class);
-        ActivityResultLauncher<ScanOptions> launcher;
-        launcher = registerForActivityResult(new ScanContract(), result -> {
-            if (result.getContents() != null) {
-                final boolean[] overwrite = {false};
-                // result.getContents is the scanned serial number
-                // logic for getting description from it goes here
-
-                // if there is already data in the field, ask user if it wants to be overwritten
-                if (!itemDescriptionField.getText().toString().equals("")) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Attention");
-                    builder.setMessage("Overwrite existing description data?");
-                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            overwrite[0] = true;
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
-                } else {
-                    overwrite[0] = true;
-                }
-                if (overwrite[0]) {
-                    // change this
-                    itemDescriptionField.setText(result.getContents());
-                }
-            }
-        });
+        descriptionLauncher.launch(o);
     }
 
     /**

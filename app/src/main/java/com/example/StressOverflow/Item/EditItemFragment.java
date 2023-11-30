@@ -214,7 +214,6 @@ public class EditItemFragment extends DialogFragment {
      */
     private void scanSerial() {
         ScanOptions o = new ScanOptions();
-        o.setCaptureActivity(ScanSerialActivity.class);
         ActivityResultLauncher<ScanOptions> launcher;
         launcher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
