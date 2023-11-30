@@ -114,21 +114,17 @@ public class Image {
         this.bitmap = bitmap;
     }
 
-
-    // STATIC METHODS
-
     /**
-     * Sets an ImageView to display an Image object.
-     * @param image Image of picture
+     * Sets an ImageView to display Image object.
      * @param imageView where to display picture
      */
-    public static void displayImage(Image image, ImageView imageView) {
-        if (image.getURL() == null) {
-            imageView.setImageBitmap(image.getBitmap());
+    public void displayImage(ImageView imageView) {
+        if (getURL() == null) {
+            imageView.setImageBitmap(getBitmap());
         } else {
             try {
                 Picasso.get()
-                        .load(image.getURL())
+                        .load(getURL())
                         .error(R.drawable.ic_error_image)
                         .into(imageView);
             } catch (Exception e) {
@@ -136,6 +132,9 @@ public class Image {
             }
         }
     }
+
+
+    // STATIC METHODS
 
     /**
      * Get all URLs of pictures from an Item as a Firebase object.

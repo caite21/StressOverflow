@@ -192,9 +192,6 @@ public class Item {
      * @return image objects
      */
     public ArrayList<Image> getPictures() {
-        if (pictures == null) {
-            setPictures(new ArrayList<>());
-        }
         return pictures;
     }
 
@@ -203,9 +200,6 @@ public class Item {
      * @return URLs of images
      */
     public ArrayList<String> getPictureURLs() {
-        if (pictures.size() == 0) {
-            setPictureURLs(new ArrayList<>());
-        }
         return pictureURLs;
     }
 
@@ -267,43 +261,36 @@ public class Item {
      */
     public void setPictureURLs(ArrayList<String> pictureURLs) {
         this.pictureURLs = pictureURLs;
-        ArrayList<Image> newImages = new ArrayList<>();
-        for (String url : pictureURLs) {
-            newImages.add(new Image(url));
-        }
-        setPictures(newImages);
+        refreshPictures();
     }
 
     /**
      * Set image objects attached to item.
-     * Should only be used by setPictureURLs().
+     * Warning: does not up date URLs
      * @param pictures image objects
      */
-    private void setPictures(ArrayList<Image> pictures) {
+    public void setPictures(ArrayList<Image> pictures) {
         this.pictures = pictures;
     }
 
     /**
-     * TODO: Should we allow duplicate images here??
      * Add URLs of images attached to item and add Image objects with the URLs.
      * @param pictureURLs URLs (strings) of pictures in storage
      */
     public void addPictureURLs(@NonNull ArrayList<String> pictureURLs) {
         this.pictureURLs.addAll(pictureURLs);
-        ArrayList<Image> newImages = new ArrayList<>();
-        for (String url : pictureURLs) {
-            newImages.add(new Image(url));
-        }
-        addPictures(newImages);
+        refreshPictures();
     }
 
     /**
-     * Add image objects attached to item.
-     * Should only be used by addPictureURLs().
-     * @param pictures image objects
+     * Refresh such that item.pictures corresponds with item.pictureURLs
      */
-    private void addPictures(ArrayList<Image> pictures) {
-        this.pictures.addAll(pictures);
+    public void refreshPictures() {
+        ArrayList<Image> newImages = new ArrayList<>();
+        for (String url : getPictureURLs()) {
+            newImages.add(new Image(url));
+        }
+        setPictures(newImages);
     }
 
     public void setMake(String make) {
