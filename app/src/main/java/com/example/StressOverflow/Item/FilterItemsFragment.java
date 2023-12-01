@@ -127,7 +127,7 @@ public class FilterItemsFragment extends DialogFragment {
             .setView(view)
             .setTitle("Filter")
             .setNegativeButton("Cancel", null)
-            .setPositiveButton("Filter", (dialog, which) -> {
+            .setPositiveButton("Filter/Sort", (dialog, which) -> {
                 Map<String, ArrayList<String>> filterConds = new HashMap<String, ArrayList<String>>();
                 filterConds.put("keywords", getCheckedChips(this.keywordChips));
                 filterConds.put("dates", getDateInputs());
