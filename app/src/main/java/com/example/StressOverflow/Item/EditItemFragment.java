@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -21,11 +22,15 @@ import androidx.fragment.app.DialogFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Scan.ScanSerialActivity;
+import com.example.StressOverflow.SignIn.MainActivity;
 import com.example.StressOverflow.Tag.Tag;
 import com.example.StressOverflow.Tag.TagList;
 import com.example.StressOverflow.Util;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -46,6 +51,8 @@ public class EditItemFragment extends DialogFragment {
     private ChipGroup tagChipGroup;
     private Button addTagButton;
     private Button refreshTagButton;
+    private Button serialScanButton;
+    private Button descriptionScanButton;
 
     private OnFragmentInteractionListener listener;
     private Item selectedItem;
@@ -89,10 +96,13 @@ public class EditItemFragment extends DialogFragment {
         itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
 
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
+        serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
+        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
 
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
+
         addTagsToChipGroup();
 
         itemTitleField.setText(this.selectedItem.getName());
@@ -126,7 +136,18 @@ public class EditItemFragment extends DialogFragment {
                 addTagsToChipGroup();
             }
         });
-
+        serialScanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanSerial();
+            }
+        });
+        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanForDescription();
+            }
+        });
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         return builder
@@ -186,6 +207,65 @@ public class EditItemFragment extends DialogFragment {
                         }
                     }
                 }).create();
+    }
+
+    /**
+     * Prompts the user to scan a barcode. Sets the item serial number field to the scanned number.
+     */
+    private void scanSerial() {
+        ScanOptions o = new ScanOptions();
+        o.setCaptureActivity(ScanSerialActivity.class);
+        ActivityResultLauncher<ScanOptions> launcher;
+        launcher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                itemSerialField.setText(result.getContents());
+            }
+        });
+        launcher.launch(o);
+    }
+
+    /**
+     * Prompts the user to scan a barcode. Sets the description according to the item found when
+     * searching up the serial number online.
+     */
+    private void scanForDescription() {
+        ScanOptions o = new ScanOptions();
+        o.setCaptureActivity(ScanSerialActivity.class);
+        ActivityResultLauncher<ScanOptions> launcher;
+        launcher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                final boolean[] overwrite = {false};
+                // result.getContents is the scanned serial number
+                // logic for getting description from it goes here
+
+                // if there is already data in the field, ask user if it wants to be overwritten
+                if (!itemDescriptionField.getText().toString().equals("")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Attention");
+                    builder.setMessage("Overwrite existing description data?");
+                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            overwrite[0] = true;
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                } else {
+                    overwrite[0] = true;
+                }
+                if (overwrite[0]) {
+                    // change this
+                    itemDescriptionField.setText(result.getContents());
+                }
+            }
+        });
     }
 
     /**
