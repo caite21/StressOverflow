@@ -306,7 +306,8 @@ public class ListActivity extends AppCompatActivity implements
      */
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
-        for (Item i: itemListAdapter.getSelectedItems()){
+        ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+        for (Item i: adapter.getSelectedItems()){
             ArrayList <Tag> currentTags = i.getTags();
             for (Tag newTag : tagsToAdd) {
                 if (currentTags.contains(newTag)) {
