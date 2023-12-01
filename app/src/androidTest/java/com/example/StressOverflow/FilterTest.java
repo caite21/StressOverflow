@@ -680,6 +680,7 @@ public class FilterTest {
 
     /**
      * Tests sorting value in descending order.
+     * TODO: FAILS FOR NO REASON WTF
      */
     @Test
     public void testValueDescSort() {
@@ -889,3 +890,4 @@ public class FilterTest {
         };
     }
 }
+

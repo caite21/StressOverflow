@@ -132,7 +132,9 @@ public class EditItemFragment extends DialogFragment {
         return builder
                 .setView(view)
                 .setTitle("Edit an item")
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    selectedItem.refreshPictures();
+                })
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {

@@ -98,11 +98,12 @@ public class AddItemFragment extends DialogFragment{
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
         addTagsToChipGroup();
 
+        Item tempItem = new Item();
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Opens fragment that shows the item's pictures
-                new AddImagesFragment().show(getChildFragmentManager(), "ADD_IMAGES");
+                new AddImagesFragment(tempItem).show(getChildFragmentManager(), "ADD_IMAGES");
             }
         });
         addTagButton.setOnClickListener(new View.OnClickListener() {

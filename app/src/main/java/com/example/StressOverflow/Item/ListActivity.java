@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
+import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -63,8 +64,8 @@ public class ListActivity extends AppCompatActivity implements
     String ownerName;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference itemRef;
-    private ArrayList<Image> pictures = new ArrayList<>();
-    private ArrayList<String> pictureURLs = new ArrayList<>();
+    private ArrayList<String> pictureURLsToDelete;
+    private ArrayList<Image> pictures;
     private ArrayList<Item> items = new ArrayList<>();
     private boolean picturesChanged = false;
     private CollectionReference tagRef;
@@ -93,7 +94,7 @@ public class ListActivity extends AppCompatActivity implements
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-        this.showTagListButton = findViewById(R.id.activity_item_list_show_tags_button);
+        this.showTagListButton = findViewById(R.id.showTagList_button);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         this.showTagListButton.setOnClickListener(showList);
@@ -124,9 +125,12 @@ public class ListActivity extends AppCompatActivity implements
             ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
 
             Item selected = adapter.getItem(position);
+
+            resetPictureVars();
             new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
         });
         this.editButton.setOnClickListener((v) -> {
+            resetPictureVars();
             new AddItemFragment(this.ownerName).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
@@ -167,13 +171,11 @@ public class ListActivity extends AppCompatActivity implements
     }
 
 
-    @Override
     /**
      * Receives the Item produced by the item addition dialog fragment, and adds the item
      * to the item list adapter.
      */
-    public void onSubmitAdd(Item item) {
-        item.addPictureURLs(pictureURLs);
+    public void addItem(Item item) {
         this.itemListAdapter.add(item);
 
         this.setSumOfItemCosts();
@@ -187,6 +189,31 @@ public class ListActivity extends AppCompatActivity implements
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
                 });
+        if (this.itemList.getAdapter() != this.items) {
+            this.itemList.setAdapter(this.itemListAdapter);
+        }
+    }
+
+    /**
+     * Wait for pictures to upload and to receive download URL
+     * before setting item in database.
+     * @param item to add
+     */
+    @Override
+    public void onSubmitAdd(Item item) {
+        if (!picturesChanged) {
+            addItem(item);
+            resetPictureVars();
+        } else {
+            Image.uploadPictures(pictures, new Image.OnAllImagesUploadedListener() {
+                @Override
+                public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                    item.addPictureURLs(downloadURLs);
+                    addItem(item);
+                    resetPictureVars();
+                }
+            });
+        }
     }
 
     /**
@@ -217,18 +244,18 @@ public class ListActivity extends AppCompatActivity implements
                         }
                     });
             itemListAdapter.remove(item);
-            exitSelectionMode();
             this.setSumOfItemCosts();
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
         }
         this.setSumOfItemCosts();
+
+        if (this.itemList.getAdapter() != this.items) {
+            this.itemList.setAdapter(this.itemListAdapter);
+        }
     }
 
-    public void onSubmitEdit(int position, Item item) {
-        if (picturesChanged) {
-            item.setPictureURLs(pictureURLs);
-        }
+    public void editItem(int position, Item item) {
         try {
             this.itemListAdapter.editItem(position, item);
             this.setSumOfItemCosts();
@@ -248,6 +275,35 @@ public class ListActivity extends AppCompatActivity implements
             Util.showShortToast(this.getApplicationContext(), "Something wrong happened");
         }
     }
+
+    /**
+     * Wait for pictures to upload and to receive download URL
+     * before setting item in database.
+     * @param position of item to edit
+     * @param item to edit
+     */
+    @Override
+    public void onSubmitEdit(int position, Item item) {
+        if (!picturesChanged) {
+            editItem(position, item);
+        } else {
+            ArrayList<Image> pics = new ArrayList<>();
+            pics.addAll(pictures);
+            Image.uploadPictures(pics, new Image.OnAllImagesUploadedListener() {
+                @Override
+                public void onAllImagesUploaded(ArrayList<String> downloadURLs) {
+                    item.setPictureURLs(downloadURLs);
+                    editItem(position, item);
+                }
+            });
+
+            for (String URL : pictureURLsToDelete) {
+                Image.deletePictureFromStorage(URL);
+            }
+        }
+        resetPictureVars();
+    }
+
     @SuppressLint("SetTextI18n") // ?? man
     /**
      *
@@ -368,22 +424,39 @@ public class ListActivity extends AppCompatActivity implements
 
 
     /**
-     * When user confirms adding images, the updated list
-     * of pictures is passed so that the pictures can be attached
-     * when the user is done adding/editing an item,
+     * When user confirms adding images, picture updates are
+     * passed so that the pictures can be attached
+     * when the user confirms adding/editing an item
      *
-     * @param pictures taken with camera or selected from library
+     * @param imagesList pictures that should be attached to image
+     * @param deleteURLs picture URLs that need to be removed from Storage
      */
     @Override
-    public void onConfirmImages(ArrayList<Image> pictures, ArrayList<String> pictureURLs) {
-        this.pictures = pictures;
-        this.pictureURLs = pictureURLs;
+    public void onConfirmImages(ArrayList<Image> imagesList, ArrayList<String> deleteURLs) {
+        this.pictureURLsToDelete.addAll(deleteURLs);
+        this.pictures = imagesList;
         picturesChanged = true;
-//        Toast.makeText(this, "Pictures attached successfully", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * At each new add/edit fragment, reset variables involving pictures
+     */
+    private void resetPictureVars() {
+        this.pictures = new ArrayList<>();
+        this.pictureURLsToDelete = new ArrayList<>();
+        this.picturesChanged = false;
+    }
+
+    /**
+     * Catches the output of the filter dialog fragment and passes output as arguments to filter and
+     * sort methods. Then updates sum of costs and list adapter.
+     *
+     * @param filterConds map of field to filter by as keys and strings to filter by as values
+     * @param sortType field to sort by. "No Sort" if a sort field was not selected.
+     * @param isAsc boolean true for ascending order and false for descending
+     */
     @Override
-    public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
+        public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
         ArrayList<Item> filteredList;
         try {
             filteredList = this.itemListAdapter.filterList(filterConds);
@@ -401,10 +474,25 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sorts the elements of the given ArrayList using the provided Comparator.
+     *
+     * @param list arraylist to be sorted
+     * @param comparator comparator to determine order of elements
+     * @param <T> type of elements in list
+     */
     public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
         Collections.sort(list, comparator);
     }
 
+    /**
+     * Sorts an ArrayList of items based on the specified sort type and order.
+     *
+     * @param sortType field by which unsortedList should be sorted ("Date", "Desc", "Make",
+     *                 "Value", or "Tags")
+     * @param unsortedList ArrayList of items to be sorted
+     * @param isAsc boolean true for ascending order and false for descending
+     */
     public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
         sort(unsortedList, new Comparator<Item>() {
             @Override
