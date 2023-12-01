@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
-import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -94,7 +93,7 @@ public class ListActivity extends AppCompatActivity implements
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-        this.showTagListButton = findViewById(R.id.showTagList_button);
+        this.showTagListButton = findViewById(R.id.activity_item_list_show_tags_button);
         this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         this.showTagListButton.setOnClickListener(showList);
@@ -216,6 +215,7 @@ public class ListActivity extends AppCompatActivity implements
                         }
                     });
             itemListAdapter.remove(item);
+            exitSelectionMode();
             this.setSumOfItemCosts();
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
@@ -265,10 +265,12 @@ public class ListActivity extends AppCompatActivity implements
             //addItemButton.setVisibility(View.GONE);
             deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
-            itemListAdapter.setSelectionMode(true);
-            itemListAdapter.toggleSelection(position);
-
-            if (itemListAdapter.getSelectedItems().size() == 0){
+//            itemListAdapter.setSelectionMode(true);
+//            itemListAdapter.toggleSelection(position);
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+            adapter.setSelectionMode(true);
+            adapter.toggleSelection(position);
+            if (adapter.getSelectedItems().size() == 0){
                 exitSelectionMode();
             }
             return true;
@@ -282,7 +284,8 @@ public class ListActivity extends AppCompatActivity implements
      */
     private void exitSelectionMode() {
         inSelectionMode = false;
-        itemListAdapter.setSelectionMode(false);
+        ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+        adapter.setSelectionMode(false);
         addTagButton.setVisibility(View.GONE);
         //addItemButton.setVisibility(View.VISIBLE);
         deleteItemButton.setVisibility(View.GONE);
@@ -334,7 +337,8 @@ public class ListActivity extends AppCompatActivity implements
     private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ArrayList<Item> itemsToDelete = itemListAdapter.getSelectedItems();
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+            ArrayList<Item> itemsToDelete = adapter.getSelectedItems();
             //iterate through the selected list and delete from adapter and database
             for (Item i: itemsToDelete){
                 itemListAdapter.remove(i);

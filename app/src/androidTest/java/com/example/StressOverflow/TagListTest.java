@@ -7,9 +7,12 @@ import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
+import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -17,6 +20,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -36,6 +40,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -83,21 +90,28 @@ public class TagListTest {
 
         // Perform the query with a callback
         final boolean[] bool = new boolean[1];
-        tagRef
-                .whereEqualTo("documentID", String.format("%s:%s", ownerName, testTagName))
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (queryDocumentSnapshots.isEmpty()){
-                            bool[0] = false;
-                        }else{
-                            bool[0] = true;
-                        }
-                    }
+        final CountDownLatch latch = new CountDownLatch(1);
 
+        tagRef
+                .document(String.format("%s:%s", ownerName, testTagName))
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        bool[0] = true;
+                        // Process the data here
+                    } else {
+                        // Document doesn't exist
+                        bool[0] = false;
+                    }
+                    latch.countDown();
                 });
-        assertTrue(bool[0]);
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(bool[0]);
+        onView(withId(R.id.activity_tag_list_listView)).check(matches(hasChildCount(0)));
     }
     @Test
     public void addToTagList() throws InterruptedException {
@@ -109,23 +123,68 @@ public class TagListTest {
         onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
 
         // Perform the query with a callback
-        // Perform the query with a callback
+        final boolean[] bool = new boolean[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        tagRef
+                .document(String.format("%s:%s", ownerName, testTagName))
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        bool[0] = true;
+                        // Process the data here
+                    } else {
+                        // Document doesn't exist
+                        bool[0] = false;
+                    }
+                    latch.countDown();
+                });
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(bool[0]);
+        onView(withId(R.id.activity_tag_list_listView)).check(matches(hasChildCount(1)));
+
+    }
+
+    @Test
+    public void addDuplicateTag(){
+        testTagName = "testTag";
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
+        onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+        onView(withId(R.id.fragment_add_tag_textView)).check(doesNotExist());
+
+        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).perform(click());
+        onView(withText("Add Tag")).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.fragment_add_tag_textView)).inRoot(isDialog()).perform(typeText(testTagName));
+        onView(withText("OK")).inRoot(isDialog()).perform(click());
+        final CountDownLatch latch = new CountDownLatch(1);
         final boolean[] bool = new boolean[1];
         tagRef
-                .whereEqualTo("documentID", String.format("%s:%s", ownerName, testTagName))
+                .document(String.format("%s:%s", ownerName, testTagName))
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (queryDocumentSnapshots.isEmpty()){
-                            bool[0] = false;
-                        }else{
-                            bool[0] = true;
-                        }
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        bool[0] = true;
+                        // Process the data here
+                    } else {
+                        // Document doesn't exist
+                        bool[0] = false;
                     }
-
+                    latch.countDown();
                 });
+        try {
+            latch.await(); // Wait for the latch to count down to 0
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         assertTrue(bool[0]);
+        onView(withId(R.id.activity_tag_list_listView)).check(matches(hasChildCount(1)));
+
     }
 
 
@@ -148,25 +207,31 @@ public class TagListTest {
                 .onChildView(withId(deleteButtonId))
                 .perform(click());
 
-        // Perform the query with a callback
-        // Perform the query with a callback
-        final boolean[] bool = new boolean[1];
-        tagRef
-                .whereEqualTo("documentID", String.format("%s:%s", ownerName, testTagName))
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (queryDocumentSnapshots.isEmpty()){
-                            bool[0] = false;
-                        }else{
-                            bool[0] = true;
-                        }
-                    }
 
+        final boolean[] bool = new boolean[1];
+        final CountDownLatch latch = new CountDownLatch(1);
+        tagRef
+                .document(String.format("%s:%s", ownerName, testTagName))
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        bool[0] = true;
+                    } else {
+                        // Document doesn't exist
+                        bool[0] = false;
+                    }
+                    latch.countDown();
                 });
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         assertFalse(bool[0]);
+        onView(withId(R.id.activity_tag_list_listView)).check(matches(hasChildCount(0)));
+
     }
+
 
 
 }
