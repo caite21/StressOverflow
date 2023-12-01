@@ -186,6 +186,9 @@ public class ListActivity extends AppCompatActivity implements
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
                 });
+        if (this.itemList.getAdapter() != this.items) {
+            this.itemList.setAdapter(this.itemListAdapter);
+        }
     }
 
     /**
@@ -243,6 +246,10 @@ public class ListActivity extends AppCompatActivity implements
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
         }
         this.setSumOfItemCosts();
+
+        if (this.itemList.getAdapter() != this.items) {
+            this.itemList.setAdapter(this.itemListAdapter);
+        }
     }
 
     public void editItem(int position, Item item) {
@@ -445,7 +452,7 @@ public class ListActivity extends AppCompatActivity implements
      * @param isAsc boolean true for ascending order and false for descending
      */
     @Override
-    public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
+        public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
         ArrayList<Item> filteredList;
         try {
             filteredList = this.itemListAdapter.filterList(filterConds);
