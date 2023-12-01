@@ -186,7 +186,7 @@
                     app:icon="@drawable/arrow_upward"/>
 
                 <Button
-                    android:id="@+id/fragment_filter_items_dec_sort_button"
+                    android:id="@+id/fragment_filter_items_desc_sort_button"
                     style="@style/Widget.App.Button.OutlinedButton.IconOnly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
