@@ -265,10 +265,12 @@ public class ListActivity extends AppCompatActivity implements
             //addItemButton.setVisibility(View.GONE);
             deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
-            itemListAdapter.setSelectionMode(true);
-            itemListAdapter.toggleSelection(position);
-
-            if (itemListAdapter.getSelectedItems().size() == 0){
+//            itemListAdapter.setSelectionMode(true);
+//            itemListAdapter.toggleSelection(position);
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+            adapter.setSelectionMode(true);
+            adapter.toggleSelection(position);
+            if (adapter.getSelectedItems().size() == 0){
                 exitSelectionMode();
             }
             return true;
@@ -282,7 +284,8 @@ public class ListActivity extends AppCompatActivity implements
      */
     private void exitSelectionMode() {
         inSelectionMode = false;
-        itemListAdapter.setSelectionMode(false);
+        ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+        adapter.setSelectionMode(false);
         addTagButton.setVisibility(View.GONE);
         //addItemButton.setVisibility(View.VISIBLE);
         deleteItemButton.setVisibility(View.GONE);
@@ -334,7 +337,8 @@ public class ListActivity extends AppCompatActivity implements
     private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ArrayList<Item> itemsToDelete = itemListAdapter.getSelectedItems();
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+            ArrayList<Item> itemsToDelete = adapter.getSelectedItems();
             //iterate through the selected list and delete from adapter and database
             for (Item i: itemsToDelete){
                 itemListAdapter.remove(i);
