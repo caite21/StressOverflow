@@ -21,12 +21,9 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.AppGlobals;
-import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
 import com.example.StressOverflow.Scan.BarcodeLookup;
 import com.example.StressOverflow.Scan.ScanSerialActivity;
-import com.example.StressOverflow.Tag.AddTagFragment;
-import com.example.StressOverflow.Tag.AddTagToItemFragment;
 import com.example.StressOverflow.Tag.Tag;
 import com.example.StressOverflow.Tag.TagList;
 import com.example.StressOverflow.Util;
@@ -38,6 +35,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Map;
 
 public class AddItemFragment extends DialogFragment{
 
@@ -62,6 +60,7 @@ public class AddItemFragment extends DialogFragment{
     private Button refreshTagButton;
     private OnFragmentInteractionListener listener;
     private String owner;
+    private View view;
 
     public AddItemFragment(String owner) {
         this.owner = owner;
@@ -129,7 +128,7 @@ public class AddItemFragment extends DialogFragment{
      * Ya
      */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_edit_item, null);
+        view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_edit_item, null);
         itemTitleField = view.findViewById(R.id.add__item__fragment__edit__title);
         itemMakeField = view.findViewById(R.id.add__item__fragment__edit__make);
         itemModelField = view.findViewById(R.id.add__item__fragment__edit__model);
@@ -157,10 +156,11 @@ public class AddItemFragment extends DialogFragment{
                 String entered_barcode = itemSerialField.getText().toString();
                 if (!entered_barcode.equals("")){
                     try {
-                        BarcodeLookup.get(entered_barcode);
+                        BarcodeLookup.get(entered_barcode, info -> handleBarcodeLookupResponse(info));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+
                 }
 
             }
@@ -293,4 +293,36 @@ public class AddItemFragment extends DialogFragment{
             chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
         }
     }
+
+    /**
+     *
+     * @param info
+     */
+    public void handleBarcodeLookupResponse(Map<String, String> info) {
+        // display found info
+        String title = info.get("title");
+        String description = info.get("description");
+
+        // show found, ask to overwrite
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder
+            .setTitle("Existing data was found for this barcode")
+            .setMessage(title + "\n" + description)
+            .setNegativeButton("Do not use", (dialog, which) ->
+                    dialog.dismiss()
+            )
+            .setPositiveButton("Use", (dialog, which) -> {
+                // if want to overwrite
+                itemTitleField.setText(title);
+                // If you want to dismiss the dialog after handling the click event
+                dialog.dismiss();
+            })
+            .create()
+            .show();
+
+//        new builder.show(getChildFragmentManager(), "BARCODELOOKUP");
+
+    }
+
+
 }
