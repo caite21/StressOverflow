@@ -23,6 +23,7 @@ import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Scan.BarcodeLookup;
 import com.example.StressOverflow.Scan.ScanSerialActivity;
 import com.example.StressOverflow.Tag.AddTagFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
@@ -34,6 +35,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
@@ -147,6 +149,22 @@ public class AddItemFragment extends DialogFragment{
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
         addTagsToChipGroup();
+
+        Button barcodeLookupButton = view.findViewById(R.id.barcodeLookupButton);
+        barcodeLookupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String entered_barcode = itemSerialField.getText().toString();
+                if (!entered_barcode.equals("")){
+                    try {
+                        BarcodeLookup.get(entered_barcode);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }
+        });
 
         Item tempItem = new Item();
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {

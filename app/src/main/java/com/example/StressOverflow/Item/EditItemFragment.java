@@ -268,6 +268,8 @@ public class EditItemFragment extends DialogFragment {
         });
     }
 
+
+
     /**
      * Add all the tags of the selected Item to the ChipGroup
      */
