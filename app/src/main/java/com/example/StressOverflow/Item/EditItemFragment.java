@@ -97,7 +97,7 @@ public class EditItemFragment extends DialogFragment {
 
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
         serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
-        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
+//        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
 
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
@@ -142,12 +142,13 @@ public class EditItemFragment extends DialogFragment {
                 scanSerial();
             }
         });
-        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scanForDescription();
-            }
-        });
+//        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                scanForDescription();
+//            }
+//        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         return builder
@@ -224,49 +225,49 @@ public class EditItemFragment extends DialogFragment {
         launcher.launch(o);
     }
 
-    /**
-     * Prompts the user to scan a barcode. Sets the description according to the item found when
-     * searching up the serial number online.
-     */
-    private void scanForDescription() {
-        ScanOptions o = new ScanOptions();
-        o.setCaptureActivity(ScanSerialActivity.class);
-        ActivityResultLauncher<ScanOptions> launcher;
-        launcher = registerForActivityResult(new ScanContract(), result -> {
-            if (result.getContents() != null) {
-                final boolean[] overwrite = {false};
-                // result.getContents is the scanned serial number
-                // logic for getting description from it goes here
-
-                // if there is already data in the field, ask user if it wants to be overwritten
-                if (!itemDescriptionField.getText().toString().equals("")) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Attention");
-                    builder.setMessage("Overwrite existing description data?");
-                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            overwrite[0] = true;
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
-                } else {
-                    overwrite[0] = true;
-                }
-                if (overwrite[0]) {
-                    // change this
-                    itemDescriptionField.setText(result.getContents());
-                }
-            }
-        });
-    }
+//    /**
+//     * Prompts the user to scan a barcode. Sets the description according to the item found when
+//     * searching up the serial number online.
+//     */
+//    private void scanForDescription() {
+//        ScanOptions o = new ScanOptions();
+//        o.setCaptureActivity(ScanSerialActivity.class);
+//        ActivityResultLauncher<ScanOptions> launcher;
+//        launcher = registerForActivityResult(new ScanContract(), result -> {
+//            if (result.getContents() != null) {
+//                final boolean[] overwrite = {false};
+//                // result.getContents is the scanned serial number
+//                // logic for getting description from it goes here
+//
+//                // if there is already data in the field, ask user if it wants to be overwritten
+//                if (!itemDescriptionField.getText().toString().equals("")) {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                    builder.setTitle("Attention");
+//                    builder.setMessage("Overwrite existing description data?");
+//                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i)
+//                        {
+//                            overwrite[0] = true;
+//                            dialogInterface.dismiss();
+//                        }
+//                    });
+//                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            dialogInterface.dismiss();
+//                        }
+//                    });
+//                } else {
+//                    overwrite[0] = true;
+//                }
+//                if (overwrite[0]) {
+//                    // change this
+//                    itemDescriptionField.setText(result.getContents());
+//                }
+//            }
+//        });
+//    }
 
 
 

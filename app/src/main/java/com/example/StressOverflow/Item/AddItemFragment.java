@@ -35,7 +35,9 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class AddItemFragment extends DialogFragment{
 
@@ -143,7 +145,7 @@ public class AddItemFragment extends DialogFragment{
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
 
         serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
-        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
+//        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
 
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
@@ -156,7 +158,7 @@ public class AddItemFragment extends DialogFragment{
                 String entered_barcode = itemSerialField.getText().toString();
                 if (!entered_barcode.equals("")){
                     try {
-                        BarcodeLookup.get(entered_barcode, info -> handleBarcodeLookupResponse(info));
+                        BarcodeLookup.get(entered_barcode, info -> handleBarcodeLookupResponse(info), getContext());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -194,12 +196,13 @@ public class AddItemFragment extends DialogFragment{
                 scanSerial();
             }
         });
-        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scanForDescription();
-            }
-        });
+//        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                scanForDescription();
+//            }
+//        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         return builder
@@ -266,15 +269,15 @@ public class AddItemFragment extends DialogFragment{
         serialLauncher.launch(o);
     }
 
-    /**
-     * Prompts the user to scan a barcode. Sets the description according to the item found when
-     * searching up the serial number online.
-     */
-    private void scanForDescription() {
-        ScanOptions o = new ScanOptions();
-        o.setCaptureActivity(ScanSerialActivity.class);
-        descriptionLauncher.launch(o);
-    }
+//    /**
+//     * Prompts the user to scan a barcode. Sets the description according to the item found when
+//     * searching up the serial number online.
+//     */
+//    private void scanForDescription() {
+//        ScanOptions o = new ScanOptions();
+//        o.setCaptureActivity(ScanSerialActivity.class);
+//        descriptionLauncher.launch(o);
+//    }
 
     /**
      * Adds all the tags to the chipGroup
@@ -299,30 +302,49 @@ public class AddItemFragment extends DialogFragment{
      * @param info
      */
     public void handleBarcodeLookupResponse(Map<String, String> info) {
+        if (info.values().stream().allMatch(value -> value.equals(""))) {
+            Util.showShortToast(getContext(), "No product information found");
+            return;
+        }
+
         // display found info
-        String title = info.get("title");
-        String description = info.get("description");
+        int size = info.size();
+        String[] options = {"Title","Make","Model", "Description"};
+        EditText[] fields = {itemTitleField, itemMakeField, itemModelField, itemDescriptionField};
+        boolean[] checkedItems = new boolean[size];
+        String[] formattedOptions = new String[size];
+        for (int i = 0; i < options.length; i++) {
+            String key = options[i];
+            formattedOptions[i] = key + ": " + info.get(key);
+        }
+
+        // .setMessage("Select categories to overwrite\n") TODO: create xml for nicer format
 
         // show found, ask to overwrite
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder
-            .setTitle("Existing data was found for this barcode")
-            .setMessage(title + "\n" + description)
+            .setTitle("Found product information")
+            .setMultiChoiceItems(formattedOptions, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    checkedItems[which] =  isChecked;
+                }
+            })
             .setNegativeButton("Do not use", (dialog, which) ->
                     dialog.dismiss()
             )
             .setPositiveButton("Use", (dialog, which) -> {
-                // if want to overwrite
-                itemTitleField.setText(title);
-                // If you want to dismiss the dialog after handling the click event
+                // overwrite selected
+                for (int i = 0; i < options.length; i++) {
+                    String value = info.get(options[i]);
+                    if (value!=null && !value.equals("") && !value.equals("null") && checkedItems[i]) {
+                        fields[i].setText(value);
+                    }
+                }
                 dialog.dismiss();
             })
             .create()
             .show();
-
-//        new builder.show(getChildFragmentManager(), "BARCODELOOKUP");
-
     }
-
 
 }
