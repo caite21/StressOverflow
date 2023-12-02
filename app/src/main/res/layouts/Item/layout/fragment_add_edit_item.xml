@@ -349,7 +349,7 @@
                 />
 
             <Button
-                android:id="@+id/barcodeLookupButton"
+                android:id="@+id/add_item_fragment_button_lookup"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"

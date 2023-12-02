@@ -3,12 +3,15 @@
  */
 package com.example.StressOverflow.Item;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -35,9 +38,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class AddItemFragment extends DialogFragment{
 
@@ -151,23 +152,6 @@ public class AddItemFragment extends DialogFragment{
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
         addTagsToChipGroup();
 
-        Button barcodeLookupButton = view.findViewById(R.id.barcodeLookupButton);
-        barcodeLookupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String entered_barcode = itemSerialField.getText().toString();
-                if (!entered_barcode.equals("")){
-                    try {
-                        BarcodeLookup.get(entered_barcode, info -> handleBarcodeLookupResponse(info), getContext());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
-
-            }
-        });
-
         Item tempItem = new Item();
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -196,6 +180,20 @@ public class AddItemFragment extends DialogFragment{
                 scanSerial();
             }
         });
+
+        Button barcodeLookupButton = view.findViewById(R.id.add_item_fragment_button_lookup);
+        barcodeLookupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String entered_barcode = itemSerialField.getText().toString();
+                if (BarcodeLookup.isUPCValid(entered_barcode)) {
+                    BarcodeLookup.get(entered_barcode, info -> handleBarcodeLookupResponse(info), getContext());
+                } else {
+                    Util.showShortToast(getContext(), "Invalid serial number");
+                }
+            }
+        });
+
 //        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -298,8 +296,9 @@ public class AddItemFragment extends DialogFragment{
     }
 
     /**
-     *
-     * @param info
+     * Displays found product details that can be selected to enter
+     * if the serial number is found in the UPC database.
+     * @param info map of category to found product details
      */
     public void handleBarcodeLookupResponse(Map<String, String> info) {
         if (info.values().stream().allMatch(value -> value.equals(""))) {
