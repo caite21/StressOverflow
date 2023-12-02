@@ -24,13 +24,14 @@ public class BarcodeLookup {
     }
 
     /**
-     * UPC should be 12 digits and start with 0
+     * UPC should be 12 digits, usually starts with 0
      * @param barcode string UPC
      * @return true or false
      */
     public static boolean isUPCValid(String barcode) {
         if (barcode != null && barcode.length() == 12) {
-            return barcode.matches("\\d+") && barcode.charAt(0) == '0';
+//            && barcode.charAt(0) == '0'
+            return barcode.matches("\\d+");
         }
         return false;
     }

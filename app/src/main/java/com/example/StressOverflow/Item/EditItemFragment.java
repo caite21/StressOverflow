@@ -350,7 +350,7 @@ public class EditItemFragment extends DialogFragment {
                 .setNegativeButton("Cancel", (dialog, which) ->
                         dialog.dismiss()
                 )
-                .setPositiveButton("Use", (dialog, which) -> {
+                .setPositiveButton("Use selected", (dialog, which) -> {
                     // overwrite selected
                     for (int i = 0; i < options.length; i++) {
                         String value = info.get(options[i]);
