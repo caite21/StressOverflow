@@ -36,38 +36,6 @@ public class BarcodeLookup {
     }
 
     /**
-     * Parses JSON into hashmap of category and its result
-     * @param jsonResponse JSON from UPC database
-     * @return hashmap of category and its result
-     * @throws JSONException if can't convert response into JSONObject
-     */
-    public static Map<String, String> parseResponse(String jsonResponse) throws JSONException {
-        Map<String, String> barcodeLookupResult = new HashMap<>();
-        JSONObject jsonObject = new JSONObject(jsonResponse);
-
-        try {
-            JSONObject productObject = jsonObject.getJSONObject("product");
-            barcodeLookupResult.put("Title", productObject.optString("title"));
-            barcodeLookupResult.put("Make", productObject.optString("brand"));
-            barcodeLookupResult.put("Description", productObject.optString("description"));
-//            barcodeLookupResult.put("Picture", productObject.getJSONArray("images").optString(0));
-        } catch (JSONException e) {
-            barcodeLookupResult.put("Title", "");
-            barcodeLookupResult.put("Make", "");
-            barcodeLookupResult.put("Description", "");
-        }
-        try {
-            JSONObject productObject = jsonObject.getJSONObject("product");
-            JSONObject attributesObject = productObject.getJSONObject("attributes");
-            barcodeLookupResult.put("Model", attributesObject.optString("model"));
-        } catch (JSONException e) {
-            barcodeLookupResult.put("Model", "");
-        }
-
-        return barcodeLookupResult;
-    }
-
-    /**
      * Access UPC database with API. Passes result from database to listener
      * in the form of a hashmap. Uses: https://rapidapi.com/UnlimitedAPI/api/barcodes-lookup/
      * @param barcode string UPC
@@ -103,6 +71,38 @@ public class BarcodeLookup {
                 listener.OnBarcodeLookupResponse(empty);
             }
         });
+    }
+
+    /**
+     * Parses JSON into hashmap of category and its result
+     * @param jsonResponse JSON from UPC database
+     * @return hashmap of category and its result
+     * @throws JSONException if can't convert response into JSONObject
+     */
+    public static Map<String, String> parseResponse(String jsonResponse) throws JSONException {
+        Map<String, String> barcodeLookupResult = new HashMap<>();
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+
+        try {
+            JSONObject productObject = jsonObject.getJSONObject("product");
+            barcodeLookupResult.put("Title", productObject.optString("title"));
+            barcodeLookupResult.put("Make", productObject.optString("manufacturer"));
+            barcodeLookupResult.put("Description", productObject.optString("description"));
+//            barcodeLookupResult.put("Picture", productObject.getJSONArray("images").optString(0));
+        } catch (JSONException e) {
+            barcodeLookupResult.put("Title", "");
+            barcodeLookupResult.put("Make", "");
+            barcodeLookupResult.put("Description", "");
+        }
+        try {
+            JSONObject productObject = jsonObject.getJSONObject("product");
+            JSONObject attributesObject = productObject.getJSONObject("attributes");
+            barcodeLookupResult.put("Model", attributesObject.optString("model"));
+        } catch (JSONException e) {
+            barcodeLookupResult.put("Model", "");
+        }
+
+        return barcodeLookupResult;
     }
 
 }

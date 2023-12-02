@@ -277,6 +277,7 @@ public class ListActivity extends AppCompatActivity implements
         if (!picturesChanged) {
             editItem(position, item);
         } else {
+//            item.reorderURLs();
             ArrayList<Image> pics = new ArrayList<>();
             pics.addAll(pictures);
             Image.uploadPictures(pics, new Image.OnAllImagesUploadedListener() {

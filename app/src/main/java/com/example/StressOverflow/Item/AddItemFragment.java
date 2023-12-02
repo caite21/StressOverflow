@@ -308,8 +308,8 @@ public class AddItemFragment extends DialogFragment{
 
         // display found info
         int size = info.size();
-        String[] options = {"Title","Make","Model", "Description"};
-        EditText[] fields = {itemTitleField, itemMakeField, itemModelField, itemDescriptionField};
+        String[] options = {"Title", "Description","Make","Model"};
+        EditText[] fields = {itemTitleField, itemDescriptionField, itemMakeField, itemModelField};
         boolean[] checkedItems = new boolean[size];
         String[] formattedOptions = new String[size];
         for (int i = 0; i < options.length; i++) {
@@ -322,14 +322,14 @@ public class AddItemFragment extends DialogFragment{
         // show found, ask to overwrite
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder
-            .setTitle("Found product information")
+            .setTitle("Found product information:")
             .setMultiChoiceItems(formattedOptions, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                     checkedItems[which] =  isChecked;
                 }
             })
-            .setNegativeButton("Do not use", (dialog, which) ->
+            .setNegativeButton("Cancel", (dialog, which) ->
                     dialog.dismiss()
             )
             .setPositiveButton("Use", (dialog, which) -> {
