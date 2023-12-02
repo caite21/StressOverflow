@@ -134,7 +134,8 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter = new ItemListAdapter(this, items);
         this.itemList.setAdapter(this.itemListAdapter);
 
-        this.sumOfItemCosts.setText(this.ownerName);
+//        this.sumOfItemCosts.setText(this.ownerName);
+        Util.showShortToast(getBaseContext(), "Welcome " + this.ownerName);
 
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
@@ -161,6 +162,7 @@ public class ListActivity extends AppCompatActivity implements
                                 items.add(item);
                             }
                             itemListAdapter.notifyDataSetChanged();
+                            setSumOfItemCosts();
                         }
                     }
 
