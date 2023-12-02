@@ -114,7 +114,7 @@ public class EditItemFragment extends DialogFragment {
         itemMonthField.setText(this.selectedItem.getDateMonth());
         itemDateField.setText(this.selectedItem.getDateDate());
         itemCommentsField.setText(this.selectedItem.getComments());
-        itemSerialField.setText(Integer.toString(selectedItem.getSerial()));
+        itemSerialField.setText(Long.toString(selectedItem.getSerial()));
 
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,7 +172,7 @@ public class EditItemFragment extends DialogFragment {
                         );
                         Double value = Double.valueOf(itemValueField.getText().toString());
                         String comments = itemCommentsField.getText().toString();
-                        Integer serial = Integer.valueOf(itemSerialField.getText().toString());
+                        Long serial = Long.valueOf(itemSerialField.getText().toString());
                         for (int chipID : tagChipGroup.getCheckedChipIds()){
                             Chip newChip = tagChipGroup.findViewById(chipID);
                             Tag newTag = new Tag(newChip.getText().toString());

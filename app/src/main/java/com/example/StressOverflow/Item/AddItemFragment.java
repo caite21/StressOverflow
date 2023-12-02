@@ -242,7 +242,7 @@ public class AddItemFragment extends DialogFragment{
                                     comments,
                                     newTags,
                                     emptyPictureURLs,
-                                    Integer.valueOf(serial),
+                                    Long.valueOf(serial),
                                     owner
                             ));
                         } catch (IllegalArgumentException e) {

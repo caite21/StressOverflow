@@ -29,7 +29,7 @@ public final class Util {
                 String.format("TestComment%s", String.valueOf(val)),
                 new ArrayList<Tag>(),
                 new ArrayList<String>(),
-                (Integer) val,
+                Long.valueOf((long) val),
                 "Test Owner"
         );
     }
