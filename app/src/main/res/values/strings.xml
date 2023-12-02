@@ -14,7 +14,7 @@
     <string name="add_item_fragment_picture_button_text">Pictures</string>
     <string name="add_item_fragment_serial_header">Serial Number</string>
     <string name="add_item_fragment_description_button">Scan barcode</string>
-    <string name="add_item_fragment_serial_button">Scan number</string>
+    <string name="add_item_fragment_serial_button">Scan</string>
 
     <string name="activity_item_list_edit_button_text">Add Item</string>
     <string name="activity_item_list_filter_button_text">Sort / Filter</string>
@@ -54,5 +54,6 @@
 
     <string name = "activity_tag_list_add_btn_text">Add</string>
     <string name = "activity_tag_list_back_btn_text">Back</string>
+    <string name="add_item_fragment_lookup_button">Lookup</string>
 
 </resources>

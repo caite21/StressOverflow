@@ -55,7 +55,7 @@ public class Image {
      * Listener interface for when an image has been uploaded
      */
     public interface OnImageUploadedListener {
-        void onImageUploaded(String downloadUrl);
+        void onImageUploaded(String downloadUrl, int insert_index);
         void onUploadFailure(Exception e);
     }
 
@@ -170,19 +170,22 @@ public class Image {
     public static void uploadPictures(ArrayList<Image> pictures, OnAllImagesUploadedListener listener) {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
         ArrayList<String> downloadURLs = new ArrayList<>();
+        int insert_index = 0;
 
         // Upload each Bitmap to Storage and get URL
         for (Image image : pictures) {
             if (image.getURL() != null) {
                 // already uploaded
                 downloadURLs.add(image.getURL());
+                insert_index++;
             }
             else {
                 Bitmap bitmap = image.getBitmap();
-                uploadBitmapToStorage(bitmap, new OnImageUploadedListener() {
+                int copy_index = 0 + insert_index; // trust me, do not change this
+                uploadBitmapToStorage(bitmap, copy_index, new OnImageUploadedListener() {
                     @Override
-                    public void onImageUploaded(String downloadUrl) {
-                        downloadURLs.add(downloadUrl);
+                    public void onImageUploaded(String downloadUrl, int index) {
+                        downloadURLs.add(index, downloadUrl);
 
                         if (downloadURLs.size() == pictures.size()) {
                             listener.onAllImagesUploaded(downloadURLs);
@@ -207,7 +210,7 @@ public class Image {
      * @param bitmap bitmap of picture
      * @param listener for when picture is done uploading
      */
-    public static void uploadBitmapToStorage(Bitmap bitmap, OnImageUploadedListener listener) {
+    public static void uploadBitmapToStorage(Bitmap bitmap, int insert_index, OnImageUploadedListener listener) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
@@ -224,7 +227,7 @@ public class Image {
                 storageRef.getDownloadUrl().addOnCompleteListener(downloadUrlTask -> {
                     if (downloadUrlTask.isSuccessful()) {
                         String downloadUrl = downloadUrlTask.getResult().toString();
-                        listener.onImageUploaded(downloadUrl);
+                        listener.onImageUploaded(downloadUrl, insert_index);
                     } else {
                         listener.onUploadFailure(downloadUrlTask.getException());
                     }

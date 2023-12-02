@@ -40,7 +40,7 @@ public class Item {
     private ArrayList<Tag> tags = new ArrayList<Tag>();
     private ArrayList<String> pictureURLs = new ArrayList<>();
     private ArrayList<Image> pictures = new ArrayList<>();
-    private Integer serial;
+    private Long serial;
     private String owner;
 
     public Item() {}
@@ -55,7 +55,7 @@ public class Item {
             String comments,
             ArrayList<Tag> tags,
             ArrayList<String> pictureURLs,
-            Integer serial,
+            Long serial,
             String owner
     ) {
         this.id = UUID.randomUUID();
@@ -83,7 +83,7 @@ public class Item {
             String comments,
             ArrayList<Tag> tags,
             ArrayList<String> pictureURLs,
-            Integer serial,
+            Long serial,
             String owner
     ) {
         this.id = uuid;
@@ -203,7 +203,7 @@ public class Item {
         return pictureURLs;
     }
 
-    public Integer getSerial() {
+    public Long getSerial() {
         return this.serial;
     }
 
@@ -348,7 +348,7 @@ public class Item {
         this.tags.removeAll(tags);
     }
 
-    public void setSerial(int serial) {
+    public void setSerial(Long serial) {
         this.serial = serial;
     }
 
@@ -419,7 +419,7 @@ public class Item {
                     (String) data.get("comments"),
                     tags,
                     pictureURLs,
-                    ((Long) data.get("serial")).intValue(),
+                    ((Long) data.get("serial")).longValue(),
                     (String) data.get("owner")
             );
             return out;

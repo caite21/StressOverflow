@@ -205,4 +205,6 @@ public class AddImagesTest {
         // click pictures
         // check that all expected pictures are there/compare bitmaps
     }
+
+    // also test going back and forth from fragments with Cancel button
 }
