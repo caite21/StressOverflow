@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -191,6 +192,9 @@ public class EditItemFragment extends DialogFragment {
                         Long serial = Long.valueOf(itemSerialField.getText().toString());
                         for (int chipID : tagChipGroup.getCheckedChipIds()){
                             Chip newChip = tagChipGroup.findViewById(chipID);
+                            newChip.setChipBackgroundColorResource(R.color.sagi);
+                            newChip.setTextColor(Color.WHITE);
+                            newChip.setChipCornerRadius(10);
                             Tag newTag = new Tag(newChip.getText().toString());
                             newTags.add(newTag);
                         }
@@ -306,6 +310,9 @@ public class EditItemFragment extends DialogFragment {
                 chip.setChecked(false);
                 chip.setActivated(false);
             }
+            chip.setChipBackgroundColorResource(R.color.sagi);
+            chip.setTextColor(Color.WHITE);
+            chip.setChipCornerRadius(10);
             chip.setCheckedIconVisible(true);
             tagChipGroup.addView(chip);
             chip.setOnClickListener(v -> chip.setActivated(!chip.isActivated()));
