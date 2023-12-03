@@ -27,6 +27,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Array;
 import java.text.ParseException;
@@ -82,6 +83,19 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         TextView itemSerial = view.findViewById(R.id.listview__item__serial__number);
         ImageView pictureImageView = view.findViewById(R.id.listview__item__picture);
 
+        if (item.getPictureURLs().size() > 0 ) {
+            Picasso.get()
+                    .load(item.getPictureURLs().get(0))
+                    .error(R.drawable.ic_error_image)
+                    .into(pictureImageView);
+
+//        if (item.getPictureURLs().size() > 0 || item.getPictures().size() > 0) {
+//            Image image = item.getPictures().get(0);
+//            image.displayImage(pictureImageView);
+        } else {
+            pictureImageView.setImageResource(R.drawable.default_image);
+        }
+
         itemTitle.setText(item.getName());
         itemMakeModel.setText(item.getMakeModel());
         itemDescription.setText(item.getDescription(true));
@@ -91,13 +105,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
         addTagChips(view, item);
         applySelectionBackground(view, item);
-
-        if (item.getPictureURLs().size() > 0 || item.getPictures().size() > 0) {
-            Image image = item.getPictures().get(0);
-            image.displayImage(pictureImageView);
-        } else {
-            pictureImageView.setImageResource(R.drawable.default_image);
-        }
 
         return view;
     }
@@ -201,21 +208,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.notifyDataSetChanged();
     }
 
-//    /**
-//     * Sorts the list with the provided comparator that uses Item as a template.
-//     *
-//     * @param cmp provides rules for how to sort the ArrayList
-//     */
-////    @Override
-////    public int compareDate(Item firstItem, Item secondItem) {
-//    public void compareDate(String compareType) {
-//        List itemlist = (List) this.items;
-//        if (compareType == "description") {
-//            itemlist.sort(Sort.descriptionComparator);
-//        }
-//        this.notifyDataSetChanged();
-//    }
-
     /**
      * Add the tags for the item on runtime
      * @param view gets the current view that it's rendering
@@ -268,8 +260,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
     /**
      * Filters the item list by description keywords, dates, makes, and tags.
-     * @param conditions - The string key that describes the filter and the arraylist that
-     *                     species what to filter
+     * @param conditions string key that describes the filter and the arraylist that specifies
+     *                   what to filter
      * @return Arraylist of items that fit the filtering conditions
      * @throws ParseException
      */

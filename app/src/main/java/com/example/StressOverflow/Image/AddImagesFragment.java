@@ -1,10 +1,12 @@
 package com.example.StressOverflow.Image;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,6 +21,8 @@ import android.widget.GridView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import java.io.IOException;
@@ -35,6 +39,7 @@ import androidx.annotation.Nullable;
 
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Util;
 
 
 /**
@@ -177,10 +182,16 @@ public class AddImagesFragment extends DialogFragment  {
                             Uri image = data.getData();
                             Bitmap selectedBitmap = getBitmapFromUri(image);
                             imagesList.add(new Image(selectedBitmap));
-                        } else {
+                        } else if (imageUri != null) {
                             // Image captured with camera
                             Bitmap selectedBitmap = getBitmapFromUri(imageUri);
                             imagesList.add(new Image(selectedBitmap));
+                        } else if (data.getExtras() != null) {
+                            // Failed to write image captured with camera, but can still save it
+                            Bitmap capturedBitmap = (Bitmap) data.getExtras().get("data");
+                            imagesList.add(new Image(capturedBitmap));
+                        } else {
+                            Util.showShortToast(getContext(), "Image Error: result is null");
                         }
 
                         // display image(s)
@@ -203,9 +214,16 @@ public class AddImagesFragment extends DialogFragment  {
 
     /**
      * A pop-up that gives the options of adding images by taking a picture with the
-     * camera or selecting pictures from the library
+     * camera or selecting pictures from the library. Also asks for camera permission
+     * if necessary.
      */
     private void openImageChooser() {
+        // ask for camera permission
+        final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+
         // Intent to capture a photo
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -225,7 +243,7 @@ public class AddImagesFragment extends DialogFragment  {
         // Intent to choose which intent
         Intent chooser = new Intent(Intent.ACTION_CHOOSER);
         chooser.putExtra(Intent.EXTRA_INTENT, pickPicturesIntent);
-        chooser.putExtra(Intent.EXTRA_TITLE, "Choose images or take a picture");
+        chooser.putExtra(Intent.EXTRA_TITLE, "Select images or take a picture");
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
         addPicturesLauncher.launch(chooser);
     }
@@ -241,8 +259,13 @@ public class AddImagesFragment extends DialogFragment  {
             InputStream inputStream = contentResolver.openInputStream(uri);
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
-            Log.d("IMAGES", "Converting picture to bitmap failed: ", e);
-            return null;
+            try {
+                return MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            } catch (IOException e2) {
+                Log.d("IMAGES", "Converting picture to bitmap failed");
+                Util.showShortToast(getContext(), "Image Error: Converting picture to bitmap failed");
+                return null;
+            }
         }
     }
 
