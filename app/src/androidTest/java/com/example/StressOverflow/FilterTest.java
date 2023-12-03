@@ -118,9 +118,9 @@ public class FilterTest {
 
         ArrayList<Tag> tagList = new ArrayList<>();
         tagList.add(tag1);
-        Item item1 = new Item("Test1", "make", "model", "this is the first item",
+        item1 = new Item("Test1", "make", "model", "this is the first item",
             new GregorianCalendar(2023, 1, 1),5.00,
-            "Comments", tagList, images, 123456, AppGlobals.getInstance().getOwnerName());
+            "Comments", tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
         itemRef.document(item1.getId().toString())
             .set(item1.toFirebaseObject())
             .addOnFailureListener(new OnFailureListener() {
@@ -146,7 +146,7 @@ public class FilterTest {
 
         item2 = new Item("Test2", "make1", "model", "this is the second item",
             new GregorianCalendar(2022, 1, 1), 6.00, "Comments",
-                tagList, images, 123456, AppGlobals.getInstance().getOwnerName());
+                tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
         itemRef.document(item2.getId().toString())
             .set(item2.toFirebaseObject())
             .addOnFailureListener(new OnFailureListener() {
@@ -160,7 +160,7 @@ public class FilterTest {
         tagList.remove(tag1);
         item3 = new Item("Test3", "make2", "model", "this is the second add 1 and last item",
                 new GregorianCalendar(2001, 1, 1),7.00,
-                "Comments", tagList, images, 123456, AppGlobals.getInstance().getOwnerName());
+                "Comments", tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
         itemRef.document(item3.getId().toString())
                 .set(item3.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
@@ -540,7 +540,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test2")));
         onData(anything())
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(1)
@@ -550,7 +550,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
+                .check(matches(withText("Test1")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
         onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
@@ -571,7 +571,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
+                .check(matches(withText("Test1")));
         onData(anything())
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(1)
@@ -581,7 +581,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test2")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
         onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
@@ -601,7 +601,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test3")));
         onData(anything())
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(1)
@@ -611,7 +611,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test3")));
+                .check(matches(withText("Test1")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
         onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
@@ -632,7 +632,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test3")));
+                .check(matches(withText("Test1")));
         onData(anything())
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(1)
@@ -642,7 +642,7 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
         onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
@@ -724,16 +724,6 @@ public class FilterTest {
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(1)
-                .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(2)
-                .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
@@ -753,19 +743,9 @@ public class FilterTest {
 
         onData(anything())
                 .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(0)
-                .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test3")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(1)
-                .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
         onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));

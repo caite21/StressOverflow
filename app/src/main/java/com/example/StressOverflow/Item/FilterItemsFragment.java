@@ -158,7 +158,7 @@ public class FilterItemsFragment extends DialogFragment {
         ArrayList<String> keywords;
         keywords = new ArrayList<String>();
         for (int i = 0; i < this.itemAdapter.getCount(); i++) {
-            String[] descriptionWords = Objects.requireNonNull(this.itemAdapter.getItem(i)).getDescription().split(" ");
+            String[] descriptionWords = Objects.requireNonNull(this.itemAdapter.getItem(i)).getDescription().toLowerCase().replaceAll("[^\\sa-zA-Z0-9]", "").split(" ");
             for (String descriptionWord : descriptionWords) {
                 if (!keywords.contains(descriptionWord)) {
                     keywords.add(descriptionWord);

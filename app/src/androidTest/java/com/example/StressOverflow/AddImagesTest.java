@@ -67,7 +67,7 @@ public class AddImagesTest {
         ArrayList<String> pictureURLs = new ArrayList<>();
         item = new Item("testItem","make","model","description",
                 new GregorianCalendar(),10.0, "Comments",testTags,pictureURLs,
-                123456, AppGlobals.getInstance().getOwnerName());
+                123456L, AppGlobals.getInstance().getOwnerName());
 
         firestore.collection("items").document(item.getId().toString())
                 .set(item.toFirebaseObject())
