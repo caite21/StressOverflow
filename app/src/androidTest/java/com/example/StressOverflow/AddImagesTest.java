@@ -1,8 +1,12 @@
 package com.example.StressOverflow;
 
 import static android.content.ContentValues.TAG;
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
+import static androidx.test.espresso.action.ViewActions.pressBack;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -10,11 +14,18 @@ import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.test.espresso.Espresso;
@@ -25,6 +36,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
 import com.example.StressOverflow.Image.Image;
+import com.example.StressOverflow.Image.ImagesDisplayAdapter;
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Item.ListActivity;
 import com.example.StressOverflow.Tag.Tag;
@@ -36,6 +48,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
+import junit.framework.AssertionFailedError;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -65,6 +79,7 @@ public class AddImagesTest {
 
         ArrayList<Tag> testTags = new ArrayList<>();
         ArrayList<String> pictureURLs = new ArrayList<>();
+        pictureURLs.add("https://firebasestorage.googleapis.com/v0/b/stressoverflow.appspot.com/o/images%2Fimage_1701480005690.jpg?alt=media&token=400b81e3-97da-4c1f-b1e0-98cceb4d3b62");
         item = new Item("testItem","make","model","description",
                 new GregorianCalendar(),10.0, "Comments",testTags,pictureURLs,
                 123456L, AppGlobals.getInstance().getOwnerName());
@@ -160,14 +175,47 @@ public class AddImagesTest {
 
     @Test
     public void deleteImagesTest(){
-        // add 3 pictures
-        // check count is 3
-        // click one
-        // click delete
-        // check count is 2
-        // click one
-        // click delete
-        // check count is 1
+        // go to image selection
+        onData(is(instanceOf(Item.class)))
+                .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__pictures))
+                .perform(scrollTo())
+                .perform(click());
+        SystemClock.sleep(4000);
+        // click on the very first picture (fails if it doesn't exist)
+        onData(anything())
+                .inAdapterView(withId(R.id.images_area))
+                .atPosition(0)
+                .perform(click());
+
+        SystemClock.sleep(2000);
+        onView(withId(R.id.delete_button))
+                .perform(click());
+        // go back to ListActivity
+        SystemClock.sleep(2000);
+        onView(withText("OK")). perform(pressBack());
+        SystemClock.sleep(2000);
+        onView(withText("OK")). perform(pressBack());
+        SystemClock.sleep(2000);
+
+        // same process
+        onData(is(instanceOf(Item.class)))
+                .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__pictures))
+                .perform(scrollTo())
+                .perform(click());
+        SystemClock.sleep(4000);
+        // check if the first image is not displayed
+        onData(anything())
+                .inAdapterView(withId(R.id.images_area))
+                .atPosition(0)
+                .check(matches(not(isDisplayed())));
     }
 
     @Test
