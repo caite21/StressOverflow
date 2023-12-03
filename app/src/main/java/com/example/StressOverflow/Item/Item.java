@@ -40,7 +40,7 @@ public class Item {
     private ArrayList<Tag> tags = new ArrayList<Tag>();
     private ArrayList<String> pictureURLs = new ArrayList<>();
     private ArrayList<Image> pictures = new ArrayList<>();
-    private Long serial;
+    private String serial;
     private String owner;
 
     public Item() {}
@@ -55,7 +55,7 @@ public class Item {
             String comments,
             ArrayList<Tag> tags,
             ArrayList<String> pictureURLs,
-            Long serial,
+            String serial,
             String owner
     ) {
         this.id = UUID.randomUUID();
@@ -83,7 +83,7 @@ public class Item {
             String comments,
             ArrayList<Tag> tags,
             ArrayList<String> pictureURLs,
-            Long serial,
+            String serial,
             String owner
     ) {
         this.id = uuid;
@@ -166,7 +166,7 @@ public class Item {
     public String getDateAsString() {
         return String.format("%s/%s/%s",
                 this.getDate().get(Calendar.YEAR),
-                this.getDate().get(Calendar.MONTH) + 1,
+                this.getDate().get(Calendar.MONTH),
                 this.getDate().get(Calendar.DATE)
         );
     }
@@ -176,7 +176,7 @@ public class Item {
     }
 
     public String getDateMonth() {
-        return String.format("%s", this.getDate().get(Calendar.MONTH) + 1);
+        return String.format("%s", this.getDate().get(Calendar.MONTH));
     }
 
     public String getDateDate() {
@@ -203,7 +203,7 @@ public class Item {
         return pictureURLs;
     }
 
-    public Long getSerial() {
+    public String getSerial() {
         return this.serial;
     }
 
@@ -228,6 +228,13 @@ public class Item {
             return 0.0d;
         }
         return this.value;
+    }
+
+    public String getValueAsString() {
+        if (this.value == null) {
+            return "No value";
+        }
+        return String.format("$%.2f", this.value);
     }
 
     public String getComments() {
@@ -348,7 +355,7 @@ public class Item {
         this.tags.removeAll(tags);
     }
 
-    public void setSerial(Long serial) {
+    public void setSerial(String serial) {
         this.serial = serial;
     }
 
@@ -419,7 +426,7 @@ public class Item {
                     (String) data.get("comments"),
                     tags,
                     pictureURLs,
-                    ((Long) data.get("serial")).longValue(),
+                    (String) data.get("serial"),
                     (String) data.get("owner")
             );
             return out;

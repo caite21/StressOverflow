@@ -59,7 +59,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         super(context, R.layout.listview_item_content, items);
         this.items = items;
         this.context = context;
-        this.itemRef = db.collection("items");
+        this.itemRef = db.collection("test_items");
     }
 
     public void clearItems(){
@@ -85,9 +85,9 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         itemTitle.setText(item.getName());
         itemMakeModel.setText(item.getMakeModel());
         itemDescription.setText(item.getDescription(true));
-        itemPrice.setText((item.getValue().toString()));
+        itemPrice.setText(item.getValueAsString());
         itemDate.setText(item.getDateAsString());
-        itemSerial.setText(item.getSerial().toString());
+        itemSerial.setText(item.getSerial());
 
         addTagChips(view, item);
         applySelectionBackground(view, item);
@@ -156,12 +156,12 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
      *
      * @return cumulative value of items in the list
      */
-    public Double getTotalValue() {
+    public String getTotalValue() {
         double cum = 0;
         for (int i = 0; i < items.size(); i++) {
             cum = cum + items.get(i).getValue();
         }
-        return Math.round(cum * 100.0d) / 100.0d;
+        return String.format("$%.2f", cum);
     }
 
     public void addItem(Item item) {

@@ -84,7 +84,7 @@ public class ListActivity extends AppCompatActivity implements
 
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
-        this.itemRef = this.db.collection("items");
+        this.itemRef = this.db.collection("test_items");
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
@@ -303,7 +303,7 @@ public class ListActivity extends AppCompatActivity implements
      */
     public void setSumOfItemCosts() {
         ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
-        this.sumOfItemCosts.setText(adapter.getTotalValue().toString());
+        this.sumOfItemCosts.setText(adapter.getTotalValue());
     }
 
     /**
