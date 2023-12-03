@@ -29,7 +29,7 @@ public final class Util {
                 String.format("TestComment%s", String.valueOf(val)),
                 new ArrayList<Tag>(),
                 new ArrayList<String>(),
-                (Integer) val,
+                Long.valueOf((long) val),
                 "Test Owner"
         );
     }
@@ -42,7 +42,7 @@ public final class Util {
      * How many characters do we expect to fit on a single line for the description
      * field on the main list activity? (Of course tentative amount for now)
      */
-    public static final int MAX_LINE_LENGTH = 30;
+    public static final int MAX_LINE_LENGTH = 300;
 
     /**
      * Displays a short toast at the bottom of the screen.

@@ -60,6 +60,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
-    implementation ("com.squareup.picasso:picasso:2.71828")
+    implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.loopj.android:android-async-http:1.4.10")
 
 }

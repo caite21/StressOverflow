@@ -92,7 +92,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         addTagChips(view, item);
         applySelectionBackground(view, item);
 
-        if (item.getPictureURLs().size() > 0) {
+        if (item.getPictureURLs().size() > 0 || item.getPictures().size() > 0) {
             Image image = item.getPictures().get(0);
             image.displayImage(pictureImageView);
         } else {

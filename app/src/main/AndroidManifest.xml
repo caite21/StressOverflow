@@ -38,6 +38,10 @@
             android:name=".SignIn.ForgotPasswordActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".Scan.ScanSerialActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>
