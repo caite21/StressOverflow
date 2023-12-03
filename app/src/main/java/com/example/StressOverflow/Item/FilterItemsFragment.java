@@ -7,6 +7,8 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.StressOverflow.R;
@@ -28,6 +31,7 @@ import com.example.StressOverflow.Tag.Tag;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
@@ -56,6 +60,8 @@ public class FilterItemsFragment extends DialogFragment {
     private MaterialButtonToggleGroup sortField;
     private MaterialButtonToggleGroup sortOrder;
     private Button sortAsc;
+
+    private Drawable textview_design;
 
     /**
      * Constructor for passing in variables from the activity
@@ -111,6 +117,8 @@ public class FilterItemsFragment extends DialogFragment {
         this.sortOrder = view.findViewById(R.id.fragment_filter_items_sort_order_buttongroup);
         this.sortAsc = view.findViewById(R.id.fragment_filter_items_asc_sort_button);
 
+        textview_design = ContextCompat.getDrawable(this.getContext(), R.drawable.sagi_textview);
+
         setupKeywordInput();
 
         setupDateInputListener(this.startDateInput);
@@ -149,6 +157,12 @@ public class FilterItemsFragment extends DialogFragment {
             }).create();
     }
 
+    private void format_chips(Chip chip) {
+        chip.setChipBackgroundColorResource(R.color.sagi);
+        chip.setTextColor(Color.WHITE);
+        chip.setChipCornerRadius(10);
+    }
+
     /**
      * Gets all description words for autocompleting in the text edit. Also sets up a chip when
      * ENTER is pressed to add to the list of keyword filters.
@@ -175,6 +189,7 @@ public class FilterItemsFragment extends DialogFragment {
                 // Add chip if user hits enter
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     Chip chip = new Chip(getContext());
+                    format_chips(chip);
                     chip.setText(keywordInput.getText());
                     chip.setCloseIconVisible(true);
                     chip.setCheckable(true);
@@ -221,6 +236,7 @@ public class FilterItemsFragment extends DialogFragment {
      */
     private void setupChip(String chipLabel, ChipGroup group) {
         Chip chip = new Chip(getContext());
+        this.format_chips(chip);
         chip.setText(chipLabel);
         chip.setCheckedIconVisible(true);
         chip.setCheckable(true);

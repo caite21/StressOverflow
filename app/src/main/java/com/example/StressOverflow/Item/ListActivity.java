@@ -482,7 +482,7 @@ public class ListActivity extends AppCompatActivity implements
      * @return Arraylist of items that fit the filtering conditions
      * @throws ParseException
      */
-    public ArrayList<Item> filterList(Map<String, ArrayList<String>> conditions) throws ParseException {
+    private ArrayList<Item> filterList(Map<String, ArrayList<String>> conditions) throws ParseException {
         // If there are no filters, return original list
         if (conditions.get("keywords").isEmpty() & conditions.get("dates").isEmpty() & conditions.get("makes").isEmpty() & conditions.get("tags").isEmpty()) {
             return this.items;
@@ -532,7 +532,7 @@ public class ListActivity extends AppCompatActivity implements
      * @param comparator comparator to determine order of elements
      * @param <T> type of elements in list
      */
-    public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
+    private static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
         Collections.sort(list, comparator);
     }
 
@@ -544,7 +544,7 @@ public class ListActivity extends AppCompatActivity implements
      * @param unsortedList ArrayList of items to be sorted
      * @param isAsc boolean true for ascending order and false for descending
      */
-    public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
+    private void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
         sort(unsortedList, new Comparator<Item>() {
             @Override
             public int compare(Item obj1, Item obj2) {
@@ -582,7 +582,7 @@ public class ListActivity extends AppCompatActivity implements
     /**
      * If the list is filtered, remove the filters and notify user.
      */
-    public void removeFilters() {
+    private void removeFilters() {
         if (this.itemList.getAdapter() != this.itemListAdapter) {
             this.itemList.setAdapter(this.itemListAdapter);
             this.setSumOfItemCosts();

@@ -216,8 +216,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         for (Tag t: tags){
             if (tagCounter!=3){
                 Chip chip = new Chip(this.context);
-                chip.setChipBackgroundColorResource(R.color.lavender);
-                chip.setTextColor(Color.BLACK);
+                chip.setChipBackgroundColorResource(R.color.sagi);
+                chip.setTextColor(Color.WHITE);
+                chip.setChipCornerRadius(10);
+//                chip.setChipBackgroundColorResource(R.color.lavender);
+//                chip.setTextColor(Color.BLACK);
                 chip.setText(t.getTagName());
                 chip.setClickable(false);
                 chip.setFocusable(false);
