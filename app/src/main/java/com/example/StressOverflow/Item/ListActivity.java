@@ -122,7 +122,10 @@ public class ListActivity extends AppCompatActivity implements
 
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
-            Item selected = this.itemListAdapter.getItem(position);
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+
+            Item selected = adapter.getItem(position);
+
             resetPictureVars();
             new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
         });
@@ -188,6 +191,9 @@ public class ListActivity extends AppCompatActivity implements
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
                 });
+        if (this.itemList.getAdapter() != this.items) {
+            this.itemList.setAdapter(this.itemListAdapter);
+        }
     }
 
     /**
@@ -245,6 +251,10 @@ public class ListActivity extends AppCompatActivity implements
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
         }
         this.setSumOfItemCosts();
+
+        if (this.itemList.getAdapter() != this.items) {
+            this.itemList.setAdapter(this.itemListAdapter);
+        }
     }
 
     public void editItem(int position, Item item) {
@@ -316,10 +326,12 @@ public class ListActivity extends AppCompatActivity implements
             //addItemButton.setVisibility(View.GONE);
             deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
-            itemListAdapter.setSelectionMode(true);
-            itemListAdapter.toggleSelection(position);
-
-            if (itemListAdapter.getSelectedItems().size() == 0){
+//            itemListAdapter.setSelectionMode(true);
+//            itemListAdapter.toggleSelection(position);
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+            adapter.setSelectionMode(true);
+            adapter.toggleSelection(position);
+            if (adapter.getSelectedItems().size() == 0){
                 exitSelectionMode();
             }
             return true;
@@ -333,7 +345,8 @@ public class ListActivity extends AppCompatActivity implements
      */
     private void exitSelectionMode() {
         inSelectionMode = false;
-        itemListAdapter.setSelectionMode(false);
+        ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+        adapter.setSelectionMode(false);
         addTagButton.setVisibility(View.GONE);
         //addItemButton.setVisibility(View.VISIBLE);
         deleteItemButton.setVisibility(View.GONE);
@@ -354,7 +367,8 @@ public class ListActivity extends AppCompatActivity implements
      */
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
-        for (Item i: itemListAdapter.getSelectedItems()){
+        ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+        for (Item i: adapter.getSelectedItems()){
             ArrayList <Tag> currentTags = i.getTags();
             for (Tag newTag : tagsToAdd) {
                 if (currentTags.contains(newTag)) {
@@ -385,7 +399,8 @@ public class ListActivity extends AppCompatActivity implements
     private View.OnClickListener deleteSelectedItems = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ArrayList<Item> itemsToDelete = itemListAdapter.getSelectedItems();
+            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+            ArrayList<Item> itemsToDelete = adapter.getSelectedItems();
             //iterate through the selected list and delete from adapter and database
             for (Item i: itemsToDelete){
                 itemListAdapter.remove(i);
@@ -435,8 +450,16 @@ public class ListActivity extends AppCompatActivity implements
         this.picturesChanged = false;
     }
 
+    /**
+     * Catches the output of the filter dialog fragment and passes output as arguments to filter and
+     * sort methods. Then updates sum of costs and list adapter.
+     *
+     * @param filterConds map of field to filter by as keys and strings to filter by as values
+     * @param sortType field to sort by. "No Sort" if a sort field was not selected.
+     * @param isAsc boolean true for ascending order and false for descending
+     */
     @Override
-    public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
+        public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
         ArrayList<Item> filteredList;
         try {
             filteredList = this.itemListAdapter.filterList(filterConds);
@@ -454,10 +477,25 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sorts the elements of the given ArrayList using the provided Comparator.
+     *
+     * @param list arraylist to be sorted
+     * @param comparator comparator to determine order of elements
+     * @param <T> type of elements in list
+     */
     public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
         Collections.sort(list, comparator);
     }
 
+    /**
+     * Sorts an ArrayList of items based on the specified sort type and order.
+     *
+     * @param sortType field by which unsortedList should be sorted ("Date", "Desc", "Make",
+     *                 "Value", or "Tags")
+     * @param unsortedList ArrayList of items to be sorted
+     * @param isAsc boolean true for ascending order and false for descending
+     */
     public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
         sort(unsortedList, new Comparator<Item>() {
             @Override
