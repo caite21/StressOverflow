@@ -83,15 +83,13 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         TextView itemSerial = view.findViewById(R.id.listview__item__serial__number);
         ImageView pictureImageView = view.findViewById(R.id.listview__item__picture);
 
+        // set item picture
         if (item.getPictureURLs().size() > 0 ) {
+            String picURL = new String(item.getPictureURLs().get(0));
             Picasso.get()
-                    .load(item.getPictureURLs().get(0))
+                    .load(picURL)
                     .error(R.drawable.ic_error_image)
                     .into(pictureImageView);
-
-//        if (item.getPictureURLs().size() > 0 || item.getPictures().size() > 0) {
-//            Image image = item.getPictures().get(0);
-//            image.displayImage(pictureImageView);
         } else {
             pictureImageView.setImageResource(R.drawable.default_image);
         }
