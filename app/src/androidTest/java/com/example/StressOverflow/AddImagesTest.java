@@ -4,14 +4,7 @@ import static android.content.ContentValues.TAG;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.longClick;
-import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
-import static androidx.test.espresso.action.ViewActions.typeText;
-import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.RootMatchers.isDialog;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.not;
@@ -23,38 +16,24 @@ import static org.junit.Assert.assertTrue;
 
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.test.espresso.Espresso;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import com.example.StressOverflow.Image.Image;
-import com.example.StressOverflow.Image.ImagesDisplayAdapter;
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Item.ListActivity;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
-import junit.framework.AssertionFailedError;
-
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,14 +96,14 @@ public class AddImagesTest {
 
     @Test
     public void ListActivityToEditFragmentToAddImagesFragment(){
-        onView(withId(R.id.activity__item__list__edit__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
 //        onView(ViewMatchers.withId(R.id.fragment_add_edit_item)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
     public void addImageFromLibraryTest(){
         // from addItemFragment
-        onView(withId(R.id.activity__item__list__edit__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
 
         // fill in all text boxes
 

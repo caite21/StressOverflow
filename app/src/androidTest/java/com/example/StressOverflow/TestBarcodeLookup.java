@@ -5,18 +5,14 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static androidx.test.espresso.action.ViewActions.pressBack;
-import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
+import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
-import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.RootMatchers.isDialog;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withSubstring;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 import android.os.SystemClock;
@@ -25,7 +21,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
-import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -33,33 +28,118 @@ import androidx.test.filters.LargeTest;
 
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Item.ListActivity;
-import com.example.StressOverflow.SignIn.SignUpActivity;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.UUID;
 
+/**
+ * Testing entering barcode (serial number) and the functionality of
+ * receiving results and checking results
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TestBarcodeLookup {
-    @Before
-    public void setUp() {
-        AppGlobals.getInstance().setOwnerName("testUser");
-    }
+    private CollectionReference tagsRef;
+    private FirebaseFirestore firestore;
+    private String testTagName;
+    private Item item;
+
     @Rule
     public ActivityScenarioRule<ListActivity> scenario =
             new ActivityScenarioRule<ListActivity>(ListActivity.class);
 
+
+    @Before
+    public void setUp() {
+        firestore = FirebaseFirestore.getInstance();
+        AppGlobals.getInstance().setOwnerName("testUser");
+
+
+        ArrayList<Tag> testTags = new ArrayList<>();
+        ArrayList<String> pictureURLs = new ArrayList<>();
+        pictureURLs.add("https://firebasestorage.googleapis.com/v0/b/stressoverflow.appspot.com/o/images%2Fimage_1701480005690.jpg?alt=media&token=400b81e3-97da-4c1f-b1e0-98cceb4d3b62");
+        item = new Item("testItem","make","model","description",
+                new GregorianCalendar(),10.0, "Comments",testTags,pictureURLs,
+                123456L, AppGlobals.getInstance().getOwnerName());
+
+        firestore.collection("items").document(item.getId().toString())
+                .set(item.toFirebaseObject())
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
+
+    }
+
+    @After
+    public void cleanUp(){
+        UUID uuid = item.getId();
+        this.firestore.collection("items")
+                .document(uuid.toString())
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item insertion into collection items: ", e);
+                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                    }
+                });
+
+    }
+
+
+
+    /**
+     * Add an item with a serial number: 12345 and check that it does not
+     * receive a description, and check that the description is unchanged
+     */
+    @Ignore
+    public void testInvalidBarcode() {
+        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
+
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__serial)).
+                perform(scrollTo());
+        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add__item__fragment__edit__serial)).
+                perform(ViewActions.typeText("12345"));
+
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
+
+        SystemClock.sleep(7000);
+        onView(withSubstring("Description:")).check(doesNotExist());
+        onView(withSubstring("Earl Grey")).check(doesNotExist());
+        onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withText("")));
+    }
+
+    /**
+     * Add an item with a serial number: 077652082272 and check
+     * that it receives a description, check that it can select a description,
+     * check that it enters the description, and check that the description
+     * is as expected (Earl Grey Tea) and since the make and model were
+     * not selected ensure that they are empty
+     */
     @Test
-    public void testSagi() {
-        onView(withId(R.id.activity__item__list__edit__item__button)).perform(click());
+    public void testDescriptionFoundFromAddItem() {
+        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
         SystemClock.sleep(2000);
         onView(withId(R.id.add__item__fragment__edit__serial)).
                 perform(scrollTo());
@@ -69,6 +149,8 @@ public class TestBarcodeLookup {
         SystemClock.sleep(2000);
         onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
         onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
+
+        // wait for lookup result
         SystemClock.sleep(4000);
         onView(withSubstring("Description:")).perform(click());
         SystemClock.sleep(2000);
@@ -78,4 +160,48 @@ public class TestBarcodeLookup {
         onView(withId(R.id.add__item__fragment__edit__make)).check(ViewAssertions.matches(withText("")));
         onView(withId(R.id.add__item__fragment__edit__model)).check(ViewAssertions.matches(withText("")));
     }
+
+    /**
+     * Edit an item with a serial number: 077652082272 and check
+     * that it receives a description, check that it can select a description,
+     * check that it enters the description, and check that the description
+     * is overwritten as expected (Earl Grey Tea)
+     */
+    @Test
+    public void testDescriptionFoundFromEditItem() {
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(3000);
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__serial)).
+                perform(scrollTo());
+        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+
+        // clear serial number
+        onView(withId(R.id.add__item__fragment__edit__serial)).
+                perform(ViewActions.clearText());
+        onView(withId(R.id.add__item__fragment__edit__serial)).
+                perform(ViewActions.typeText("077652082272"));
+
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
+        SystemClock.sleep(4000);
+        onView(withSubstring("Description:")).perform(click());
+        SystemClock.sleep(2000);
+        onView(withSubstring("USE SELECTED")).perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withSubstring("Earl Grey")));
+    }
+
+
+    /**
+     * Add an item with a serial number: 12345 and check that it does not
+     * receive a description, and check that the description is unchanged
+     */
 }

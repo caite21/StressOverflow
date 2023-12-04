@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
-import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -88,7 +87,7 @@ public class ListActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
-        this.editButton = findViewById(R.id.activity__item__list__edit__item__button);
+        this.editButton = findViewById(R.id.activity_item_list_add_item_button);
         this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
         this.addItemButton = findViewById(R.id.activity__item__list__add__item__button);
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
