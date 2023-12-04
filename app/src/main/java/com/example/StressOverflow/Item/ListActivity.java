@@ -332,7 +332,7 @@ public class ListActivity extends AppCompatActivity implements
      */
     public void setSumOfItemCosts() {
         ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
-        this.sumOfItemCosts.setText(adapter.getTotalValue().toString());
+        this.sumOfItemCosts.setText(adapter.getTotalValue());
     }
 
     /**
