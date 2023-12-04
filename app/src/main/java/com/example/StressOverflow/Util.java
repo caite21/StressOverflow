@@ -7,6 +7,8 @@ import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Tag.Tag;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
@@ -29,20 +31,37 @@ public final class Util {
                 String.format("TestComment%s", String.valueOf(val)),
                 new ArrayList<Tag>(),
                 new ArrayList<String>(),
-                (Integer) val,
+                String.valueOf(val),
                 "Test Owner"
         );
     }
-    /**
-     * Upper bound for maximum character length for a name for a single item
-     */
+
+    public static boolean isDateValid(Integer year, Integer month, Integer day) {
+        try {
+            if (year < 0 || day < 0 || month < 0 || month > 12) {
+                return false;
+            }
+            if (month == 2 && year % 4 != 0 && day > 28) {
+                return false;
+            }
+            if (month == 2 && year % 4 == 0 && day > 29) {
+                return false;
+            }
+            if ((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) && day > 31) {
+                return false;
+            }
+            return day <= 30;
+        } catch (Exception e) {
+            return false;
+        }
+    }
     public static final int MAX_ITEM_NAME_LENGTH = 60;
 
     /**
      * How many characters do we expect to fit on a single line for the description
      * field on the main list activity? (Of course tentative amount for now)
      */
-    public static final int MAX_LINE_LENGTH = 30;
+    public static final int MAX_LINE_LENGTH = 300;
 
     /**
      * Displays a short toast at the bottom of the screen.

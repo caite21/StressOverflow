@@ -84,7 +84,7 @@ public class ListActivity extends AppCompatActivity implements
 
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
-        this.itemRef = this.db.collection("items");
+        this.itemRef = this.db.collection("test_items");
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
@@ -137,7 +137,8 @@ public class ListActivity extends AppCompatActivity implements
         this.itemListAdapter = new ItemListAdapter(this, items);
         this.itemList.setAdapter(this.itemListAdapter);
 
-        this.sumOfItemCosts.setText(this.ownerName);
+//        this.sumOfItemCosts.setText(this.ownerName);
+        Util.showShortToast(getBaseContext(), "Welcome " + this.ownerName);
 
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
@@ -164,6 +165,7 @@ public class ListActivity extends AppCompatActivity implements
                                 items.add(item);
                             }
                             itemListAdapter.notifyDataSetChanged();
+                            setSumOfItemCosts();
                         }
                     }
 
@@ -287,6 +289,7 @@ public class ListActivity extends AppCompatActivity implements
         if (!picturesChanged) {
             editItem(position, item);
         } else {
+//            item.reorderURLs();
             ArrayList<Image> pics = new ArrayList<>();
             pics.addAll(pictures);
             Image.uploadPictures(pics, new Image.OnAllImagesUploadedListener() {
@@ -310,7 +313,7 @@ public class ListActivity extends AppCompatActivity implements
      */
     public void setSumOfItemCosts() {
         ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
-        this.sumOfItemCosts.setText(adapter.getTotalValue().toString());
+        this.sumOfItemCosts.setText(adapter.getTotalValue());
     }
 
     /**
