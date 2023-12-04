@@ -1,11 +1,6 @@
 package com.example.StressOverflow.Image;
 
-import static androidx.appcompat.content.res.AppCompatResources.getDrawable;
-
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,7 +57,6 @@ public class ImagesDisplayAdapter extends ArrayAdapter<Image> {
 
         Image image = images.get(position);
         ImageView imageView = view.findViewById(R.id.image);
-//        image.displayImage(imageView);
 
         if (image.getURL() == null) {
             if (image.getBitmap() != null) {

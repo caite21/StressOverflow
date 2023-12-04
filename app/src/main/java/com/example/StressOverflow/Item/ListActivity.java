@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.SignIn.SignInActivity;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
-import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -93,12 +92,12 @@ public class ListActivity extends AppCompatActivity implements
         this.itemRef = this.db.collection("items");
         setContentView(R.layout.activity_item_list);
 
-        this.itemList = findViewById(R.id.activity__item__list__item__list);
+        this.itemList = findViewById(R.id.activity_item_list_item_list);
         this.editButton = findViewById(R.id.activity_item_list_add_item_button);
-        this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
-        this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
-        this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
-        this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
+        this.filterButton = findViewById(R.id.activity_item_list_filter_item_button);
+        this.deleteItemButton = findViewById(R.id.activity_item_list_remove_item_button);
+        this.addTagButton = findViewById(R.id.activity_item_list_add_tag_button);
+        this.sumOfItemCosts = findViewById(R.id.activity_item_list_cost_sum_text);
         this.showTagListButton = findViewById(R.id.showTagList_button);
         this.logoutButton = findViewById(R.id.logoutButton);
         this.addTagButton.setOnClickListener(openTagFragment);
@@ -355,29 +354,28 @@ public class ListActivity extends AppCompatActivity implements
     private AdapterView.OnItemLongClickListener selectItems = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            int transition = -200;
-            float alpha = 1;
-            if (addTagButton.getVisibility() == View.VISIBLE) {
-                transition*=-1;
-                alpha = 0;
+            if (!inSelectionMode) {
+                int transition = -200;
+                float alpha = 1;
+                logoutButton.animate()
+                        .translationYBy(transition) // Translate the view along the X-axis by 200 pixels
+                        .setDuration(200) // Set the duration of the animation to 1000 milliseconds (1 second)
+                        .start(); // Start the animation
+
+                addTagButton.animate()
+                        .alpha(alpha) // Set the alpha to 1 (fully opaque)
+                        .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
+                        .start(); // Start the animation
+                addTagButton.setVisibility(View.VISIBLE);
+                //addItemButton.setVisibility(View.GONE);
+
+                deleteItemButton.animate()
+                        .alpha(alpha) // Set the alpha to 1 (fully opaque)
+                        .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
+                        .start(); // Start the animation
+                deleteItemButton.setVisibility(View.VISIBLE);
             }
-            logoutButton.animate()
-                    .translationYBy(transition) // Translate the view along the X-axis by 200 pixels
-                    .setDuration(200) // Set the duration of the animation to 1000 milliseconds (1 second)
-                    .start(); // Start the animation
 
-            addTagButton.animate()
-                    .alpha(alpha) // Set the alpha to 1 (fully opaque)
-                    .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
-                    .start(); // Start the animation
-            addTagButton.setVisibility(View.VISIBLE);
-            //addItemButton.setVisibility(View.GONE);
-
-            deleteItemButton.animate()
-                    .alpha(alpha) // Set the alpha to 1 (fully opaque)
-                    .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
-                    .start(); // Start the animation
-            deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
 //            itemListAdapter.setSelectionMode(true);
 //            itemListAdapter.toggleSelection(position);
@@ -397,12 +395,30 @@ public class ListActivity extends AppCompatActivity implements
      * Styles the selected items accordingly
      */
     private void exitSelectionMode() {
+        if (inSelectionMode) {
+            int transition = 200;
+            float alpha = 0;
+            logoutButton.animate()
+                    .translationYBy(transition) // Translate the view along the X-axis by 200 pixels
+                    .setDuration(200) // Set the duration of the animation to 1000 milliseconds (1 second)
+                    .start(); // Start the animation
+
+            addTagButton.animate()
+                    .alpha(alpha) // Set the alpha to 1 (fully opaque)
+                    .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
+                    .start(); // Start the animation
+            addTagButton.setVisibility(View.GONE);
+            //addItemButton.setVisibility(View.GONE);
+
+            deleteItemButton.animate()
+                    .alpha(alpha) // Set the alpha to 1 (fully opaque)
+                    .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
+                    .start(); // Start the animation
+            deleteItemButton.setVisibility(View.GONE);
+        }
         inSelectionMode = false;
         ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
         adapter.setSelectionMode(false);
-        addTagButton.setVisibility(View.GONE);
-        //addItemButton.setVisibility(View.VISIBLE);
-        deleteItemButton.setVisibility(View.GONE);
     }
 
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
@@ -463,10 +479,7 @@ public class ListActivity extends AppCompatActivity implements
                 itemListAdapter.remove(i);
                 onSubmitDelete(i);
             }
-            //if there are no more items, exit selection mode
-            if (itemListAdapter.getItemListSize()==0){
-                exitSelectionMode();
-            }
+            exitSelectionMode();
         }
     };
 

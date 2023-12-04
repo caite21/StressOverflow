@@ -27,7 +27,7 @@
             />
 
         <EditText
-            android:id="@+id/add__item__fragment__edit__title"
+            android:id="@+id/add_item_fragment_edit_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="40dp"
@@ -53,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <EditText
-                android:id="@+id/add__item__fragment__edit__make"
+                android:id="@+id/add_item_fragment_edit_make"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
@@ -63,7 +63,7 @@
                 android:paddingStart="12dp"
                 />
             <EditText
-                android:id="@+id/add__item__fragment__edit__model"
+                android:id="@+id/add_item_fragment_edit_model"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
@@ -93,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <EditText
-                android:id="@+id/add__item__fragment__edit__description"
+                android:id="@+id/add_item_fragment_edit_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
@@ -128,7 +128,7 @@
                 android:textStyle="bold"
                 />
             <EditText
-                android:id="@+id/add__item__fragment__edit__year"
+                android:id="@+id/add_item_fragment_edit_year"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_edit_text"
@@ -151,7 +151,7 @@
                 android:textStyle="bold"
                 />
             <EditText
-                android:id="@+id/add__item__fragment__edit__month"
+                android:id="@+id/add_item_fragment_edit_month"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_edit_text"
@@ -174,7 +174,7 @@
                 android:textStyle="bold"
                 />
             <EditText
-                android:id="@+id/add__item__fragment__edit__date"
+                android:id="@+id/add_item_fragment_edit_date"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_edit_text"
@@ -196,7 +196,7 @@
             android:textStyle="bold"
             />
         <EditText
-            android:id="@+id/add__item__fragment__edit__value"
+            android:id="@+id/add_item_fragment_edit_value"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="@drawable/sagi_edit_text"
@@ -221,7 +221,7 @@
             />
 
         <EditText
-            android:id="@+id/add__item__fragment__edit__comment"
+            android:id="@+id/add_item_fragment_edit_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="40dp"
@@ -274,7 +274,7 @@
           </LinearLayout>
 
           <com.google.android.material.chip.ChipGroup
-              android:id="@+id/add__item__fragment__chipGroup"
+              android:id="@+id/add_item_fragment_chipGroup"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_marginTop="4dp">
@@ -300,7 +300,7 @@
                 android:layout_marginEnd="10dp"
                 />
             <Button
-                android:id="@+id/add__item__fragment__edit__pictures"
+                android:id="@+id/add_item_fragment_edit_pictures"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:background="@drawable/sagi_button"
@@ -329,7 +329,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <EditText
-                android:id="@+id/add__item__fragment__edit__serial"
+                android:id="@+id/add_item_fragment_edit_serial"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"

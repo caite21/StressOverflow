@@ -3,15 +3,12 @@ package com.example.StressOverflow.Image;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
+import android.support.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -38,7 +35,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.R;
@@ -48,7 +44,8 @@ import com.example.StressOverflow.Util;
 /**
  * Fragment displays an item's images and allows the user to add
  * multiple images from their library, add a picture with the
- * camera, and delete images
+ * camera, and delete images (as well as move an image to the first
+ * place so it will displayed as the item's icon in the list)
  */
 public class AddImagesFragment extends DialogFragment  {
     private Uri imageUri;
@@ -93,7 +90,6 @@ public class AddImagesFragment extends DialogFragment  {
 
     /**
      * Displays images in the grid and implements Add and Delete buttons.
-     *
      * @param savedInstanceState The last saved instance state of the Fragment,
      * or null if this is a freshly created Fragment.
      * @return built dialog fragment
@@ -173,7 +169,6 @@ public class AddImagesFragment extends DialogFragment  {
                         if (data == null) return;
 
                         if (data.getClipData() != null) {
-                            Util.showShortToast(getContext(), "Ying: Got mult Uri from library");
                             // Pictures selected from library
                             int itemCount = data.getClipData().getItemCount();
                             for (int i = 0; i < itemCount; i++) {
@@ -183,20 +178,17 @@ public class AddImagesFragment extends DialogFragment  {
                             }
                             imageAdapter.notifyDataSetChanged();
                         } else if (data.getData() != null) {
-                            Util.showShortToast(getContext(), "Ying: Got 1 Uri from library");
                             // Picture selected from library
                             Uri image = data.getData();
                             Bitmap selectedBitmap = getBitmapFromUri(image);
                             imagesList.add(new Image(selectedBitmap));
                             imageAdapter.notifyDataSetChanged();
                         } else if (imageUri != null) {
-                            Util.showShortToast(getContext(), "Ying: Got Uri type from camera");
                             // Image captured with camera
                             Bitmap selectedBitmap = getBitmapFromUri(imageUri);
                             imagesList.add(new Image(selectedBitmap));
                             imageAdapter.notifyDataSetChanged();
                         } else if (data.getExtras() != null) {
-                            Util.showShortToast(getContext(), "Ying: thumbnail method");
                             // Failed to write image captured with camera, but can still save it
                             Bitmap capturedBitmap = (Bitmap) data.getExtras().get("data");
                             imagesList.add(new Image(capturedBitmap));
@@ -204,9 +196,6 @@ public class AddImagesFragment extends DialogFragment  {
                         } else {
                             Util.showShortToast(getContext(), "Image Error: result is null");
                         }
-
-                        // display image(s)
-//                        imageAdapter.notifyDataSetChanged();
                     }
                 });
 
@@ -233,11 +222,11 @@ public class AddImagesFragment extends DialogFragment  {
         final int CAMERA_PERMISSION_REQUEST_CODE = 100;
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+            return;
         }
 
         // Intent to capture a photo
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         // Image details for saving
 //        String fileName = "image.jpg";
 //        ContentValues values = new ContentValues();
@@ -259,21 +248,16 @@ public class AddImagesFragment extends DialogFragment  {
     }
 
     /**
-     * Converts uri to bitmap
-     *
+     * Converts uri to bitmap and makes sure the orientation of the image
+     * is correct
      * @param uri to convert to bitmap
      * @return bitmap of uri
      */
     private Bitmap getBitmapFromUri(Uri uri) {
         try {
-//            InputStream inputStream = contentResolver.openInputStream(uri);
-//            return BitmapFactory.decodeStream(inputStream);
-
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
             Bitmap rotatedBitmap = ExifRotateBitmap(contentResolver, uri, bitmap);
-
-//            Matrix matrix = new Matrix();
-//            matrix.postRotate(90);
+//            Matrix matrix = new Matrix(); matrix.postRotate(90);
 //            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             return rotatedBitmap;
         } catch (IOException e) {
@@ -283,9 +267,15 @@ public class AddImagesFragment extends DialogFragment  {
         }
     }
 
+    /**
+     * Rotates bitmap because random bitmap rotation is a known issue
+     * in android. This is from: https://github.com/MvvmCross/MvvmCross/issues/2096
+     * @param bitmap Bitmap to rotate to the correct orientation
+     * @param uri Uri of original image
+     * @return bitmap of correct orientation
+     */
     private Bitmap ExifRotateBitmap(ContentResolver contentResolver, Uri uri, Bitmap bitmap) throws IOException {
-        if (bitmap == null)
-            return null;
+        if (bitmap == null) return null;
 
         InputStream inputStream = contentResolver.openInputStream(uri);
         ExifInterface ei = new ExifInterface(inputStream);
@@ -294,20 +284,17 @@ public class AddImagesFragment extends DialogFragment  {
         if (rotationInDegrees == 0) {
             return bitmap;
         }
-
         Matrix matrix = new Matrix();
         matrix.preRotate(rotationInDegrees);
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-
     }
 
     /**
-     * Gets the Amount of Degress of rotation using the exif integer to determine how much
-     * we should rotate the image. This is from:
-     * https://stackoverflow.com/questions/29971319/image-orientation-android
-     * @param exifOrientation - the Exif data for Image Orientation
-     * @return - how much to rotate in degress
+     * Gets degrees of rotation using the exif integer to determine how much
+     * we should rotate the image to get the correct orientation.
+     * This is from: https://stackoverflow.com/questions/29971319/image-orientation-android
+     * @param exifOrientation Exif data for Image Orientation
+     * @return how much to rotate in degress
      */
     private static int exifToDegrees(int exifOrientation) {
         if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }

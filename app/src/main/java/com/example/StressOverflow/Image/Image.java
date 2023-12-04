@@ -27,7 +27,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 /**
- * Represents an image which can be displayed with a bitmap
+ * An image that can be displayed using a bitmap
  * or a download URL
  */
 public class Image {
