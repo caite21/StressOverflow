@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
@@ -116,6 +117,11 @@ public class AddTagToItemFragment extends DialogFragment{
         //add all the tags as chips in the dialog
         for (Tag t: allTags){
             Chip chip = new Chip(getContext());
+
+            chip.setChipBackgroundColorResource(R.color.sagi);
+            chip.setTextColor(Color.WHITE);
+            chip.setChipCornerRadius(10);
+
             chip.setText(t.getTagName());
             chip.setCheckedIconVisible(true);
             chip.setCheckable(true);

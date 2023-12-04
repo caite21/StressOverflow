@@ -3,15 +3,13 @@
  */
 package com.example.StressOverflow.Item;
 
-import static android.content.ContentValues.TAG;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -35,11 +33,13 @@ import com.google.android.material.chip.ChipGroup;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
+/**
+ * Fragment where a user can adds attributes of a new item.
+ */
 public class AddItemFragment extends DialogFragment{
 
     private EditText itemTitleField;
@@ -94,18 +94,18 @@ public class AddItemFragment extends DialogFragment{
      */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_edit_item, null);
-        itemTitleField = view.findViewById(R.id.add__item__fragment__edit__title);
-        itemMakeField = view.findViewById(R.id.add__item__fragment__edit__make);
-        itemModelField = view.findViewById(R.id.add__item__fragment__edit__model);
-        itemDescriptionField = view.findViewById(R.id.add__item__fragment__edit__description);
-        itemMonthField = view.findViewById(R.id.add__item__fragment__edit__month);
-        itemYearField = view.findViewById(R.id.add__item__fragment__edit__year);
-        itemDateField = view.findViewById(R.id.add__item__fragment__edit__date);
-        itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
-        itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
-        itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
-        itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
-        tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
+        itemTitleField = view.findViewById(R.id.add_item_fragment_edit_title);
+        itemMakeField = view.findViewById(R.id.add_item_fragment_edit_make);
+        itemModelField = view.findViewById(R.id.add_item_fragment_edit_model);
+        itemDescriptionField = view.findViewById(R.id.add_item_fragment_edit_description);
+        itemMonthField = view.findViewById(R.id.add_item_fragment_edit_month);
+        itemYearField = view.findViewById(R.id.add_item_fragment_edit_year);
+        itemDateField = view.findViewById(R.id.add_item_fragment_edit_date);
+        itemValueField = view.findViewById(R.id.add_item_fragment_edit_value);
+        itemCommentsField = view.findViewById(R.id.add_item_fragment_edit_comment);
+        itemPicturesButton = view.findViewById(R.id.add_item_fragment_edit_pictures);
+        itemSerialField = view.findViewById(R.id.add_item_fragment_edit_serial);
+        tagChipGroup = view.findViewById(R.id.add_item_fragment_chipGroup);
 
         serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
 
@@ -207,6 +207,9 @@ public class AddItemFragment extends DialogFragment{
 
                         for (int chipID : tagChipGroup.getCheckedChipIds()){
                             Chip newChip = tagChipGroup.findViewById(chipID);
+                            newChip.setChipBackgroundColorResource(R.color.sagi);
+                            newChip.setTextColor(Color.WHITE);
+                            newChip.setChipCornerRadius(10);
                             Tag newTag = new Tag(newChip.getText().toString());
                             newTags.add(newTag);
                         }
@@ -262,6 +265,9 @@ public class AddItemFragment extends DialogFragment{
         //add all the tags as chips in the dialog
         for (Tag t: allTags){
             Chip chip = new Chip(getContext());
+            chip.setChipBackgroundColorResource(R.color.sagi);
+            chip.setTextColor(Color.WHITE);
+            chip.setChipCornerRadius(10);
             chip.setText(t.getTagName());
             chip.setCheckedIconVisible(true);
             chip.setCheckable(true);

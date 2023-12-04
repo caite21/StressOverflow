@@ -5,31 +5,23 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
-import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
-import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Checks.checkNotNull;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
-import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static com.google.common.base.Predicates.not;
 import static org.hamcrest.CoreMatchers.anything;
-import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -44,13 +36,10 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Item.ListActivity;
-import com.example.StressOverflow.Item.ItemListAdapter;
 import com.example.StressOverflow.Tag.Tag;
-import com.example.StressOverflow.Image.Image;
 
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -71,7 +60,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 
@@ -118,7 +106,7 @@ public class FilterTest {
 
         ArrayList<Tag> tagList = new ArrayList<>();
         tagList.add(tag1);
-        Item item1 = new Item("Test1", "make", "model", "this is the first item",
+        item1 = new Item("Test1", "make", "model", "this is the first item",
             new GregorianCalendar(2023, 1, 1),5.00,
             "Comments", tagList, images, "123456", AppGlobals.getInstance().getOwnerName());
         itemRef.document(item1.getId().toString())
@@ -244,7 +232,7 @@ public class FilterTest {
      */
     @Test
     public void testKeywordFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         // Test autocomplete
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(typeText("se"));
@@ -255,16 +243,16 @@ public class FilterTest {
 
         // Test filtering
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
-            .inAdapterView(withId(R.id.activity__item__list__item__list))
+            .inAdapterView(withId(R.id.activity_item_list_item_list))
             .onChildView(withId(R.id.listview__item__title))
             .check(matches(isDisplayed()));
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test3")))
-            .inAdapterView(withId(R.id.activity__item__list__item__list))
+            .inAdapterView(withId(R.id.activity_item_list_item_list))
             .onChildView(withId(R.id.listview__item__title))
             .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$13.00")));
     }
 
     /**
@@ -272,7 +260,7 @@ public class FilterTest {
      */
     @Test
     public void testRemoveKeywordFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(typeText("second"));
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(pressImeActionButton());
@@ -287,16 +275,16 @@ public class FilterTest {
 
         // Tests filtering
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test3")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$13.00")));
     }
 
     /**
@@ -304,7 +292,7 @@ public class FilterTest {
      */
     @Test
     public void testManyKeywordFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         // Tests multiple filters
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(typeText("second"));
@@ -316,12 +304,12 @@ public class FilterTest {
 
         // Tests filtering
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test3")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("7.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$7.00")));
     }
 
     /**
@@ -329,7 +317,7 @@ public class FilterTest {
      */
     @Test
     public void testStartDateFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_start_date_edittext)).perform(click());
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
@@ -339,12 +327,12 @@ public class FilterTest {
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test1")))
-            .inAdapterView(withId(R.id.activity__item__list__item__list))
+            .inAdapterView(withId(R.id.activity_item_list_item_list))
             .onChildView(withId(R.id.listview__item__title))
             .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
             .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("5.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$5.00")));
     }
 
     /**
@@ -352,7 +340,7 @@ public class FilterTest {
      */
     @Test
     public void testEndDateFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_end_date_edittext)).perform(click());
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
@@ -362,16 +350,16 @@ public class FilterTest {
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test3")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$13.00")));
     }
 
     /**
@@ -379,7 +367,7 @@ public class FilterTest {
      */
     @Test
     public void testStartEndDateFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_start_date_edittext)).perform(click());
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
@@ -396,12 +384,12 @@ public class FilterTest {
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("6.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$6.00")));
     }
 
     /**
@@ -409,18 +397,18 @@ public class FilterTest {
      */
     @Test
     public void testMakeFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(allOf(withText("make"), isDescendantOfA(withId(R.id.fragment_filter_items_makes_chipgroup)))).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test1")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("5.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$5.00")));
     }
 
     /**
@@ -428,22 +416,22 @@ public class FilterTest {
      */
     @Test
     public void testTagFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(allOf(withText("testTag"), isDescendantOfA(withId(R.id.fragment_filter_items_tags_chipgroup)))).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test1")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("11.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$11.00")));
     }
 
     /**
@@ -451,18 +439,18 @@ public class FilterTest {
      */
     @Test
     public void testAllTagFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_all_tags_checkbox)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("6.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$6.00")));
     }
 
     /**
@@ -470,29 +458,29 @@ public class FilterTest {
      */
     @Test
     public void testDateAscSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_date_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test1")));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -500,30 +488,30 @@ public class FilterTest {
      */
     @Test
     public void testDateDescSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_date_sort_button)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.fragment_filter_items_desc_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test1")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -531,29 +519,29 @@ public class FilterTest {
      */
     @Test
     public void testDescriptionAscSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_description_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
-        onView(withId(R.id.activity__item__list__item__list))
+                .check(matches(withText("Test1")));
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -561,30 +549,30 @@ public class FilterTest {
      */
     @Test
     public void testDescriptionDescSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_description_sort_button)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.fragment_filter_items_desc_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
+                .check(matches(withText("Test1")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
-        onView(withId(R.id.activity__item__list__item__list))
+                .check(matches(withText("Test2")));
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -592,29 +580,29 @@ public class FilterTest {
      */
     @Test
     public void testMakeAscSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_make_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
+                .check(matches(withText("Test3")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test3")));
-        onView(withId(R.id.activity__item__list__item__list))
+                .check(matches(withText("Test1")));
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -622,30 +610,30 @@ public class FilterTest {
      */
     @Test
     public void testMakeDescSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_make_sort_button)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.fragment_filter_items_desc_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test3")));
+                .check(matches(withText("Test1")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
-        onView(withId(R.id.activity__item__list__item__list))
+                .check(matches(withText("Test3")));
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -653,29 +641,29 @@ public class FilterTest {
      */
     @Test
     public void testValueAscSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_value_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test1")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -684,30 +672,30 @@ public class FilterTest {
      */
     @Test
     public void testValueDescSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_value_sort_button)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.fragment_filter_items_desc_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test1")));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -715,29 +703,19 @@ public class FilterTest {
      */
     @Test
     public void testTagsAscSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_tag_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(1)
-                .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(2)
-                .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -745,30 +723,20 @@ public class FilterTest {
      */
     @Test
     public void testTagsDescSort() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_tag_sort_button)).inRoot(isDialog()).perform(click());
         onView(withId(R.id.fragment_filter_items_desc_sort_button)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(0)
-                .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test3")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
-                .atPosition(1)
-                .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test2")));
-        onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(2)
                 .onChildView(withId(R.id.listview__item__title))
-                .check(matches(withText("Test1")));
-        onView(withId(R.id.activity__item__list__item__list))
+                .check(matches(withText("Test3")));
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -776,21 +744,21 @@ public class FilterTest {
      */
     @Test
     public void testUnFilter() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(typeText("second"));
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(pressImeActionButton());
         onView(ViewMatchers.isRoot()).perform(ViewActions.closeSoftKeyboard());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$13.00")));
 
         // un-filter
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -798,7 +766,7 @@ public class FilterTest {
      */
     @Test
     public void testFilterSortCombo() {
-        onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
+        onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
 
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(typeText("second"));
         onView(withId(R.id.fragment_filter_items_keywords_textedit)).perform(pressImeActionButton());
@@ -810,18 +778,18 @@ public class FilterTest {
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
 
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test3")));
         onData(anything())
-                .inAdapterView(withId(R.id.activity__item__list__item__list))
+                .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .atPosition(1)
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(withText("Test2")));
-        onView(withId(R.id.activity__item__list__item__list))
+        onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$13.00")));
     }
 
     private static Matcher<Object> withItemText(String expectedText) {
