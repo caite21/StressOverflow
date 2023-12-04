@@ -126,10 +126,7 @@ public class ListActivity extends AppCompatActivity implements
 
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
-            ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
-
-            Item selected = adapter.getItem(position);
-
+            Item selected = this.itemListAdapter.getItem(position);
             resetPictureVars();
             new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
         });
