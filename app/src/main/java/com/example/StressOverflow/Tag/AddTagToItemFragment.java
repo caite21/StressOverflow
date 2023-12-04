@@ -36,6 +36,9 @@ public class AddTagToItemFragment extends DialogFragment{
     private String ownerName;
 
 
+    /**
+     * Called when user adds a tag to an item fragment
+     */
     public AddTagToItemFragment() {
         this.ownerName = AppGlobals.getInstance().getOwnerName();
     }
@@ -111,6 +114,9 @@ public class AddTagToItemFragment extends DialogFragment{
                 }).create();
     }
 
+    /**
+     * Adds the tags to ChipGroup of the item
+     */
     private void addTagsToChipGroup(){
         allTags = AppGlobals.getInstance().getAllTags();
         chipGroup.removeAllViews();

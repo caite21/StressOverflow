@@ -29,6 +29,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Displays the tags on the listview
+ */
 public class TagListAdapter extends ArrayAdapter<Tag> {
     private ArrayList<Tag> tags;
     private Context context;

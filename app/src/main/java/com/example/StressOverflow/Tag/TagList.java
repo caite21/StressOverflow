@@ -21,6 +21,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Holds all the tag objects on the listview
+ */
 public class TagList extends AppCompatActivity implements AddTagFragment.OnFragmentInteractionListener {
     ArrayList<Tag> tagList = new ArrayList<>();
     Button addTag_button;
