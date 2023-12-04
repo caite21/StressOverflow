@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * model for object Tag
+ */
 public class Tag implements Serializable {
     private String tagName;
 
