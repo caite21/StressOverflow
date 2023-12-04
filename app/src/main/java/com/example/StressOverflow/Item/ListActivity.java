@@ -84,7 +84,7 @@ public class ListActivity extends AppCompatActivity implements
 
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
-        this.itemRef = this.db.collection("test_items");
+        this.itemRef = this.db.collection("items");
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);

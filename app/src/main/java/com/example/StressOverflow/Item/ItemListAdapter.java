@@ -59,7 +59,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         super(context, R.layout.listview_item_content, items);
         this.items = items;
         this.context = context;
-        this.itemRef = db.collection("test_items");
+        this.itemRef = db.collection("items");
     }
 
     public void clearItems(){
