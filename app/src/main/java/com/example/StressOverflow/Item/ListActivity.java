@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.StressOverflow.Image.AddImagesFragment;
+import com.example.StressOverflow.SignIn.SignInActivity;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
 import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
@@ -31,6 +32,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.CollectionReference;
@@ -55,13 +57,13 @@ public class ListActivity extends AppCompatActivity implements
         EditItemFragment.OnFragmentInteractionListener,
         AddImagesFragment.OnFragmentInteractionListener,
         FilterItemsFragment.OnFragmentInteractionListener {
-
+    private FirebaseAuth mAuth;
     ListView itemList;
     ItemListAdapter itemListAdapter;
     Button editButton;
     Button filterButton;
     Button showTagListButton;
-    FloatingActionButton addItemButton;
+    FloatingActionButton logoutButton;
     FloatingActionButton deleteItemButton;
     FloatingActionButton addTagButton;
     TextView sumOfItemCosts;
@@ -85,7 +87,7 @@ public class ListActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mAuth = FirebaseAuth.getInstance();
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
         this.itemRef = this.db.collection("items");
@@ -94,12 +96,14 @@ public class ListActivity extends AppCompatActivity implements
         this.itemList = findViewById(R.id.activity__item__list__item__list);
         this.editButton = findViewById(R.id.activity_item_list_add_item_button);
         this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
-        this.addItemButton = findViewById(R.id.activity__item__list__add__item__button);
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
         this.showTagListButton = findViewById(R.id.showTagList_button);
+        this.logoutButton = findViewById(R.id.logoutButton);
         this.addTagButton.setOnClickListener(openTagFragment);
+        addTagButton.setAlpha(0f);
+        deleteItemButton.setAlpha(0f);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         this.showTagListButton.setOnClickListener(showList);
         itemList.setOnItemLongClickListener(selectItems);
@@ -151,7 +155,11 @@ public class ListActivity extends AppCompatActivity implements
         this.filterButton.setOnClickListener(v -> {
             new FilterItemsFragment(this.itemList, this.itemListAdapter).show(getSupportFragmentManager(), "FILTER");
         });
-
+        this.logoutButton.setOnClickListener(v -> {
+            mAuth.signOut();
+            Intent i = new Intent(ListActivity.this, SignInActivity.class);
+            startActivity(i);
+        });
         this.itemRef
                 .whereEqualTo("owner",this.ownerName)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -347,8 +355,28 @@ public class ListActivity extends AppCompatActivity implements
     private AdapterView.OnItemLongClickListener selectItems = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            int transition = -200;
+            float alpha = 1;
+            if (addTagButton.getVisibility() == View.VISIBLE) {
+                transition*=-1;
+                alpha = 0;
+            }
+            logoutButton.animate()
+                    .translationYBy(transition) // Translate the view along the X-axis by 200 pixels
+                    .setDuration(200) // Set the duration of the animation to 1000 milliseconds (1 second)
+                    .start(); // Start the animation
+
+            addTagButton.animate()
+                    .alpha(alpha) // Set the alpha to 1 (fully opaque)
+                    .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
+                    .start(); // Start the animation
             addTagButton.setVisibility(View.VISIBLE);
             //addItemButton.setVisibility(View.GONE);
+
+            deleteItemButton.animate()
+                    .alpha(alpha) // Set the alpha to 1 (fully opaque)
+                    .setDuration(500) // Set the duration of the animation to 1000 milliseconds (1 second)
+                    .start(); // Start the animation
             deleteItemButton.setVisibility(View.VISIBLE);
             inSelectionMode = true;
 //            itemListAdapter.setSelectionMode(true);
