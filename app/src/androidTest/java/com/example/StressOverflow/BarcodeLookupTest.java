@@ -30,8 +30,11 @@ import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.Item.ListActivity;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -95,18 +98,38 @@ public class BarcodeLookupTest {
      */
     @After
     public void cleanUp(){
-        UUID uuid = item.getId();
         this.firestore.collection("items")
-                .document(uuid.toString())
-                .delete()
+                .whereEqualTo("owner", "testUser")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            documentSnapshot.getReference().delete()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // Deletion successful
+                                            Log.d(TAG, "Document successfully deleted");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // Handle deletion failure
+                                            Log.w(TAG, "Error deleting document", e);
+                                        }
+                                    });
+                        }
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error with item insertion into collection items: ", e);
-                        throw new RuntimeException("Error with item insertion into collection items: ", e);
+                        // Handle query failure
+                        Log.w(TAG, "Error getting documents: ", e);
                     }
                 });
-        SystemClock.sleep(2000);
     }
 
     /**
