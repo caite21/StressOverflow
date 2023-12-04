@@ -63,15 +63,15 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/activity__item__list__add__item__button"
+        android:id="@+id/logoutButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="30dp"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="gone"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:visibility="visible"
+        app:srcCompat="@drawable/log_out" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/activity__item__list__add__tag__button"
