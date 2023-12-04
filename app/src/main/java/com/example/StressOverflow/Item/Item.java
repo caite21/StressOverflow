@@ -1,9 +1,5 @@
 /**
  * Represents a single item
- * Should pictures be their own class, or is simply a link to a picture enough?
- * TODO: Throw more illegal argument exceptions or something
- * reminder: tags are not hashable, dont make tags or pictures a HashSet (which also might muck
- * around with mutex's if we require in future)
  */
 package com.example.StressOverflow.Item;
 
@@ -108,9 +104,19 @@ public class Item {
         this.name = name;
     }
 
+    /**
+     * Returns the UUId of this Item.
+     *
+     * @return the UUID of this item
+     */
     public UUID getId() {
         return this.id;
     }
+
+    /**
+     * Returns the name of this item
+     * @return The name of this item, or `Untitled item' if its name is an empty string.
+     */
     public String getName() {
         if (Objects.equals(this.name, "")) {
             return "Untitled item";
@@ -118,23 +124,38 @@ public class Item {
         return this.name;
     }
 
+    /**
+     * Returns the make of this Item.
+     *
+     * @return the make of this Item
+     */
     public String getMake() {
         return this.make;
     }
 
+    /**
+     * Returns the model of this Item
+     *
+     * @return the model of this Item
+     */
     public String getModel() {
         return this.model;
     }
 
+    /**
+     * Returns the description of this Item
+     *
+     * @return the description of this Item
+     */
     public String getDescription() {
         return this.description;
     }
 
     /**
-     * Most likely to be used on the list view (truncate the description if its too long)
-     * TODO: BREAKS IF IT ENCOUNTERS A WORD WITH LENGTH GREATER THAN Util.MAX_LINE_LENGTH
+     * Returns a description with a brevity option (truncate the description if its too long)
+     *
      * @param brief whether or not to return first 2 lines of description
-     * @return
+     * @return a shortened description if brief, else the normal description
      */
     public String getDescription(boolean brief) {
         if (brief) {
@@ -161,10 +182,20 @@ public class Item {
         return this.getDescription();
     }
 
+    /**
+     * Returns the date of this object if applicable
+     *
+     * @return The date
+     */
     public GregorianCalendar getDate() {
         return this.date;
     }
 
+    /**
+     * The date as a string
+     *
+     * @return the date as a string
+     */
     public String getDateAsString() {
         return String.format("%s/%s/%s",
                 this.getDate().get(Calendar.YEAR),
@@ -173,18 +204,38 @@ public class Item {
         );
     }
 
+    /**
+     * Get the year of the date as a string
+     *
+     * @return the year of the date as a string
+     */
     public String getDateYear() {
         return String.format("%s", this.getDate().get(Calendar.YEAR));
     }
 
+    /**
+     * Get the month of the date as a string
+     *
+     * @return the month of the date as a string
+     */
     public String getDateMonth() {
         return String.format("%s", this.getDate().get(Calendar.MONTH));
     }
 
+    /**
+     * Get the day of the date as a string
+     *
+     * @return the day of the date as a string
+     */
     public String getDateDate() {
         return String.format("%s", this.getDate().get(Calendar.DATE));
     }
 
+    /**
+     * Get the tags of this Item
+     *
+     * @return the tags of this Item
+     */
     public ArrayList<Tag> getTags() {
         return this.tags;
     }
@@ -205,26 +256,27 @@ public class Item {
         return pictureURLs;
     }
 
+    /**
+     * Get the serial number of this Item
+     *
+     * @return the serial number of this item
+     */
     public String getSerial() {
         return this.serial;
     }
 
+    /**
+     * Get the owner of this Item
+     * @return the owner of this item
+     */
     public String getOwner() {
         return this.owner;
     }
 
     /**
-     * TODO: This should be able to return any number of possible serial number formats.
-     * Examples: this.getSerial = 12345678905, this.getSerialAsString("0-ddddd-ddddd-d")
-     *           returns 0-12345-67890-5. will implement once i find a need for it
-     *           (which may never come)
-     *
-     * @return serial number formatted as string
+     * Gets the value of this Item
+     * @return the value of this Item
      */
-    public String getSerialAsString(String format) {
-        throw new NotImplementedError();
-    }
-
     public Double getValue() {
         if (this.value == null) {
             return 0.0d;
@@ -232,6 +284,10 @@ public class Item {
         return this.value;
     }
 
+    /**
+     * Gets the value of this item formatted as $#.##
+     * @return The value of htis item as a nicely formatted string
+     */
     public String getValueAsString() {
         if (this.value == null) {
             return "No value";
@@ -239,6 +295,10 @@ public class Item {
         return String.format("$%.2f", this.value);
     }
 
+    /**
+     * Gets the comments associated with this items
+     * @return the comments associatec with this item
+     */
     public String getComments() {
         return comments;
     }
@@ -302,22 +362,43 @@ public class Item {
         setPictures(newImages);
     }
 
+    /**
+     * Sets the make of this Item
+     * @param make the new make
+     */
     public void setMake(String make) {
         this.make = make;
     }
 
+    /**
+     * Sets the model of this Item
+     * @param model the new model
+     */
     public void setModel(String model) {
         this.model = model;
     }
 
+    /**
+     * Sets the description of this Item
+     * @param description the new description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Sets the date of this Item
+     * @param date the new date
+     */
     public void setDate(GregorianCalendar date) {
         this.date = date;
     }
 
+    /**
+     * Sets the value of this Item
+     * @param value the new value of this Item
+     * @throws IllegalArgumentException if the value is negative
+     */
     public void setValue(Double value) throws IllegalArgumentException {
         if (value == null) {
             value = 0.0d;
@@ -328,10 +409,18 @@ public class Item {
         this.value = value;
     }
 
+    /**
+     * Changes ownership of this Item
+     * @param owner the username of the new owner
+     */
     public void setOwner(String owner) {
         this.owner = owner;
     }
 
+    /**
+     * Changes the comments of this Item
+     * @param comments the new comments of this item
+     */
     public void setComments(String comments) {
         this.comments = comments;
     }

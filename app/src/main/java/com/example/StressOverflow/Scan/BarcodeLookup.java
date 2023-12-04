@@ -1,3 +1,6 @@
+/**
+ * Manages the API lookup for barcode information
+ */
 package com.example.StressOverflow.Scan;
 
 import org.json.JSONException;
@@ -105,5 +108,4 @@ public class BarcodeLookup {
 
         return barcodeLookupResult;
     }
-
 }

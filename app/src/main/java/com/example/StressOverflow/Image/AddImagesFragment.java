@@ -1,3 +1,6 @@
+/**
+ * Pop-up fragment for interfacing with a user's images
+ */
 package com.example.StressOverflow.Image;
 
 import android.Manifest;

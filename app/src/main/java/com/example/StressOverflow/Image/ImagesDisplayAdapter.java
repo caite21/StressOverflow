@@ -1,3 +1,6 @@
+/**
+ * Used for storing images associated with an object and assigning thumbnails
+ */
 package com.example.StressOverflow.Image;
 
 import android.content.Context;

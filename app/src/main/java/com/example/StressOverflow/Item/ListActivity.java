@@ -1,3 +1,6 @@
+/**
+ * The main list activity that shows a list of items to our super awesome end user
+ */
 package com.example.StressOverflow.Item;
 
 import static android.content.ContentValues.TAG;
@@ -389,8 +392,6 @@ public class ListActivity extends AppCompatActivity implements
             }
 
             inSelectionMode = true;
-//            itemListAdapter.setSelectionMode(true);
-//            itemListAdapter.toggleSelection(position);
             ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
             adapter.setSelectionMode(true);
             adapter.toggleSelection(position);

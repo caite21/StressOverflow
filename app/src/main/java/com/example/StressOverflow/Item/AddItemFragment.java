@@ -86,12 +86,13 @@ public class AddItemFragment extends DialogFragment{
         });
     }
 
-    @NonNull
-    @Override
     /**
      * Called when the floating action button to create an item is pressed
-     * Ya
+     *
+     * @param savedInstanceState The instance state passed from the thing making this fragment
      */
+    @NonNull
+    @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_edit_item, null);
         itemTitleField = view.findViewById(R.id.add_item_fragment_edit_title);

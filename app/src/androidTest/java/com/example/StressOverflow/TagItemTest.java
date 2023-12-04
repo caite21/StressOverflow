@@ -157,7 +157,7 @@ public class TagItemTest {
                         throw new RuntimeException("Error with item deletion into collection items: ", e);
                     }
                 });
-
+        SystemClock.sleep(2000);
     }
     @Rule
     public ActivityScenarioRule<ListActivity> listActivityRule =

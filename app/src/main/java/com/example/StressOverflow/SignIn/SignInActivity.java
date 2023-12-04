@@ -43,7 +43,6 @@ public class SignInActivity extends AppCompatActivity  {
     private TextView signUpButton;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-
     private String newLogin;
     private String newPassword;
 

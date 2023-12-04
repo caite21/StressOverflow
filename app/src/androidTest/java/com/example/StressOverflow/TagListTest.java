@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -73,6 +74,7 @@ public class TagListTest {
                         throw new RuntimeException("Error with item deletion into collection items: ", e);
                     }
                 });
+        SystemClock.sleep(2000);
     }
 
     @Rule

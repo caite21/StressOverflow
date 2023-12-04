@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -158,13 +159,14 @@ public class FilterTest {
                         throw new RuntimeException("Error with item insertion into collection items: ", e);
                     }
                 });
+        SystemClock.sleep(1000);
     }
 
     /**
      * Removes firestore test data.
      */
     @After
-    public void cleanUp() {
+    public void cleanUp() throws InterruptedException {
         itemRef
             .whereEqualTo("owner", "testUser")
             .get()
@@ -218,6 +220,38 @@ public class FilterTest {
                         throw new RuntimeException("Error with item deletion into collection items: ", e);
                     }
                 });
+        tagRef
+                .document(String.format("%s:%s", ownerName, "testTag2"))
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                        throw new RuntimeException("Error with item deletion into collection items: ", e);
+                    }
+                });
+        tagRef
+                .document(String.format("%s:%s", ownerName, "testTag"))
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                        throw new RuntimeException("Error with item deletion into collection items: ", e);
+                    }
+                });
+        tagRef
+                .document(String.format("%s:%s", ownerName, "testTag1"))
+                .delete()
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error with item deletion into collection items: ", e);
+                        throw new RuntimeException("Error with item deletion into collection items: ", e);
+                    }
+                });
+        Thread.sleep(2000);
+
     }
 
     /**
@@ -440,16 +474,18 @@ public class FilterTest {
     @Test
     public void testAllTagFilter() {
         onView(withId(R.id.activity_item_list_filter_item_button)).perform(click());
-
+        SystemClock.sleep(1000);
         onView(withId(R.id.fragment_filter_items_all_tags_checkbox)).inRoot(isDialog()).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
-
+        SystemClock.sleep(1000);
         onData(allOf(is(instanceOf(Item.class)), withItemText("Test2")))
                 .inAdapterView(withId(R.id.activity_item_list_item_list))
                 .onChildView(withId(R.id.listview__item__title))
                 .check(matches(isDisplayed()));
+        SystemClock.sleep(1000);
         onView(withId(R.id.activity_item_list_item_list))
                 .check(matches(withItemCount(1)));
+        SystemClock.sleep(1000);
         onView(withId(R.id.activity_item_list_cost_sum_text)).check(matches(withText("$6.00")));
     }
 

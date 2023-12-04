@@ -1,3 +1,6 @@
+/**
+ * Represents a single image
+ */
 package com.example.StressOverflow.Image;
 
 import static android.content.ContentValues.TAG;
