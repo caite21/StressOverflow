@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.SignIn.SignInActivity;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
-import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -95,7 +94,7 @@ public class ListActivity extends AppCompatActivity implements
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
-        this.showTagListButton = findViewById(R.id.showTagList_button);
+        this.showTagListButton = findViewById(R.id.activity_item_list_show_tags_button);
         this.logoutButton = findViewById(R.id.logoutButton);
         this.addTagButton.setOnClickListener(openTagFragment);
         addTagButton.setAlpha(0f);
@@ -393,14 +392,15 @@ public class ListActivity extends AppCompatActivity implements
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
         ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+        ArrayList<Tag> collector = new ArrayList<>();
         for (Item i: adapter.getSelectedItems()){
             ArrayList <Tag> currentTags = i.getTags();
             for (Tag newTag : tagsToAdd) {
-                if (currentTags.contains(newTag)) {
-                    tagsToAdd.remove(newTag);
+                if (!currentTags.contains(newTag)) {
+                    collector.add(newTag);
                 }
             }
-            i.addTags(tagsToAdd);
+            i.addTags(collector);
             this.itemRef
                     .document(i.getId().toString())
                     .update(i.toFirebaseObject())
