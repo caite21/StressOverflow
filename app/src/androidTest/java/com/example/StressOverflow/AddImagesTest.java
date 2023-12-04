@@ -173,7 +173,7 @@ public class AddImagesTest {
 
         // go to edit fragment for the item
         int listViewId = R.id.activity_item_list_item_list;
-        SystemClock.sleep(3000);
+        SystemClock.sleep(2000);
         onData(anything())
                 .inAdapterView(withId(listViewId))
                 .atPosition(0)
@@ -186,7 +186,7 @@ public class AddImagesTest {
                 perform(scrollTo());
         onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
-        SystemClock.sleep(2000);
+        SystemClock.sleep(3000);
         assertEquals(3, item.getPictureURLs().size());
 
         boolean isFailure = false;
