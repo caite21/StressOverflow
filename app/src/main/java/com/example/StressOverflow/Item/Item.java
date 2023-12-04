@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import kotlin.NotImplementedError;
@@ -101,9 +102,7 @@ public class Item {
     }
 
     public void setName(String name) throws IllegalArgumentException {
-        if (name.equals("")) {
-            throw new IllegalArgumentException("empty name not allowed");
-        } else if (name.length() > Util.MAX_ITEM_NAME_LENGTH) {
+        if (name.length() > Util.MAX_ITEM_NAME_LENGTH) {
             throw new IllegalArgumentException(String.format("name exceeds maximum name length (%d)", Util.MAX_ITEM_NAME_LENGTH));
         }
         this.name = name;
@@ -113,6 +112,9 @@ public class Item {
         return this.id;
     }
     public String getName() {
+        if (Objects.equals(this.name, "")) {
+            return "Untitled item";
+        }
         return this.name;
     }
 
@@ -317,6 +319,9 @@ public class Item {
     }
 
     public void setValue(Double value) throws IllegalArgumentException {
+        if (value == null) {
+            value = 0.0d;
+        }
         if (value < 0.0d) {
             throw new IllegalArgumentException(String.format("negative value not allowed for item %s", this.getName()));
         }
