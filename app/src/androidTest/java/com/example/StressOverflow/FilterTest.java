@@ -120,7 +120,7 @@ public class FilterTest {
         tagList.add(tag1);
         Item item1 = new Item("Test1", "make", "model", "this is the first item",
             new GregorianCalendar(2023, 1, 1),5.00,
-            "Comments", tagList, images, 123456, AppGlobals.getInstance().getOwnerName());
+            "Comments", tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
         itemRef.document(item1.getId().toString())
             .set(item1.toFirebaseObject())
             .addOnFailureListener(new OnFailureListener() {
@@ -146,7 +146,7 @@ public class FilterTest {
 
         item2 = new Item("Test2", "make1", "model", "this is the second item",
             new GregorianCalendar(2022, 1, 1), 6.00, "Comments",
-                tagList, images, 123456, AppGlobals.getInstance().getOwnerName());
+                tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
         itemRef.document(item2.getId().toString())
             .set(item2.toFirebaseObject())
             .addOnFailureListener(new OnFailureListener() {
@@ -160,7 +160,7 @@ public class FilterTest {
         tagList.remove(tag1);
         item3 = new Item("Test3", "make2", "model", "this is the second add 1 and last item",
                 new GregorianCalendar(2001, 1, 1),7.00,
-                "Comments", tagList, images, 123456, AppGlobals.getInstance().getOwnerName());
+                "Comments", tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
         itemRef.document(item3.getId().toString())
                 .set(item3.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {

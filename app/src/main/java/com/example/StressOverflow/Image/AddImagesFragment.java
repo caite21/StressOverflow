@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -170,6 +171,7 @@ public class AddImagesFragment extends DialogFragment  {
                         if (data == null) return;
 
                         if (data.getClipData() != null) {
+                            Util.showShortToast(getContext(), "Ying: Got mult Uri from library");
                             // Pictures selected from library
                             int itemCount = data.getClipData().getItemCount();
                             for (int i = 0; i < itemCount; i++) {
@@ -178,15 +180,18 @@ public class AddImagesFragment extends DialogFragment  {
                                 imagesList.add(new Image(selectedBitmap));
                             }
                         } else if (data.getData() != null) {
+                            Util.showShortToast(getContext(), "Ying: Got 1 Uri from library");
                             // Picture selected from library
                             Uri image = data.getData();
                             Bitmap selectedBitmap = getBitmapFromUri(image);
                             imagesList.add(new Image(selectedBitmap));
                         } else if (imageUri != null) {
+                            Util.showShortToast(getContext(), "Ying: Got Uri type from camera");
                             // Image captured with camera
                             Bitmap selectedBitmap = getBitmapFromUri(imageUri);
                             imagesList.add(new Image(selectedBitmap));
                         } else if (data.getExtras() != null) {
+                            Util.showShortToast(getContext(), "Ying: thumbnail fallback method");
                             // Failed to write image captured with camera, but can still save it
                             Bitmap capturedBitmap = (Bitmap) data.getExtras().get("data");
                             imagesList.add(new Image(capturedBitmap));
@@ -228,12 +233,12 @@ public class AddImagesFragment extends DialogFragment  {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         // Image details for saving
-        String fileName = "image.jpg";
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, fileName);
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Image taken with camera");
-        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+//        String fileName = "image.jpg";
+//        ContentValues values = new ContentValues();
+//        values.put(MediaStore.Images.Media.TITLE, fileName);
+//        values.put(MediaStore.Images.Media.DESCRIPTION, "Image taken with camera");
+//        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+//        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         // Intent to pick photo(s)
         Intent pickPicturesIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -256,16 +261,27 @@ public class AddImagesFragment extends DialogFragment  {
      */
     private Bitmap getBitmapFromUri(Uri uri) {
         try {
-            InputStream inputStream = contentResolver.openInputStream(uri);
-            return BitmapFactory.decodeStream(inputStream);
+//            Util.showShortToast(getContext(), "Ying: uses first bitmap conversion");
+//            InputStream inputStream = contentResolver.openInputStream(uri);
+//            return BitmapFactory.decodeStream(inputStream);
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            return rotatedBitmap;
         } catch (IOException e) {
-            try {
-                return MediaStore.Images.Media.getBitmap(contentResolver, uri);
-            } catch (IOException e2) {
-                Log.d("IMAGES", "Converting picture to bitmap failed");
-                Util.showShortToast(getContext(), "Image Error: Converting picture to bitmap failed");
-                return null;
-            }
+//            try {
+////                Util.showShortToast(getContext(), "Ying: uses second bitmap conversion");
+//                return MediaStore.Images.Media.getBitmap(contentResolver, uri);
+//            } catch (IOException e2) {
+//                Log.d("IMAGES", "Converting picture to bitmap failed");
+//                Util.showShortToast(getContext(), "Image Error: Converting picture to bitmap failed");
+//                return null;
+//            }
+            Log.d("IMAGES", "Converting picture to bitmap failed");
+            Util.showShortToast(getContext(), "Image Error: Converting picture to bitmap failed");
+            return null;
         }
     }
 

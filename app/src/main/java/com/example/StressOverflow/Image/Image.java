@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Util;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -174,14 +175,17 @@ public class Image {
 
         // Upload each Bitmap to Storage and get URL
         for (Image image : pictures) {
+
             if (image.getURL() != null) {
                 // already uploaded
-                downloadURLs.add(image.getURL());
+                String url = new String(image.getURL());
+                downloadURLs.add(url);
                 insert_index++;
             }
             else {
                 Bitmap bitmap = image.getBitmap();
                 int copy_index = 0 + insert_index; // trust me, do not change this
+                insert_index++;
                 uploadBitmapToStorage(bitmap, copy_index, new OnImageUploadedListener() {
                     @Override
                     public void onImageUploaded(String downloadUrl, int index) {

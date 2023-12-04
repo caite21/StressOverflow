@@ -190,10 +190,18 @@ public class ListActivity extends AppCompatActivity implements
                         Log.w(TAG, "Error with item addition on collection items: ", e);
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
-                });
-        if (this.itemList.getAdapter() != this.items) {
-            this.itemList.setAdapter(this.itemListAdapter);
-        }
+
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        if (itemList.getAdapter() != items) {
+                            itemList.setAdapter(itemListAdapter);
+                        }
+                        itemListAdapter.notifyDataSetChanged();
+                    }
+                })
+                ;
     }
 
     /**
@@ -239,22 +247,25 @@ public class ListActivity extends AppCompatActivity implements
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            // delete associated images from storage
+                            itemListAdapter.remove(item);
+
+                            if (itemList.getAdapter() != items) {
+                                itemList.setAdapter(itemListAdapter);
+                            }
+                            setSumOfItemCosts();
+                            itemListAdapter.notifyDataSetChanged();
+
+                            // delete associated images from storage (can be async)
                             for (String URL : item.getPictureURLs()) {
                                 Image.deletePictureFromStorage(URL);
                             }
                         }
                     });
-            itemListAdapter.remove(item);
-            this.setSumOfItemCosts();
+
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
         }
-        this.setSumOfItemCosts();
 
-        if (this.itemList.getAdapter() != this.items) {
-            this.itemList.setAdapter(this.itemListAdapter);
-        }
     }
 
     public void editItem(int position, Item item) {
@@ -270,7 +281,16 @@ public class ListActivity extends AppCompatActivity implements
                             Log.w(TAG, "Error with item update on collection items: ", e);
                             throw new RuntimeException("Error with item update on collection items: ", e);
                         }
-                    });
+                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            if (itemList.getAdapter() != items) {
+                                itemList.setAdapter(itemListAdapter);
+                            }
+                            itemListAdapter.notifyDataSetChanged();
+                        }
+                    })
+            ;
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Attempted to edit out of bounds object") ;
         } catch (Exception e) {
@@ -385,9 +405,13 @@ public class ListActivity extends AppCompatActivity implements
                             Log.w(TAG, "Error with item update on collection items: ", e);
                             throw new RuntimeException("Error with item update on collection items: ", e);
                         }
-                    });
-
-            itemListAdapter.notifyDataSetChanged();
+                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            itemListAdapter.notifyDataSetChanged();
+                        }
+                    })
+            ;
         }
         exitSelectionMode();
 

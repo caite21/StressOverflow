@@ -90,7 +90,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
                     .load(picURL)
                     .error(R.drawable.ic_error_image)
                     .into(pictureImageView);
-        } else {
+        }
+        else {
             pictureImageView.setImageResource(R.drawable.default_image);
         }
 
