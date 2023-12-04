@@ -183,14 +183,16 @@
                     style="@style/Widget.App.Button.OutlinedButton.IconOnly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/arrow_upward"/>
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    app:icon="@drawable/arrow_upward_black"/>
 
                 <Button
                     android:id="@+id/fragment_filter_items_desc_sort_button"
                     style="@style/Widget.App.Button.OutlinedButton.IconOnly"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/arrow_downward"/>
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    app:icon="@drawable/arrow_downward_black"/>
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -213,6 +215,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    android:textColor="@drawable/button_text_color_selector"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
                     android:text="@string/fragment_filter_items_date_btn_text" />
@@ -223,6 +227,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    android:textColor="@drawable/button_text_color_selector"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
                     android:text="@string/fragment_filter_items_descr_btn_text" />
@@ -233,6 +239,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    android:textColor="@drawable/button_text_color_selector"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
                     android:text="@string/fragment_filter_items_make_btn_text" />
@@ -243,6 +251,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    android:textColor="@drawable/button_text_color_selector"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
                     android:text="@string/fragment_filter_items_value_btn_text" />
@@ -253,6 +263,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:backgroundTint="@drawable/button_background_color_selector"
+                    android:textColor="@drawable/button_text_color_selector"
                     android:paddingStart="0dp"
                     android:paddingEnd="0dp"
                     android:text="@string/fragment_filter_items_tags_header" />

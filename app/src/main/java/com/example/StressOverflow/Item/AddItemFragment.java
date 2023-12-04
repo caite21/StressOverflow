@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -207,6 +208,9 @@ public class AddItemFragment extends DialogFragment{
 
                         for (int chipID : tagChipGroup.getCheckedChipIds()){
                             Chip newChip = tagChipGroup.findViewById(chipID);
+                            newChip.setChipBackgroundColorResource(R.color.sagi);
+                            newChip.setTextColor(Color.WHITE);
+                            newChip.setChipCornerRadius(10);
                             Tag newTag = new Tag(newChip.getText().toString());
                             newTags.add(newTag);
                         }
@@ -262,6 +266,9 @@ public class AddItemFragment extends DialogFragment{
         //add all the tags as chips in the dialog
         for (Tag t: allTags){
             Chip chip = new Chip(getContext());
+            chip.setChipBackgroundColorResource(R.color.sagi);
+            chip.setTextColor(Color.WHITE);
+            chip.setChipCornerRadius(10);
             chip.setText(t.getTagName());
             chip.setCheckedIconVisible(true);
             chip.setCheckable(true);
