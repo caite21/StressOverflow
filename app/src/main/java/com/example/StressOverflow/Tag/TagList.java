@@ -53,7 +53,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
         tagAdapter = new TagListAdapter(TagList.this, tagList);
         tagListView.setAdapter(tagAdapter);
 
-        //displays on tagList Activity
+        //displays tags that belong to the user on tagList Activity
         tagRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots,
@@ -66,6 +66,7 @@ public class TagList extends AppCompatActivity implements AddTagFragment.OnFragm
                     tagList.clear();
                     for (QueryDocumentSnapshot doc: querySnapshots) {
                         String ownerNameTagName = doc.getId();
+                        //Checks that the username is valid
                         if (!ownerNameTagName.isEmpty() && ownerNameTagName.contains(":")){
                             String[] parts = ownerNameTagName.split(":");
                             String tagName = parts[1];

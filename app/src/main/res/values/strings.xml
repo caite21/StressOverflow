@@ -16,8 +16,10 @@
     <string name="add_item_fragment_description_button">Scan barcode</string>
     <string name="add_item_fragment_serial_button">Scan</string>
 
+    <string name ="activity_item_list_totalSum"> Placeholder </string>
     <string name="activity_item_list_edit_button_text">Add Item</string>
     <string name="activity_item_list_filter_button_text">Sort / Filter</string>
+    <string name ="activity_item_list_showTagList_button_text">Show Tags</string>
 
     <string name="select_image_fragment_delete_button_text">Delete</string>
     <string name="select_image_fragment_add_images_button_text">Add</string>
@@ -55,5 +57,16 @@
     <string name = "activity_tag_list_add_btn_text">Add</string>
     <string name = "activity_tag_list_back_btn_text">Back</string>
     <string name="add_item_fragment_lookup_button">Lookup</string>
+
+    <string name = "tag_refreshTags">Refresh Tags</string>
+    <string name = "tag_editTags">Edit Tags</string>
+    <string name = "fragment_add_tag_hint">Enter Tag</string>
+    <string name = "listview_tag_content">Tag</string>
+    <string name = "listview_item_content_placeholder_number">$12345.00</string>
+    <string name = "listview_item_content_placeholder_text">Lorem Ipsum</string>
+    <string name = "listview_item_content_placeholder_serial">0-12345-6789-0</string>
+
+
+
 
 </resources>
