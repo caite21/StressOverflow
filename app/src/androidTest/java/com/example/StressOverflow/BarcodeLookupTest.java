@@ -46,8 +46,9 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 /**
- * Testing entering barcode (serial number) and the functionality of
- * receiving results and checking results
+ * Tests entering barcode (serial number) and the functionality of
+ * receiving results and checking that the result is correct
+ * and that a user can choose to use the found description
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -125,7 +126,7 @@ public class BarcodeLookupTest {
                 .perform(longClick());
         SystemClock.sleep(1000);
 
-//         delete 2
+        // delete 2
         onData(Matchers.anything())
                 .inAdapterView(withId(listViewId))
                 .atPosition(2)
@@ -137,7 +138,6 @@ public class BarcodeLookupTest {
         onView(ViewMatchers.withId(R.id.activity__item__list__remove__item__button)).perform(click());
         SystemClock.sleep(2000);
     }
-
 
     /**
      * Add an item with a serial number: 12345 and check that it does not
