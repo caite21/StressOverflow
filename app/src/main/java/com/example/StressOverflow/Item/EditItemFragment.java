@@ -34,11 +34,13 @@ import com.google.android.material.chip.ChipGroup;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
+/**
+ * Fragment where a user can change or add attributes of an item.
+ */
 public class EditItemFragment extends DialogFragment {
 
     private EditText itemTitleField;
@@ -92,21 +94,21 @@ public class EditItemFragment extends DialogFragment {
      */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_add_edit_item, null);
-        itemTitleField = view.findViewById(R.id.add__item__fragment__edit__title);
-        itemMakeField = view.findViewById(R.id.add__item__fragment__edit__make);
-        itemModelField = view.findViewById(R.id.add__item__fragment__edit__model);
-        itemDescriptionField = view.findViewById(R.id.add__item__fragment__edit__description);
-        itemYearField = view.findViewById(R.id.add__item__fragment__edit__year);
-        itemMonthField = view.findViewById(R.id.add__item__fragment__edit__month);
-        itemDateField = view.findViewById(R.id.add__item__fragment__edit__date);
-        itemValueField = view.findViewById(R.id.add__item__fragment__edit__value);
-        itemCommentsField = view.findViewById(R.id.add__item__fragment__edit__comment);
-        itemSerialField = view.findViewById(R.id.add__item__fragment__edit__serial);
+        itemTitleField = view.findViewById(R.id.add_item_fragment_edit_title);
+        itemMakeField = view.findViewById(R.id.add_item_fragment_edit_make);
+        itemModelField = view.findViewById(R.id.add_item_fragment_edit_model);
+        itemDescriptionField = view.findViewById(R.id.add_item_fragment_edit_description);
+        itemYearField = view.findViewById(R.id.add_item_fragment_edit_year);
+        itemMonthField = view.findViewById(R.id.add_item_fragment_edit_month);
+        itemDateField = view.findViewById(R.id.add_item_fragment_edit_date);
+        itemValueField = view.findViewById(R.id.add_item_fragment_edit_value);
+        itemCommentsField = view.findViewById(R.id.add_item_fragment_edit_comment);
+        itemSerialField = view.findViewById(R.id.add_item_fragment_edit_serial);
 
-        itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
+        itemPicturesButton = view.findViewById(R.id.add_item_fragment_edit_pictures);
         serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
 
-        tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
+        tagChipGroup = view.findViewById(R.id.add_item_fragment_chipGroup);
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
 
@@ -162,9 +164,6 @@ public class EditItemFragment extends DialogFragment {
                 }
             }
         });
-//(dialog, which) -> {
-//                    selectedItem.refreshPictures();
-//                }
 
         final AlertDialog builder = new AlertDialog.Builder(getContext())
                 .setView(view)
@@ -307,7 +306,6 @@ public class EditItemFragment extends DialogFragment {
         }
     }
 
-
     /**
      * Displays found product details that can be selected to enter
      * if the serial number is found in the UPC database.
@@ -329,8 +327,6 @@ public class EditItemFragment extends DialogFragment {
             String key = options[i];
             formattedOptions[i] = key + ": " + info.get(key);
         }
-
-        // .setMessage("Select categories to overwrite\n") TODO: create xml for nicer format
 
         // show found, ask to overwrite
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -358,6 +354,5 @@ public class EditItemFragment extends DialogFragment {
                 .create()
                 .show();
     }
-
 
 }

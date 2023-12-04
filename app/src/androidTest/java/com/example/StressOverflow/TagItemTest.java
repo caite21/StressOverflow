@@ -25,9 +25,7 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.Item.Item;
-import com.example.StressOverflow.Item.ListActivity;
 import com.example.StressOverflow.Tag.Tag;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -103,7 +101,7 @@ public class TagItemTest {
 
     @Test
     public void AddTagToTagList(){
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(2000);
 
         onData(Matchers.anything())
@@ -111,15 +109,15 @@ public class TagItemTest {
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .perform(longClick());
-        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_item_list_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity_item_list_add_tag_button)).perform(click());
         onView(ViewMatchers.withId(R.id.fragment_add_tag_to_item_make_new_tag_button)).perform(click());
         onView(ViewMatchers.withId(R.id.activity_tag_list_listView)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
     }
 
     @Test
     public void addTags(){
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(2000);
 
         onData(Matchers.anything())
@@ -127,8 +125,8 @@ public class TagItemTest {
                 .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .perform(longClick());
-        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_item_list_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity_item_list_add_tag_button)).perform(click());
         int chipGroupID = R.id.fragment_add_tag_to_item_tag_chipGroup;
 
         onView(allOf(withText("tag 1"), isDescendantOfA(withId(chipGroupID))))
@@ -165,7 +163,7 @@ public class TagItemTest {
     }
     @Test
     public void deleteItem(){
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(2000);
 
         onData(Matchers.anything())
@@ -174,8 +172,8 @@ public class TagItemTest {
                 .onChildView(withId(R.id.listview__item__title))
                 .perform(longClick());
 
-        onView(ViewMatchers.withId(R.id.activity__item__list__remove__item__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-        onView(ViewMatchers.withId(R.id.activity__item__list__remove__item__button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_item_list_remove_item_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        onView(ViewMatchers.withId(R.id.activity_item_list_remove_item_button)).perform(click());
 
 
         final boolean[] itemBool = new boolean[1];

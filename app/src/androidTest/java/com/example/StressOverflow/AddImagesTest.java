@@ -4,21 +4,17 @@ import static android.content.ContentValues.TAG;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.CoreMatchers.not;
+import static androidx.test.espresso.matcher.ViewMatchers.withSubstring;
 import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -31,9 +27,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-
-import org.junit.After;
-import org.junit.Before;
+import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,28 +38,41 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 
+/**
+ * Tests adding and deleting images which are attached to an item.
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class AddImagesTest {
-    private CollectionReference tagsRef;
+    private CollectionReference itemsRef;
     private FirebaseFirestore firestore;
     private String testTagName;
     private Item item;
 
 
-    @Before
-    public void setUp() {
+    @Rule
+    public ActivityScenarioRule<ListActivity> listActivityRule = new ActivityScenarioRule<>(ListActivity.class);
+
+    /**
+     * Create and add dummy item
+     */
+    public void setUp(int numberOfPics) {
         firestore = FirebaseFirestore.getInstance();
         AppGlobals.getInstance().setOwnerName("testUser");
 
         ArrayList<Tag> testTags = new ArrayList<>();
         ArrayList<String> pictureURLs = new ArrayList<>();
-        pictureURLs.add("https://firebasestorage.googleapis.com/v0/b/stressoverflow.appspot.com/o/images%2Fimage_1701480005690.jpg?alt=media&token=400b81e3-97da-4c1f-b1e0-98cceb4d3b62");
-        item = new Item("testItem","make","model","description",
+        for (int i=0; i<numberOfPics; i++) {
+            pictureURLs.add("https://firebasestorage.googleapis.com/v0/b/stressoverflow.appspot.com/o/images%2Fimage_1701667607368.jpg?alt=media&token=1df046d0-834f-4079-96ea-9f62e69e65b0"
+            );
+        }
+
+        item = new Item("testUser","make","model","description",
                 new GregorianCalendar(),10.0, "Comments",testTags,pictureURLs,
                 "123456", AppGlobals.getInstance().getOwnerName());
 
-        firestore.collection("items").document(item.getId().toString())
+        firestore.collection("items")
+                .document(item.getId().toString())
                 .set(item.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -73,10 +81,11 @@ public class AddImagesTest {
                         throw new RuntimeException("Error with item insertion into collection items: ", e);
                     }
                 });
-
     }
 
-    @After
+    /**
+     * Delete dummy item
+     */
     public void cleanUp(){
         UUID uuid = item.getId();
         this.firestore.collection("items")
@@ -89,187 +98,312 @@ public class AddImagesTest {
                         throw new RuntimeException("Error with item insertion into collection items: ", e);
                     }
                 });
-
-    }
-    @Rule
-    public ActivityScenarioRule<ListActivity> listActivityRule = new ActivityScenarioRule<>(ListActivity.class);
-
-    @Test
-    public void ListActivityToEditFragmentToAddImagesFragment(){
-        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
-//        onView(ViewMatchers.withId(R.id.fragment_add_edit_item)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+        SystemClock.sleep(2000);
     }
 
-    @Test
-    public void addImageFromLibraryTest(){
-        // from addItemFragment
-        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
+    @Ignore("For forced cleaning up")
+    public void deleteItems() {
+        int listViewId = R.id.activity_item_list_item_list;
+        SystemClock.sleep(4000);
 
-        // fill in all text boxes
-
-        // click pictures
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
-        // check that count is 0
-
-        // click add
-        // click from files
-        // select one
-        // check that count is 1
-        onView(withId(R.id.add_image_button)).perform(click());
+        for (int i=0; i<6; i++) {
+            onData(Matchers.anything())
+                    .inAdapterView(withId(listViewId))
+                    .atPosition(0)
+                    .onChildView(withId(R.id.listview__item__title))
+                    .perform(longClick());
+            SystemClock.sleep(2000);
+            onView(ViewMatchers.withId(R.id.activity_item_list_remove_item_button)).perform(click());
+            SystemClock.sleep(3000);
+        }
 
     }
 
+    /**
+     * test ability to attach 1 image to an item and test
+     * that it is displayed when editing the after
+     */
     @Test
-    public void addMultipleImagesFromLibraryTest(){
-        // click pictures
-        // check that count is 0
-        // click add
-        // click from files
-        // select 3
-        // check that count is 3
-    }
+    public void attachOneImageToItem(){
+        setUp(1);
 
-    @Test
-    public void addImageFromCameraTest() throws InterruptedException {
-        // click pictures
-        // check that count is 0
-        // click add
-        // click from camera
-        // take photo
-        // check that count is 1
-    }
-
-    @Test
-    public void addFromCameraAndLibraryTest(){
-        // click pictures
-        // check that count is 0
-        // click add
-        // click from files
-        // select 3
-
-        // click add
-        // click from camera
-        // take photo
-        // check that count is 4
-    }
-
-    @Test
-    public void ListActivitytoTagList(){
-        onView(withId(R.id.showTagList_button)).perform(click());
-        onView(ViewMatchers.withId(R.id.activity_tag_list_add_tag_button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-    }
-
-    @Test
-    public void editItemToAddImagesFragment() {
-//        int listViewId = R.id.activity__item__list__item__list;
-//        SystemClock.sleep(2000);
-//
-//        onData(Matchers.anything())
-//                .inAdapterView(withId(listViewId))
-//                .atPosition(0)
-//                .onChildView(withId(R.id.listview__item__title))
-//                .perform(longClick());
-//        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
-//        onView(ViewMatchers.withId(R.id.activity__item__list__add__tag__button)).perform(click());
-//        SystemClock.sleep(2000);
-//
-//        onView(withId(R.id.add__item__fragment__edit__pictures))
-//                .perform(scrollTo())
-//                .perform(click());
-//        SystemClock.sleep(4000);
-
-                // go to image selection
-        onData(is(instanceOf(Item.class)))
-                .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
+        // go to edit fragment for the item
+        int listViewId = R.id.activity_item_list_item_list;
+        SystemClock.sleep(3000);
+        onData(anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
                 .onChildView(withId(R.id.listview__item__title))
                 .perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__pictures))
-                .perform(scrollTo())
+
+        // go to add pictures fragment
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(2000);
+        assertEquals(1, item.getPictureURLs().size());
+
+        boolean isFailure = false;
+        try {
+            onData(anything())
+                    .inAdapterView(withId(R.id.images_area))
+                    .atPosition(0)
+                    .perform(click());
+        } catch (Exception e) {
+            isFailure = true;
+        }
+        assert(!isFailure);
+
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        cleanUp();
+    }
+
+    /**
+     * test ability to attach 3 images to an item and test
+     * that it is displayed when editing the item after
+     */
+    @Test
+    public void attachMultipleImagesToItem(){
+        setUp(3);
+
+        // go to edit fragment for the item
+        int listViewId = R.id.activity_item_list_item_list;
+        SystemClock.sleep(3000);
+        onData(anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
                 .perform(click());
+        SystemClock.sleep(2000);
+
+        // go to add pictures fragment
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(2000);
+        assertEquals(3, item.getPictureURLs().size());
+
+        boolean isFailure = false;
+        try {
+            onData(anything())
+                    .inAdapterView(withId(R.id.images_area))
+                    .atPosition(2)
+                    .perform(click());
+        } catch (Exception e) {
+            isFailure = true;
+        }
+        assert(!isFailure);
+
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        cleanUp();
     }
 
+    /**
+     * test ability to delete an image from an item and test
+     * that it is reflected when editing the item after
+     */
     @Test
-    public void deleteImagesTest(){
-//        editItemToAddImagesFragment();
-//        // go to image selection
-//        onData(is(instanceOf(Item.class)))
-//                .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
-//                .onChildView(withId(R.id.listview__item__title))
-//                .perform(click());
-//        SystemClock.sleep(2000);
-//        onView(withId(R.id.add__item__fragment__edit__pictures))
-//                .perform(scrollTo())
-//                .perform(click());
-//        SystemClock.sleep(4000);
-//        // click on the very first picture (fails if it doesn't exist)
-//        onData(anything())
-//                .inAdapterView(withId(R.id.images_area))
-//                .atPosition(0)
-//                .perform(click());
-//
-//        SystemClock.sleep(2000);
-//        onView(withId(R.id.delete_button))
-//                .perform(click());
-//        // go back to ListActivity
-//        SystemClock.sleep(2000);
-//        onView(withText("OK")). perform(pressBack());
-//        SystemClock.sleep(2000);
-//        onView(withText("OK")). perform(pressBack());
-//        SystemClock.sleep(2000);
-//
-//        // same process
-//        onData(is(instanceOf(Item.class)))
-//                .inAdapterView(withId(R.id.activity__item__list__item__list)).atPosition(0)
-//                .onChildView(withId(R.id.listview__item__title))
-//                .perform(click());
-//        SystemClock.sleep(2000);
-//        onView(withId(R.id.add__item__fragment__edit__pictures))
-//                .perform(scrollTo())
-//                .perform(click());
-//        SystemClock.sleep(4000);
-//        // check if the first image is not displayed
-//        onData(anything())
-//                .inAdapterView(withId(R.id.images_area))
-//                .atPosition(0)
-//                .check(matches(not(isDisplayed())));
+    public void deleteImageFromItem(){
+        setUp(2);
+        // view item's pics
+        int listViewId = R.id.activity_item_list_item_list;
+        SystemClock.sleep(3000);
+        onData(anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(2000);
+
+        // delete a pic
+        onData(anything())
+                .inAdapterView(withId(R.id.images_area))
+                .atPosition(0)
+                .perform(click());
+        SystemClock.sleep(1000);
+        onView(withId(R.id.delete_button)).perform(click());
+        SystemClock.sleep(1000);
+
+        // check fragment saved
+        onView(withSubstring("OK")).perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(3000);
+
+        // save in db
+        onView(withSubstring("OK")).perform(click());
+        SystemClock.sleep(1000);
+        onView(withSubstring("OK")).perform(click());
+        SystemClock.sleep(5000);
+
+        // check saved in db
+        onData(anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        SystemClock.sleep(2000);
+        // go to add pictures fragment
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(3000);
+
+        boolean isFailure = false;
+        try {
+            onData(anything())
+                    .inAdapterView(withId(R.id.images_area))
+                    .atPosition(0)
+                    .perform(click());
+        } catch (Exception e) {
+            isFailure = true;
+        }
+        assert(!isFailure);
+        isFailure = false;
+        try {
+            onData(anything())
+                    .inAdapterView(withId(R.id.images_area))
+                    .atPosition(1)
+                    .perform(click());
+        } catch (Exception e) {
+            isFailure = true;
+        }
+        assert(isFailure);
+
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        cleanUp();
     }
 
+    /**
+     * test ability to delete every image from an item and test
+     * that it is reflected when editing the item after
+     */
     @Test
-    public void imagesSavedToDatabaseTest(){
-        // add images to item
-        // close
-        // edit item
-        // click pictures
-        // check that all expected pictures are there/compare bitmaps
+    public void deleteAllImagesFromItem(){
+        setUp(3);
+        // view item's pics
+        int listViewId = R.id.activity_item_list_item_list;
+        SystemClock.sleep(3000);
+        onData(anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(2000);
+
+        // delete pics
+        onData(anything())
+                .inAdapterView(withId(R.id.images_area))
+                .atPosition(0)
+                .perform(click());
+        SystemClock.sleep(1000);
+        onView(withId(R.id.delete_button)).perform(click());
+        SystemClock.sleep(1000);
+        onData(anything())
+                .inAdapterView(withId(R.id.images_area))
+                .atPosition(0)
+                .perform(click());
+        SystemClock.sleep(1000);
+        onView(withId(R.id.delete_button)).perform(click());
+        SystemClock.sleep(1000);
+        onData(anything())
+                .inAdapterView(withId(R.id.images_area))
+                .atPosition(0)
+                .perform(click());
+        SystemClock.sleep(1000);
+        onView(withId(R.id.delete_button)).perform(click());
+        SystemClock.sleep(1000);
+
+        // check fragment saved
+        onView(withSubstring("OK")).perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the (no) images here
+        SystemClock.sleep(3000);
+
+        // save in db
+        onView(withSubstring("OK")).perform(click());
+        SystemClock.sleep(1000);
+        onView(withSubstring("OK")).perform(click());
+        SystemClock.sleep(5000);
+
+        // check saved in db
+        onData(anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(0)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(click());
+        SystemClock.sleep(2000);
+        // go to add pictures fragment
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        // you'll see the images here
+        SystemClock.sleep(3000);
+        boolean isFailure = false;
+        try {
+            onData(anything())
+                    .inAdapterView(withId(R.id.images_area))
+                    .atPosition(0)
+                    .perform(click());
+        } catch (Exception e) {
+            isFailure = true;
+        }
+        assert(isFailure);
+
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(1000);
+        cleanUp();
     }
 
+    /**
+     * Check that there are the options and capabilities to add images
+     * from the android camera or system library. These cannot be
+     * tested with espresso as they are handled by the android system
+     */
     @Test
-    public void imagesDeletedFromDatabaseTest(){
-        // add images to item
-        // close
-        // edit item
-        // click pictures
-        // check that all expected pictures are there/compare bitmaps
+    public void addImageFromAndroidResources(){
+        SystemClock.sleep(2000);
+        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
+        SystemClock.sleep(2000);
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
+                perform(scrollTo());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
+        SystemClock.sleep(2000);
+
+        onView(withId(R.id.add_image_button)).perform(click());
+        // displays options, cannot be tested since handled by android system
+        SystemClock.sleep(4000);
     }
 
-    @Test
-    public void imagesSavedToStorageTest(){
-        // add images to item
-        // close
-        // edit item
-        // click pictures
-        // check that all expected pictures are there/compare bitmaps
-    }
-
-    @Test
-    public void imagesDeletedFromStorageTest(){
-        // add images to item
-        // close
-        // edit item
-        // click pictures
-        // check that all expected pictures are there/compare bitmaps
-    }
-
-    // also test going back and forth from fragments with Cancel button
 }
