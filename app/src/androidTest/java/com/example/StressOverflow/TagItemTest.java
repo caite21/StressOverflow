@@ -578,10 +578,8 @@ public class TagItemTest {
 
         //Click on refresh button
         onView(ViewMatchers.withId(R.id.add_item_fragment_refresh_tags_button)).perform(click());
-//
-//        //Check to see that chipGroup is empty
 
-
+        //Check to see that chipGroup is empty
         onView(withId(R.id.add_item_fragment_chipGroup))
                 .check((view, noViewFoundException) -> {
                     if (view instanceof ChipGroup) {
