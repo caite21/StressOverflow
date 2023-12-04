@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,9 +41,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -90,7 +94,7 @@ public class ListActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
-        this.editButton = findViewById(R.id.activity__item__list__edit__item__button);
+        this.editButton = findViewById(R.id.activity_item_list_add_item_button);
         this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
         this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
@@ -198,10 +202,18 @@ public class ListActivity extends AppCompatActivity implements
                         Log.w(TAG, "Error with item addition on collection items: ", e);
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
+
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        if (itemList.getAdapter() != items) {
+                            itemList.setAdapter(itemListAdapter);
+                        }
+                        itemListAdapter.notifyDataSetChanged();
+                    }
                 });
-        if (this.itemList.getAdapter() != this.items) {
-            this.itemList.setAdapter(this.itemListAdapter);
-        }
+        this.removeFilters();
     }
 
     /**
@@ -247,7 +259,15 @@ public class ListActivity extends AppCompatActivity implements
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            // delete associated images from storage
+                            itemListAdapter.remove(item);
+
+                            if (itemList.getAdapter() != items) {
+                                itemList.setAdapter(itemListAdapter);
+                            }
+                            setSumOfItemCosts();
+                            itemListAdapter.notifyDataSetChanged();
+
+                            // delete associated images from storage (can be async)
                             for (String URL : item.getPictureURLs()) {
                                 Image.deletePictureFromStorage(URL);
                             }
@@ -255,13 +275,9 @@ public class ListActivity extends AppCompatActivity implements
                     });
             itemListAdapter.remove(item);
             this.setSumOfItemCosts();
+            this.removeFilters();
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Choose an item first!");
-        }
-        this.setSumOfItemCosts();
-
-        if (this.itemList.getAdapter() != this.items) {
-            this.itemList.setAdapter(this.itemListAdapter);
         }
     }
 
@@ -278,7 +294,16 @@ public class ListActivity extends AppCompatActivity implements
                             Log.w(TAG, "Error with item update on collection items: ", e);
                             throw new RuntimeException("Error with item update on collection items: ", e);
                         }
+                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            if (itemList.getAdapter() != items) {
+                                itemList.setAdapter(itemListAdapter);
+                            }
+                            itemListAdapter.notifyDataSetChanged();
+                        }
                     });
+            this.removeFilters();
         } catch (ArrayIndexOutOfBoundsException e) {
             Util.showShortToast(this.getApplicationContext(), "Attempted to edit out of bounds object") ;
         } catch (Exception e) {
@@ -430,9 +455,13 @@ public class ListActivity extends AppCompatActivity implements
                             Log.w(TAG, "Error with item update on collection items: ", e);
                             throw new RuntimeException("Error with item update on collection items: ", e);
                         }
-                    });
-
-            itemListAdapter.notifyDataSetChanged();
+                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            itemListAdapter.notifyDataSetChanged();
+                        }
+                    })
+            ;
         }
         exitSelectionMode();
 
@@ -504,7 +533,7 @@ public class ListActivity extends AppCompatActivity implements
         public void onFilterPressed(Map<String, ArrayList<String>> filterConds, String sortType, boolean isAsc) {
         ArrayList<Item> filteredList;
         try {
-            filteredList = this.itemListAdapter.filterList(filterConds);
+            filteredList = this.filterList(filterConds);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -512,11 +541,60 @@ public class ListActivity extends AppCompatActivity implements
         if (!Objects.equals(sortType, "No Sort")) sortBy(sortType, filteredList, isAsc);
 
         ItemListAdapter filteredItemListAdapter = new ItemListAdapter(this, filteredList);
-
         this.itemList.setAdapter(filteredItemListAdapter);
-        this.setSumOfItemCosts();
 
+        this.setSumOfItemCosts();
         this.itemListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Filters the item list by description keywords, dates, makes, and tags.
+     * @param conditions string key that describes the filter and the arraylist that specifies
+     *                   what to filter
+     * @return Arraylist of items that fit the filtering conditions
+     * @throws ParseException
+     */
+    private ArrayList<Item> filterList(Map<String, ArrayList<String>> conditions) throws ParseException {
+        // If there are no filters, return original list
+        if (conditions.get("keywords").isEmpty() & conditions.get("dates").isEmpty() & conditions.get("makes").isEmpty() & conditions.get("tags").isEmpty()) {
+            return this.items;
+        }
+
+        ArrayList<Item> filtered = new ArrayList<Item>();
+        for (int i = 0; i < this.items.size(); i++) {
+            Item item = this.items.get(i);
+
+            // Filter by keywords
+            if (!conditions.get("keywords").stream().allMatch(keyword -> item.getDescription().toLowerCase().replaceAll("[^\\sa-zA-Z0-9]", "").contains(keyword))) {
+                continue;
+            }
+            // Filter by start date
+            if (!conditions.get("dates").get(0).isEmpty()) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                Date parsedDate = dateFormat.parse(conditions.get("dates").get(0));
+                GregorianCalendar parseFrom = new GregorianCalendar();
+                parseFrom.setTime(parsedDate);
+                if (!item.getDate().after(parseFrom)) continue;
+            }
+            // Filter by end date
+            if (!conditions.get("dates").get(1).isEmpty()) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                Date parsedDate = dateFormat.parse(conditions.get("dates").get(1));
+                GregorianCalendar parseTo = new GregorianCalendar();
+                parseTo.setTime(parsedDate);
+                if (!item.getDate().before(parseTo)) continue;
+            }
+            // Filter by make
+            if (!conditions.get("makes").stream().allMatch(make -> make.equals(item.getMake()))) {
+                continue;
+            }
+            // Filter by tags
+            if (!conditions.get("tags").stream().allMatch(tagList -> item.getTags().stream().anyMatch(tag -> tag.getTagName().equals(tagList)))) {
+                continue;
+            }
+            filtered.add(this.items.get(i));
+        }
+        return filtered;
     }
 
     /**
@@ -526,7 +604,7 @@ public class ListActivity extends AppCompatActivity implements
      * @param comparator comparator to determine order of elements
      * @param <T> type of elements in list
      */
-    public static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
+    private static <T> void sort(ArrayList<T> list, Comparator<T> comparator) {
         Collections.sort(list, comparator);
     }
 
@@ -538,7 +616,7 @@ public class ListActivity extends AppCompatActivity implements
      * @param unsortedList ArrayList of items to be sorted
      * @param isAsc boolean true for ascending order and false for descending
      */
-    public void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
+    private void sortBy(String sortType, ArrayList<Item> unsortedList, boolean isAsc) {
         sort(unsortedList, new Comparator<Item>() {
             @Override
             public int compare(Item obj1, Item obj2) {
@@ -546,13 +624,24 @@ public class ListActivity extends AppCompatActivity implements
                 if (Objects.equals(sortType, "Date")) {
                     result = obj1.getDate().compareTo(obj2.getDate());
                 } else if (Objects.equals(sortType, "Desc")) {
-                    result = obj1.getDescription().compareTo(obj2.getDescription());
+                    result = -1*obj1.getDescription().compareTo(obj2.getDescription());
                 } else if (Objects.equals(sortType, "Make")) {
-                    result = obj1.getMake().compareTo(obj2.getMake());
+                    result = -1*obj1.getMake().compareTo(obj2.getMake());
                 } else if (Objects.equals(sortType, "Value")) {
                     result = obj1.getValue().compareTo(obj2.getValue());
                 } else if (Objects.equals(sortType, "Tags")) {
-                    result = obj1.getTags().get(0).getTagName().compareTo(obj2.getTags().get(0).getTagName());
+                    // Empty tag lists
+                    if (obj1.getTags().isEmpty()) {
+                        result = -1;
+                    } else if (obj2.getTags().isEmpty()) {
+                        result = 1;
+                    } else {
+//                        if (!isAsc) {
+                            result = -1*obj1.getTags().get(0).getTagName().compareTo(obj2.getTags().get(0).getTagName());
+//                        } else {
+//                            result = obj1.getTags().get(obj1.getTags().size()-1).getTagName().compareTo(obj2.getTags().get(obj2.getTags().size()-1).getTagName());
+//                        }
+                    }
                 } else {
                     result = 0;
                 }
@@ -560,6 +649,17 @@ public class ListActivity extends AppCompatActivity implements
                 return isAsc ? result : -result;
             }
         });
+    }
+
+    /**
+     * If the list is filtered, remove the filters and notify user.
+     */
+    private void removeFilters() {
+        if (this.itemList.getAdapter() != this.itemListAdapter) {
+            this.itemList.setAdapter(this.itemListAdapter);
+            this.setSumOfItemCosts();
+            Toast.makeText(this, "Filters and Sorting Removed", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

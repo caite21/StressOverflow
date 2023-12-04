@@ -1,12 +1,17 @@
 package com.example.StressOverflow.Image;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +24,8 @@ import android.widget.GridView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import java.io.IOException;
@@ -29,12 +36,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.StressOverflow.Item.Item;
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Util;
 
 
 /**
@@ -130,8 +138,8 @@ public class AddImagesFragment extends DialogFragment  {
             }
         });
 
-        final Button iconButton = view.findViewById(R.id.icon_button);
-        iconButton.setOnClickListener(new View.OnClickListener() {
+        final Button firstButton = view.findViewById(R.id.move_to_first_button);
+        firstButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (clickedImage != null) {
@@ -165,6 +173,7 @@ public class AddImagesFragment extends DialogFragment  {
                         if (data == null) return;
 
                         if (data.getClipData() != null) {
+                            Util.showShortToast(getContext(), "Ying: Got mult Uri from library");
                             // Pictures selected from library
                             int itemCount = data.getClipData().getItemCount();
                             for (int i = 0; i < itemCount; i++) {
@@ -172,19 +181,32 @@ public class AddImagesFragment extends DialogFragment  {
                                 Bitmap selectedBitmap = getBitmapFromUri(image);
                                 imagesList.add(new Image(selectedBitmap));
                             }
+                            imageAdapter.notifyDataSetChanged();
                         } else if (data.getData() != null) {
+                            Util.showShortToast(getContext(), "Ying: Got 1 Uri from library");
                             // Picture selected from library
                             Uri image = data.getData();
                             Bitmap selectedBitmap = getBitmapFromUri(image);
                             imagesList.add(new Image(selectedBitmap));
-                        } else {
+                            imageAdapter.notifyDataSetChanged();
+                        } else if (imageUri != null) {
+                            Util.showShortToast(getContext(), "Ying: Got Uri type from camera");
                             // Image captured with camera
                             Bitmap selectedBitmap = getBitmapFromUri(imageUri);
                             imagesList.add(new Image(selectedBitmap));
+                            imageAdapter.notifyDataSetChanged();
+                        } else if (data.getExtras() != null) {
+                            Util.showShortToast(getContext(), "Ying: thumbnail method");
+                            // Failed to write image captured with camera, but can still save it
+                            Bitmap capturedBitmap = (Bitmap) data.getExtras().get("data");
+                            imagesList.add(new Image(capturedBitmap));
+                            imageAdapter.notifyDataSetChanged();
+                        } else {
+                            Util.showShortToast(getContext(), "Image Error: result is null");
                         }
 
                         // display image(s)
-                        imageAdapter.notifyDataSetChanged();
+//                        imageAdapter.notifyDataSetChanged();
                     }
                 });
 
@@ -203,19 +225,25 @@ public class AddImagesFragment extends DialogFragment  {
 
     /**
      * A pop-up that gives the options of adding images by taking a picture with the
-     * camera or selecting pictures from the library
+     * camera or selecting pictures from the library. Also asks for camera permission
+     * if necessary.
      */
     private void openImageChooser() {
+        // ask for camera permission
+        final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+
         // Intent to capture a photo
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         // Image details for saving
-        String fileName = "image.jpg";
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, fileName);
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Image taken with camera");
-        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+//        String fileName = "image.jpg";
+//        ContentValues values = new ContentValues();
+//        values.put(MediaStore.Images.Media.TITLE, fileName);
+//        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+//        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         // Intent to pick photo(s)
         Intent pickPicturesIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -225,7 +253,7 @@ public class AddImagesFragment extends DialogFragment  {
         // Intent to choose which intent
         Intent chooser = new Intent(Intent.ACTION_CHOOSER);
         chooser.putExtra(Intent.EXTRA_INTENT, pickPicturesIntent);
-        chooser.putExtra(Intent.EXTRA_TITLE, "Choose images or take a picture");
+        chooser.putExtra(Intent.EXTRA_TITLE, "Select images or take a picture");
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePictureIntent});
         addPicturesLauncher.launch(chooser);
     }
@@ -238,12 +266,54 @@ public class AddImagesFragment extends DialogFragment  {
      */
     private Bitmap getBitmapFromUri(Uri uri) {
         try {
-            InputStream inputStream = contentResolver.openInputStream(uri);
-            return BitmapFactory.decodeStream(inputStream);
+//            InputStream inputStream = contentResolver.openInputStream(uri);
+//            return BitmapFactory.decodeStream(inputStream);
+
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri);
+            Bitmap rotatedBitmap = ExifRotateBitmap(contentResolver, uri, bitmap);
+
+//            Matrix matrix = new Matrix();
+//            matrix.postRotate(90);
+//            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            return rotatedBitmap;
         } catch (IOException e) {
-            Log.d("IMAGES", "Converting picture to bitmap failed: ", e);
+            Log.d("IMAGES", "Converting picture to bitmap failed");
+            Util.showShortToast(getContext(), "Image Error: Converting picture to bitmap failed or rotation failed.");
             return null;
         }
+    }
+
+    private Bitmap ExifRotateBitmap(ContentResolver contentResolver, Uri uri, Bitmap bitmap) throws IOException {
+        if (bitmap == null)
+            return null;
+
+        InputStream inputStream = contentResolver.openInputStream(uri);
+        ExifInterface ei = new ExifInterface(inputStream);
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        float rotationInDegrees = exifToDegrees(orientation);
+        if (rotationInDegrees == 0) {
+            return bitmap;
+        }
+
+        Matrix matrix = new Matrix();
+        matrix.preRotate(rotationInDegrees);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+
+    }
+
+    /**
+     * Gets the Amount of Degress of rotation using the exif integer to determine how much
+     * we should rotate the image. This is from:
+     * https://stackoverflow.com/questions/29971319/image-orientation-android
+     * @param exifOrientation - the Exif data for Image Orientation
+     * @return - how much to rotate in degress
+     */
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        return 0;
     }
 
 }

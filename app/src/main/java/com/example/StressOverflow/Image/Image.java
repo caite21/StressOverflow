@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.example.StressOverflow.R;
+import com.example.StressOverflow.Util;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -26,11 +27,10 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 /**
- * Represents an image which is displayed and stored using a Bitmap
- * and an id
+ * Represents an image which can be displayed with a bitmap
+ * or a download URL
  */
 public class Image {
-    private UUID id;
     private Bitmap bitmap;
     private String URL;
 
@@ -41,6 +41,7 @@ public class Image {
      */
     public Image(Bitmap bitmap) {
         this.bitmap = bitmap;
+        this.URL = null;
     }
 
     /**
@@ -49,6 +50,7 @@ public class Image {
      */
     public Image(String URL) {
         this.URL = URL;
+        this.bitmap = null;
     }
 
     /**
@@ -80,22 +82,6 @@ public class Image {
      */
     public void setURL(String URL) {
         this.URL = URL;
-    }
-
-    /**
-     * Get id
-     * @return id of image
-     */
-    public UUID getId() {
-        return id;
-    }
-
-    /**
-     * Set id of image
-     * @param id of image
-     */
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     /**
@@ -174,14 +160,17 @@ public class Image {
 
         // Upload each Bitmap to Storage and get URL
         for (Image image : pictures) {
+
             if (image.getURL() != null) {
                 // already uploaded
-                downloadURLs.add(image.getURL());
+                String url = new String(image.getURL());
+                downloadURLs.add(url);
                 insert_index++;
             }
             else {
                 Bitmap bitmap = image.getBitmap();
                 int copy_index = 0 + insert_index; // trust me, do not change this
+                insert_index++;
                 uploadBitmapToStorage(bitmap, copy_index, new OnImageUploadedListener() {
                     @Override
                     public void onImageUploaded(String downloadUrl, int index) {
