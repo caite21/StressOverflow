@@ -51,7 +51,7 @@ import java.util.UUID;
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TestBarcodeLookup {
+public class BarcodeLookupTest {
     private CollectionReference tagsRef;
     private FirebaseFirestore firestore;
     private String testTagName;
@@ -112,7 +112,7 @@ public class TestBarcodeLookup {
      * Forcefully deletes items. For use when test crashes app and
      * clean up fails
      */
-    @Ignore("For forcefully cleaning up")
+    @Ignore("For forced cleaning up")
     public void deleteItems() {
         int listViewId = R.id.activity__item__list__item__list;
         SystemClock.sleep(4000);

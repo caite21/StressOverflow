@@ -233,6 +233,7 @@ public class AddImagesFragment extends DialogFragment  {
         final int CAMERA_PERMISSION_REQUEST_CODE = 100;
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+            return;
         }
 
         // Intent to capture a photo
