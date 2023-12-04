@@ -61,9 +61,9 @@ public class TagItemTest {
         ArrayList<String> images = new ArrayList<>();
 
         //Add a tag first
-        testTags.add(new Tag("testTag1"));
-        item = new Item("deleteItemTest","make","model","description", new GregorianCalendar(),77.00, "Comments",testTags,images,
-                123456, AppGlobals.getInstance().getOwnerName());
+//        testTags.add(new Tag("testTag1"));
+//        item = new Item("deleteItemTest","make","model","description", new GregorianCalendar(),77.00, "Comments",testTags,images,
+//                123456, AppGlobals.getInstance().getOwnerName());
         firestore.collection("items").document(item.getId().toString())
                 .set(item.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {

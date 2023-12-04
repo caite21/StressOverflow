@@ -14,7 +14,7 @@
         android:layout_height="74dp"
         android:layout_marginStart="20dp"
         android:ems="10"
-        android:hint="Enter Tag"
+        android:hint="@string/fragment_add_tag_hint"
         android:inputType="text"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
