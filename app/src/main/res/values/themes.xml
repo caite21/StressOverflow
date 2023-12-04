@@ -22,4 +22,12 @@
         <item name="android:minHeight">48dp</item>
     </style>
 
+    <style name="Widget.App.ButtonStyle"
+        parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/button_active</item>
+    </style>
+    <style name="button_active">
+        <item name="colorPrimary">@color/sagi</item>
+    </style>
+
 </resources>

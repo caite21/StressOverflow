@@ -36,7 +36,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/icon_button"
+        android:id="@+id/move_to_first_button"
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_margin="12dp"
