@@ -62,7 +62,7 @@ public class AddImagesTest {
         pictureURLs.add("https://firebasestorage.googleapis.com/v0/b/stressoverflow.appspot.com/o/images%2Fimage_1701480005690.jpg?alt=media&token=400b81e3-97da-4c1f-b1e0-98cceb4d3b62");
         item = new Item("testItem","make","model","description",
                 new GregorianCalendar(),10.0, "Comments",testTags,pictureURLs,
-                123456L, AppGlobals.getInstance().getOwnerName());
+                "123456", AppGlobals.getInstance().getOwnerName());
 
         firestore.collection("items").document(item.getId().toString())
                 .set(item.toFirebaseObject())

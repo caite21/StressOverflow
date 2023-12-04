@@ -62,20 +62,23 @@ public class TestBarcodeLookup {
             new ActivityScenarioRule<ListActivity>(ListActivity.class);
 
 
+    /**
+     * Create and add dummy item
+     */
     @Before
     public void setUp() {
         firestore = FirebaseFirestore.getInstance();
         AppGlobals.getInstance().setOwnerName("testUser");
-
 
         ArrayList<Tag> testTags = new ArrayList<>();
         ArrayList<String> pictureURLs = new ArrayList<>();
         pictureURLs.add("https://firebasestorage.googleapis.com/v0/b/stressoverflow.appspot.com/o/images%2Fimage_1701480005690.jpg?alt=media&token=400b81e3-97da-4c1f-b1e0-98cceb4d3b62");
         item = new Item("testItem","make","model","description",
                 new GregorianCalendar(),10.0, "Comments",testTags,pictureURLs,
-                123456L, AppGlobals.getInstance().getOwnerName());
+                "123456", AppGlobals.getInstance().getOwnerName());
 
-        firestore.collection("items").document(item.getId().toString())
+        firestore.collection("items")
+                .document(item.getId().toString())
                 .set(item.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -84,9 +87,11 @@ public class TestBarcodeLookup {
                         throw new RuntimeException("Error with item insertion into collection items: ", e);
                     }
                 });
-
     }
 
+    /**
+     * Delete dummy item
+     */
     @After
     public void cleanUp(){
         UUID uuid = item.getId();
@@ -100,26 +105,55 @@ public class TestBarcodeLookup {
                         throw new RuntimeException("Error with item insertion into collection items: ", e);
                     }
                 });
-
+        SystemClock.sleep(2000);
     }
 
+    /**
+     * Forcefully deletes items. For use when test crashes app and
+     * clean up fails
+     */
+    @Ignore("For forcefully cleaning up")
+    public void deleteItems() {
+        int listViewId = R.id.activity__item__list__item__list;
+        SystemClock.sleep(4000);
+
+        // delete 1
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(1)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(longClick());
+        SystemClock.sleep(1000);
+
+//         delete 2
+        onData(Matchers.anything())
+                .inAdapterView(withId(listViewId))
+                .atPosition(2)
+                .onChildView(withId(R.id.listview__item__title))
+                .perform(longClick());
+        SystemClock.sleep(1000);
+
+        SystemClock.sleep(5000);
+        onView(ViewMatchers.withId(R.id.activity__item__list__remove__item__button)).perform(click());
+        SystemClock.sleep(2000);
+    }
 
 
     /**
      * Add an item with a serial number: 12345 and check that it does not
      * receive a description, and check that the description is unchanged
      */
-    @Ignore
+    @Test
     public void testInvalidBarcode() {
-        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
-
         SystemClock.sleep(2000);
+        onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
+        SystemClock.sleep(3000);
+
         onView(withId(R.id.add__item__fragment__edit__serial)).
                 perform(scrollTo());
         onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
         onView(withId(R.id.add__item__fragment__edit__serial)).
                 perform(ViewActions.typeText("12345"));
-
         SystemClock.sleep(2000);
         onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
         onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
@@ -128,6 +162,10 @@ public class TestBarcodeLookup {
         onView(withSubstring("Description:")).check(doesNotExist());
         onView(withSubstring("Earl Grey")).check(doesNotExist());
         onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withText("")));
+
+        SystemClock.sleep(2000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(3000);
     }
 
     /**
@@ -159,6 +197,10 @@ public class TestBarcodeLookup {
         onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withSubstring("Earl Grey")));
         onView(withId(R.id.add__item__fragment__edit__make)).check(ViewAssertions.matches(withText("")));
         onView(withId(R.id.add__item__fragment__edit__model)).check(ViewAssertions.matches(withText("")));
+
+        SystemClock.sleep(2000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(2000);
     }
 
     /**
@@ -197,11 +239,10 @@ public class TestBarcodeLookup {
         onView(withSubstring("USE SELECTED")).perform(click());
         SystemClock.sleep(2000);
         onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withSubstring("Earl Grey")));
+
+        SystemClock.sleep(2000);
+        onView(withSubstring("Cancel")).perform(click());
+        SystemClock.sleep(2000);
     }
 
-
-    /**
-     * Add an item with a serial number: 12345 and check that it does not
-     * receive a description, and check that the description is unchanged
-     */
 }

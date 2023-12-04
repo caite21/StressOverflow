@@ -431,7 +431,7 @@ public class Item {
                     (String) data.get("comments"),
                     tags,
                     pictureURLs,
-                    (String) data.get("serial"),
+                    data.get("serial").toString(),
                     (String) data.get("owner")
             );
             return out;
