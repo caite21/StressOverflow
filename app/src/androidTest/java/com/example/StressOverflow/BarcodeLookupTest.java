@@ -115,7 +115,7 @@ public class BarcodeLookupTest {
      */
     @Ignore("For forced cleaning up")
     public void deleteItems() {
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(4000);
 
         // delete 1
@@ -135,7 +135,7 @@ public class BarcodeLookupTest {
         SystemClock.sleep(1000);
 
         SystemClock.sleep(5000);
-        onView(ViewMatchers.withId(R.id.activity__item__list__remove__item__button)).perform(click());
+        onView(ViewMatchers.withId(R.id.activity_item_list_remove_item_button)).perform(click());
         SystemClock.sleep(2000);
     }
 
@@ -149,19 +149,19 @@ public class BarcodeLookupTest {
         onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
         SystemClock.sleep(3000);
 
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(ViewActions.typeText("12345"));
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_edit_serial)).perform(closeSoftKeyboard());
         onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
 
         SystemClock.sleep(7000);
         onView(withSubstring("Description:")).check(doesNotExist());
         onView(withSubstring("Earl Grey")).check(doesNotExist());
-        onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withText("")));
+        onView(withId(R.id.add_item_fragment_edit_description)).check(matches(withText("")));
 
         SystemClock.sleep(2000);
         onView(withSubstring("Cancel")).perform(click());
@@ -179,13 +179,13 @@ public class BarcodeLookupTest {
     public void testDescriptionFoundFromAddItem() {
         onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(ViewActions.typeText("077652082272"));
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_edit_serial)).perform(closeSoftKeyboard());
         onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
 
         // wait for lookup result
@@ -194,9 +194,9 @@ public class BarcodeLookupTest {
         SystemClock.sleep(2000);
         onView(withSubstring("USE SELECTED")).perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withSubstring("Earl Grey")));
-        onView(withId(R.id.add__item__fragment__edit__make)).check(ViewAssertions.matches(withText("")));
-        onView(withId(R.id.add__item__fragment__edit__model)).check(ViewAssertions.matches(withText("")));
+        onView(withId(R.id.add_item_fragment_edit_description)).check(matches(withSubstring("Earl Grey")));
+        onView(withId(R.id.add_item_fragment_edit_make)).check(ViewAssertions.matches(withText("")));
+        onView(withId(R.id.add_item_fragment_edit_model)).check(ViewAssertions.matches(withText("")));
 
         SystemClock.sleep(2000);
         onView(withSubstring("Cancel")).perform(click());
@@ -211,7 +211,7 @@ public class BarcodeLookupTest {
      */
     @Test
     public void testDescriptionFoundFromEditItem() {
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(3000);
         onData(Matchers.anything())
                 .inAdapterView(withId(listViewId))
@@ -220,25 +220,25 @@ public class BarcodeLookupTest {
                 .perform(click());
 
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_edit_serial)).perform(closeSoftKeyboard());
 
         // clear serial number
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(ViewActions.clearText());
-        onView(withId(R.id.add__item__fragment__edit__serial)).
+        onView(withId(R.id.add_item_fragment_edit_serial)).
                 perform(ViewActions.typeText("077652082272"));
 
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__serial)).perform(closeSoftKeyboard());
+        onView(withId(R.id.add_item_fragment_edit_serial)).perform(closeSoftKeyboard());
         onView(withId(R.id.add_item_fragment_button_lookup)).perform(click());
         SystemClock.sleep(4000);
         onView(withSubstring("Description:")).perform(click());
         SystemClock.sleep(2000);
         onView(withSubstring("USE SELECTED")).perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__description)).check(matches(withSubstring("Earl Grey")));
+        onView(withId(R.id.add_item_fragment_edit_description)).check(matches(withSubstring("Earl Grey")));
 
         SystemClock.sleep(2000);
         onView(withSubstring("Cancel")).perform(click());

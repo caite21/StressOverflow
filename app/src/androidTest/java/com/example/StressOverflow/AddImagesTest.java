@@ -103,7 +103,7 @@ public class AddImagesTest {
 
     @Ignore("For forced cleaning up")
     public void deleteItems() {
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(4000);
 
         for (int i=0; i<6; i++) {
@@ -113,7 +113,7 @@ public class AddImagesTest {
                     .onChildView(withId(R.id.listview__item__title))
                     .perform(longClick());
             SystemClock.sleep(2000);
-            onView(ViewMatchers.withId(R.id.activity__item__list__remove__item__button)).perform(click());
+            onView(ViewMatchers.withId(R.id.activity_item_list_remove_item_button)).perform(click());
             SystemClock.sleep(3000);
         }
 
@@ -128,7 +128,7 @@ public class AddImagesTest {
         setUp(1);
 
         // go to edit fragment for the item
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(3000);
         onData(anything())
                 .inAdapterView(withId(listViewId))
@@ -138,9 +138,9 @@ public class AddImagesTest {
         SystemClock.sleep(2000);
 
         // go to add pictures fragment
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(2000);
         assertEquals(1, item.getPictureURLs().size());
@@ -172,7 +172,7 @@ public class AddImagesTest {
         setUp(3);
 
         // go to edit fragment for the item
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(3000);
         onData(anything())
                 .inAdapterView(withId(listViewId))
@@ -182,9 +182,9 @@ public class AddImagesTest {
         SystemClock.sleep(2000);
 
         // go to add pictures fragment
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(2000);
         assertEquals(3, item.getPictureURLs().size());
@@ -215,7 +215,7 @@ public class AddImagesTest {
     public void deleteImageFromItem(){
         setUp(2);
         // view item's pics
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(3000);
         onData(anything())
                 .inAdapterView(withId(listViewId))
@@ -223,9 +223,9 @@ public class AddImagesTest {
                 .onChildView(withId(R.id.listview__item__title))
                 .perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(2000);
 
@@ -241,9 +241,9 @@ public class AddImagesTest {
         // check fragment saved
         onView(withSubstring("OK")).perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(3000);
 
@@ -261,9 +261,9 @@ public class AddImagesTest {
                 .perform(click());
         SystemClock.sleep(2000);
         // go to add pictures fragment
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(3000);
 
@@ -303,7 +303,7 @@ public class AddImagesTest {
     public void deleteAllImagesFromItem(){
         setUp(3);
         // view item's pics
-        int listViewId = R.id.activity__item__list__item__list;
+        int listViewId = R.id.activity_item_list_item_list;
         SystemClock.sleep(3000);
         onData(anything())
                 .inAdapterView(withId(listViewId))
@@ -311,9 +311,9 @@ public class AddImagesTest {
                 .onChildView(withId(R.id.listview__item__title))
                 .perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(2000);
 
@@ -343,9 +343,9 @@ public class AddImagesTest {
         // check fragment saved
         onView(withSubstring("OK")).perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the (no) images here
         SystemClock.sleep(3000);
 
@@ -363,9 +363,9 @@ public class AddImagesTest {
                 .perform(click());
         SystemClock.sleep(2000);
         // go to add pictures fragment
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         // you'll see the images here
         SystemClock.sleep(3000);
         boolean isFailure = false;
@@ -396,9 +396,9 @@ public class AddImagesTest {
         SystemClock.sleep(2000);
         onView(withId(R.id.activity_item_list_add_item_button)).perform(click());
         SystemClock.sleep(2000);
-        onView(withId(R.id.add__item__fragment__edit__pictures)).
+        onView(withId(R.id.add_item_fragment_edit_pictures)).
                 perform(scrollTo());
-        onView(withId(R.id.add__item__fragment__edit__pictures)).perform(click());
+        onView(withId(R.id.add_item_fragment_edit_pictures)).perform(click());
         SystemClock.sleep(2000);
 
         onView(withId(R.id.add_image_button)).perform(click());

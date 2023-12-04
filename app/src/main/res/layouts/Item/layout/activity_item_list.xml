@@ -8,7 +8,7 @@
 
     android:orientation="vertical">
     <ListView
-        android:id="@+id/activity__item__list__item__list"
+        android:id="@+id/activity_item_list_item_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="70dp" >
@@ -35,7 +35,7 @@
                 app:backgroundTint="@null" />
 
             <Button
-                android:id="@+id/activity__item__list__filter__item__button"
+                android:id="@+id/activity_item_list_filter_item_button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -74,7 +74,7 @@
         app:srcCompat="@drawable/log_out" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/activity__item__list__add__tag__button"
+        android:id="@+id/activity_item_list_add_tag_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -85,7 +85,7 @@
         app:srcCompat="@android:drawable/btn_star" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/activity__item__list__remove__item__button"
+        android:id="@+id/activity_item_list_remove_item_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
@@ -96,7 +96,7 @@
         app:srcCompat="@android:drawable/ic_delete" />
 
     <TextView
-        android:id="@+id/activity__item__list__cost__sum__text"
+        android:id="@+id/activity_item_list_cost_sum_text"
         android:layout_width="160dp"
         android:layout_height="56dp"
         android:layout_gravity="bottom|center"

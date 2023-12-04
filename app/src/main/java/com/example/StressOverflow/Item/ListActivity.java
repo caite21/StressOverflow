@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.StressOverflow.Image.AddImagesFragment;
 import com.example.StressOverflow.SignIn.SignInActivity;
 import com.example.StressOverflow.Tag.AddTagToItemFragment;
-import com.example.StressOverflow.Item.FilterItemsFragment;
 import com.example.StressOverflow.AppGlobals;
 import com.example.StressOverflow.Image.Image;
 import com.example.StressOverflow.R;
@@ -93,12 +92,12 @@ public class ListActivity extends AppCompatActivity implements
         this.itemRef = this.db.collection("items");
         setContentView(R.layout.activity_item_list);
 
-        this.itemList = findViewById(R.id.activity__item__list__item__list);
+        this.itemList = findViewById(R.id.activity_item_list_item_list);
         this.editButton = findViewById(R.id.activity_item_list_add_item_button);
-        this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
-        this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
-        this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
-        this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
+        this.filterButton = findViewById(R.id.activity_item_list_filter_item_button);
+        this.deleteItemButton = findViewById(R.id.activity_item_list_remove_item_button);
+        this.addTagButton = findViewById(R.id.activity_item_list_add_tag_button);
+        this.sumOfItemCosts = findViewById(R.id.activity_item_list_cost_sum_text);
         this.showTagListButton = findViewById(R.id.showTagList_button);
         this.logoutButton = findViewById(R.id.logoutButton);
         this.addTagButton.setOnClickListener(openTagFragment);
