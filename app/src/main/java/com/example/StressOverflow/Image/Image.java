@@ -27,11 +27,10 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 /**
- * Represents an image which is displayed and stored using a Bitmap
- * and an id
+ * Represents an image which can be displayed with a bitmap
+ * or a download URL
  */
 public class Image {
-    private UUID id;
     private Bitmap bitmap;
     private String URL;
 
@@ -42,6 +41,7 @@ public class Image {
      */
     public Image(Bitmap bitmap) {
         this.bitmap = bitmap;
+        this.URL = null;
     }
 
     /**
@@ -50,6 +50,7 @@ public class Image {
      */
     public Image(String URL) {
         this.URL = URL;
+        this.bitmap = null;
     }
 
     /**
@@ -81,22 +82,6 @@ public class Image {
      */
     public void setURL(String URL) {
         this.URL = URL;
-    }
-
-    /**
-     * Get id
-     * @return id of image
-     */
-    public UUID getId() {
-        return id;
-    }
-
-    /**
-     * Set id of image
-     * @param id of image
-     */
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     /**
