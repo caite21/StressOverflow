@@ -97,12 +97,12 @@ public class ListActivity extends AppCompatActivity implements
         this.ownerName =  AppGlobals.getInstance().getOwnerName();
 
         //initialize views
-        this.itemList = findViewById(R.id.activity__item__list__item__list);
-        this.editButton = findViewById(R.id.activity__item__list__edit__item__button);
-        this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
-        this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
-        this.addTagButton = findViewById(R.id.activity__item__list__add__tag__button);
-        this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
+        this.itemList = findViewById(R.id.activity_item_list_item_list);
+        this.editButton = findViewById(R.id.activity_item_list_add_item_button);
+        this.filterButton = findViewById(R.id.activity_item_list_filter_item_button);
+        this.deleteItemButton = findViewById(R.id.activity_item_list_remove_item_button);
+        this.addTagButton = findViewById(R.id.activity_item_list_add_tag_button);
+        this.sumOfItemCosts = findViewById(R.id.activity_item_list_cost_sum_text);
         this.showTagListButton = findViewById(R.id.activity_item_list_show_tags_button);
 
         this.logoutButton = findViewById(R.id.logoutButton);

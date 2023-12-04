@@ -68,7 +68,6 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
-
         <entry key="-795662791">
           <value>
             <AndroidTestResultsTableState>
@@ -160,6 +159,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-154885237">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G960W" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-108239508">
           <value>
             <AndroidTestResultsTableState>
@@ -233,6 +245,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_2_API_34" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G960W" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -246,6 +259,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_2_API_34" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G960W" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
