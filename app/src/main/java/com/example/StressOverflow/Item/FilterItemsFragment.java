@@ -157,6 +157,10 @@ public class FilterItemsFragment extends DialogFragment {
             }).create();
     }
 
+    /**
+     * Changes the background and text color, as well as radius, to match rest of application.
+     * @param chip chip to change layout of
+     */
     private void format_chips(Chip chip) {
         chip.setChipBackgroundColorResource(R.color.sagi);
         chip.setTextColor(Color.WHITE);

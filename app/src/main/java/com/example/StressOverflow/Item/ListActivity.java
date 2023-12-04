@@ -92,7 +92,7 @@ public class ListActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_item_list);
 
         this.itemList = findViewById(R.id.activity__item__list__item__list);
-        this.editButton = findViewById(R.id.activity__item__list__edit__item__button);
+        this.editButton = findViewById(R.id.activity_item_list_add_item_button);
         this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
         this.addItemButton = findViewById(R.id.activity__item__list__add__item__button);
         this.deleteItemButton = findViewById(R.id.activity__item__list__remove__item__button);
@@ -194,6 +194,16 @@ public class ListActivity extends AppCompatActivity implements
                         Log.w(TAG, "Error with item addition on collection items: ", e);
                         throw new RuntimeException("Error with item update on collection items: ", e);
                     }
+
+                })
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        if (itemList.getAdapter() != items) {
+                            itemList.setAdapter(itemListAdapter);
+                        }
+                        itemListAdapter.notifyDataSetChanged();
+                    }
                 });
         this.removeFilters();
     }
@@ -241,7 +251,15 @@ public class ListActivity extends AppCompatActivity implements
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            // delete associated images from storage
+                            itemListAdapter.remove(item);
+
+                            if (itemList.getAdapter() != items) {
+                                itemList.setAdapter(itemListAdapter);
+                            }
+                            setSumOfItemCosts();
+                            itemListAdapter.notifyDataSetChanged();
+
+                            // delete associated images from storage (can be async)
                             for (String URL : item.getPictureURLs()) {
                                 Image.deletePictureFromStorage(URL);
                             }
@@ -267,6 +285,14 @@ public class ListActivity extends AppCompatActivity implements
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error with item update on collection items: ", e);
                             throw new RuntimeException("Error with item update on collection items: ", e);
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            if (itemList.getAdapter() != items) {
+                                itemList.setAdapter(itemListAdapter);
+                            }
+                            itemListAdapter.notifyDataSetChanged();
                         }
                     });
             this.removeFilters();
@@ -312,7 +338,7 @@ public class ListActivity extends AppCompatActivity implements
      */
     public void setSumOfItemCosts() {
         ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
-        this.sumOfItemCosts.setText(adapter.getTotalValue().toString());
+        this.sumOfItemCosts.setText(adapter.getTotalValue());
     }
 
     /**
@@ -384,9 +410,13 @@ public class ListActivity extends AppCompatActivity implements
                             Log.w(TAG, "Error with item update on collection items: ", e);
                             throw new RuntimeException("Error with item update on collection items: ", e);
                         }
-                    });
-
-            itemListAdapter.notifyDataSetChanged();
+                    }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            itemListAdapter.notifyDataSetChanged();
+                        }
+                    })
+            ;
         }
         exitSelectionMode();
 

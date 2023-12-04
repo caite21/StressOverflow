@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -55,8 +56,7 @@ public class EditItemFragment extends DialogFragment {
     private Button addTagButton;
     private Button refreshTagButton;
     private Button serialScanButton;
-    private Button descriptionScanButton;
-
+    ActivityResultLauncher<ScanOptions> serialLauncher;
     private OnFragmentInteractionListener listener;
     private Item selectedItem;
     private int pos;
@@ -77,6 +77,11 @@ public class EditItemFragment extends DialogFragment {
         } else {
             throw new RuntimeException("activity lacks implementation of OnFragmentInteractionListener");
         }
+        serialLauncher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                itemSerialField.setText(result.getContents());
+            }
+        });
     }
 
     @NonNull
@@ -100,7 +105,6 @@ public class EditItemFragment extends DialogFragment {
 
         itemPicturesButton = view.findViewById(R.id.add__item__fragment__edit__pictures);
         serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
-//        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
 
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
@@ -117,7 +121,7 @@ public class EditItemFragment extends DialogFragment {
         itemMonthField.setText(this.selectedItem.getDateMonth());
         itemDateField.setText(this.selectedItem.getDateDate());
         itemCommentsField.setText(this.selectedItem.getComments());
-        itemSerialField.setText(Long.toString(selectedItem.getSerial()));
+        itemSerialField.setText(selectedItem.getSerial());
 
         itemPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,39 +162,72 @@ public class EditItemFragment extends DialogFragment {
                 }
             }
         });
+//(dialog, which) -> {
+//                    selectedItem.refreshPictures();
+//                }
 
-//        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                scanForDescription();
-//            }
-//        });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-        return builder
+        final AlertDialog builder = new AlertDialog.Builder(getContext())
                 .setView(view)
                 .setTitle("Edit an item")
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    selectedItem.refreshPictures();
-                })
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("OK", null)
+                .create();
+        builder.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = ((AlertDialog) builder).getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                negativeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int i) {
+                    public void onClick(View view) {
+                        selectedItem.refreshPictures();
+                        builder.dismiss();
+                    }
+                });
+
+                positiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d("asd", "test");
+                        GregorianCalendar date;
+                        Double doubleValue;
+                        String value = itemValueField.getText().toString();
                         String title = itemTitleField.getText().toString();
                         String make = itemMakeField.getText().toString();
                         String model = itemModelField.getText().toString();
                         String desc = itemDescriptionField.getText().toString();
-                        ArrayList<Tag> newTags = new ArrayList<>();
-                        GregorianCalendar date = new GregorianCalendar(
-                                Integer.parseInt(itemYearField.getText().toString()),
-                                Integer.parseInt(itemMonthField.getText().toString()),
-                                Integer.parseInt(itemDateField.getText().toString())
-                        );
-                        Double value = Double.valueOf(itemValueField.getText().toString());
+                        try {
+                            Integer year = Integer.parseInt(itemYearField.getText().toString());
+                            Integer month = Integer.parseInt(itemMonthField.getText().toString());
+                            Integer day = Integer.parseInt(itemDateField.getText().toString());
+                            if (!Util.isDateValid(year, month, day)) {
+                                Util.showLongToast(getContext(), "You must enter a valid date!");
+                                return;
+                            }
+                            date = new GregorianCalendar(
+                                    year,
+                                    month - 1, // java months start at 0 with this object, really wholesome i think
+                                    day);
+                        } catch (NumberFormatException e) {
+                            Util.showLongToast(getContext(), "You must enter a valid date!");
+                            return;
+                        }
+                        try {
+                            if (value.equals("")) {
+                                doubleValue = null;
+                            } else {
+                                doubleValue = Double.parseDouble(value);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            Util.showLongToast(getContext(), "You must enter a valid value!");
+                            return;
+                        }
                         String comments = itemCommentsField.getText().toString();
-                        Long serial = Long.valueOf(itemSerialField.getText().toString());
-                        for (int chipID : tagChipGroup.getCheckedChipIds()){
+                        ArrayList<Tag> newTags = new ArrayList<>();
+                        String serial = itemSerialField.getText().toString();
+
+                        for (int chipID : tagChipGroup.getCheckedChipIds()) {
                             Chip newChip = tagChipGroup.findViewById(chipID);
                             newChip.setChipBackgroundColorResource(R.color.sagi);
                             newChip.setTextColor(Color.WHITE);
@@ -199,21 +236,19 @@ public class EditItemFragment extends DialogFragment {
                             newTags.add(newTag);
                         }
                         try {
-                            listener.onSubmitEdit(
-                                    pos,
-                                    new Item(
-                                        selectedItem.getId(),
-                                        title,
-                                        make,
-                                        model,
-                                        desc,
-                                        date,
-                                        value,
-                                        comments,
-                                        newTags,
-                                        selectedItem.getPictureURLs(),
-                                        serial,
-                                        selectedItem.getOwner()
+                            listener.onSubmitEdit(pos, new Item(
+                                    selectedItem.getId(),
+                                    title,
+                                    make,
+                                    model,
+                                    desc,
+                                    date,
+                                    doubleValue,
+                                    comments,
+                                    newTags,
+                                    selectedItem.getPictureURLs(),
+                                    serial,
+                                    selectedItem.getOwner()
                             ));
                         } catch (IllegalArgumentException e) {
                             Util.showLongToast(
@@ -226,8 +261,13 @@ public class EditItemFragment extends DialogFragment {
                                     String.format("An unexpected error occurred.")
                             );
                         }
+                        builder.dismiss();
                     }
-                }).create();
+                });
+            }
+        });
+        return builder;
+
     }
 
     /**
@@ -236,60 +276,8 @@ public class EditItemFragment extends DialogFragment {
     private void scanSerial() {
         ScanOptions o = new ScanOptions();
         o.setCaptureActivity(ScanSerialActivity.class);
-        ActivityResultLauncher<ScanOptions> launcher;
-        launcher = registerForActivityResult(new ScanContract(), result -> {
-            if (result.getContents() != null) {
-                itemSerialField.setText(result.getContents());
-            }
-        });
-        launcher.launch(o);
+        this.serialLauncher.launch(o);
     }
-
-//    /**
-//     * Prompts the user to scan a barcode. Sets the description according to the item found when
-//     * searching up the serial number online.
-//     */
-//    private void scanForDescription() {
-//        ScanOptions o = new ScanOptions();
-//        o.setCaptureActivity(ScanSerialActivity.class);
-//        ActivityResultLauncher<ScanOptions> launcher;
-//        launcher = registerForActivityResult(new ScanContract(), result -> {
-//            if (result.getContents() != null) {
-//                final boolean[] overwrite = {false};
-//                // result.getContents is the scanned serial number
-//                // logic for getting description from it goes here
-//
-//                // if there is already data in the field, ask user if it wants to be overwritten
-//                if (!itemDescriptionField.getText().toString().equals("")) {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                    builder.setTitle("Attention");
-//                    builder.setMessage("Overwrite existing description data?");
-//                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i)
-//                        {
-//                            overwrite[0] = true;
-//                            dialogInterface.dismiss();
-//                        }
-//                    });
-//                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            dialogInterface.dismiss();
-//                        }
-//                    });
-//                } else {
-//                    overwrite[0] = true;
-//                }
-//                if (overwrite[0]) {
-//                    // change this
-//                    itemDescriptionField.setText(result.getContents());
-//                }
-//            }
-//        });
-//    }
-
-
 
     /**
      * Add all the tags of the selected Item to the ChipGroup

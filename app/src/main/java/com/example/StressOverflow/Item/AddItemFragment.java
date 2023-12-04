@@ -54,9 +54,7 @@ public class AddItemFragment extends DialogFragment{
     private EditText itemCommentsField;
     private Button itemPicturesButton;
     private Button serialScanButton;
-    private Button descriptionScanButton;
     ActivityResultLauncher<ScanOptions> serialLauncher;
-    ActivityResultLauncher<ScanOptions> descriptionLauncher;
     private EditText itemSerialField;
     private ChipGroup tagChipGroup;
 
@@ -69,8 +67,6 @@ public class AddItemFragment extends DialogFragment{
     public AddItemFragment(String owner) {
         this.owner = owner;
     }
-
-
 
     public interface OnFragmentInteractionListener {
         void onSubmitAdd(Item item);
@@ -87,40 +83,6 @@ public class AddItemFragment extends DialogFragment{
         serialLauncher = registerForActivityResult(new ScanContract(), result -> {
             if (result.getContents() != null) {
                 itemSerialField.setText(result.getContents());
-            }
-        });
-        descriptionLauncher = registerForActivityResult(new ScanContract(), result -> {
-            if (result.getContents() != null) {
-                final boolean[] overwrite = {false};
-                // result.getContents is the scanned serial number
-                // logic for getting description from it goes here
-
-                // if there is already data in the field, ask user if it wants to be overwritten
-                if (!itemDescriptionField.getText().toString().equals("")) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Attention");
-                    builder.setMessage("Overwrite existing description data?");
-                    builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i)
-                        {
-                            overwrite[0] = true;
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
-                } else {
-                    overwrite[0] = true;
-                }
-                if (overwrite[0]) {
-                    // change this
-                    itemDescriptionField.setText(result.getContents());
-                }
             }
         });
     }
@@ -147,7 +109,6 @@ public class AddItemFragment extends DialogFragment{
         tagChipGroup = view.findViewById(R.id.add__item__fragment__chipGroup);
 
         serialScanButton = view.findViewById(R.id.add__item__fragment__button__serial);
-//        descriptionScanButton = view.findViewById(R.id.add__item__fragment__button__description);
 
         addTagButton = view.findViewById(R.id.add_item_fragment_add_tag_button);
         refreshTagButton = view.findViewById(R.id.add_item_fragment_refresh_tags_button);
@@ -195,31 +156,51 @@ public class AddItemFragment extends DialogFragment{
             }
         });
 
-//        descriptionScanButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                scanForDescription();
-//            }
-//        });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-        return builder
+        final AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(view)
                 .setTitle("Add an item")
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton("OK", null).create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int i) {
+                    public void onClick(View view) {
+                        GregorianCalendar date;
+                        Double doubleValue;
+                        String value = itemValueField.getText().toString();
                         String title = itemTitleField.getText().toString();
                         String make = itemMakeField.getText().toString();
                         String model = itemModelField.getText().toString();
                         String desc = itemDescriptionField.getText().toString();
-                        GregorianCalendar date = new GregorianCalendar(
-                                Integer.parseInt(itemYearField.getText().toString()),
-                                Integer.parseInt(itemMonthField.getText().toString()),
-                                Integer.parseInt(itemDateField.getText().toString()));
-                        Double value = Double.parseDouble(itemValueField.getText().toString());
+                        try {
+                            Integer year = Integer.parseInt(itemYearField.getText().toString());
+                            Integer month = Integer.parseInt(itemMonthField.getText().toString());
+                            Integer day = Integer.parseInt(itemDateField.getText().toString());
+                            if (!Util.isDateValid(year, month, day)) {
+                                Util.showLongToast(getContext(), "You must enter a valid date!");
+                                return;
+                            }
+                            date = new GregorianCalendar(
+                                    year,
+                                    month,
+                                    day);
+                        } catch (NumberFormatException e) {
+                            Util.showLongToast(getContext(), "You must enter a valid date!");
+                            return;
+                        }
+                        try {
+                            if (value.equals("")) {
+                                doubleValue = null;
+                            } else {
+                                doubleValue = Double.parseDouble(value);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            Util.showLongToast(getContext(), "You must enter a valid value!");
+                            return;
+                        }
                         String comments = itemCommentsField.getText().toString();
                         ArrayList<Tag> newTags = new ArrayList<>();
                         ArrayList<String> emptyPictureURLs = new ArrayList<>();
@@ -240,11 +221,11 @@ public class AddItemFragment extends DialogFragment{
                                     model,
                                     desc,
                                     date,
-                                    value,
+                                    doubleValue,
                                     comments,
                                     newTags,
                                     emptyPictureURLs,
-                                    Long.valueOf(serial),
+                                    serial,
                                     owner
                             ));
                         } catch (IllegalArgumentException e) {
@@ -258,8 +239,13 @@ public class AddItemFragment extends DialogFragment{
                                     String.format("An unexpected error occurred.")
                             );
                         }
+                        dialog.dismiss();
                     }
-                }).create();
+                });
+            }
+        });
+
+        return dialog;
     }
 
     /**
@@ -270,16 +256,6 @@ public class AddItemFragment extends DialogFragment{
         o.setCaptureActivity(ScanSerialActivity.class);
         serialLauncher.launch(o);
     }
-
-//    /**
-//     * Prompts the user to scan a barcode. Sets the description according to the item found when
-//     * searching up the serial number online.
-//     */
-//    private void scanForDescription() {
-//        ScanOptions o = new ScanOptions();
-//        o.setCaptureActivity(ScanSerialActivity.class);
-//        descriptionLauncher.launch(o);
-//    }
 
     /**
      * Adds all the tags to the chipGroup

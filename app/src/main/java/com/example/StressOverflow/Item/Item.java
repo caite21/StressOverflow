@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import kotlin.NotImplementedError;
@@ -40,7 +41,7 @@ public class Item {
     private ArrayList<Tag> tags = new ArrayList<Tag>();
     private ArrayList<String> pictureURLs = new ArrayList<>();
     private ArrayList<Image> pictures = new ArrayList<>();
-    private Long serial;
+    private String serial;
     private String owner;
 
     public Item() {}
@@ -55,7 +56,7 @@ public class Item {
             String comments,
             ArrayList<Tag> tags,
             ArrayList<String> pictureURLs,
-            Long serial,
+            String serial,
             String owner
     ) {
         this.id = UUID.randomUUID();
@@ -83,7 +84,7 @@ public class Item {
             String comments,
             ArrayList<Tag> tags,
             ArrayList<String> pictureURLs,
-            Long serial,
+            String serial,
             String owner
     ) {
         this.id = uuid;
@@ -101,9 +102,7 @@ public class Item {
     }
 
     public void setName(String name) throws IllegalArgumentException {
-        if (name.equals("")) {
-            throw new IllegalArgumentException("empty name not allowed");
-        } else if (name.length() > Util.MAX_ITEM_NAME_LENGTH) {
+        if (name.length() > Util.MAX_ITEM_NAME_LENGTH) {
             throw new IllegalArgumentException(String.format("name exceeds maximum name length (%d)", Util.MAX_ITEM_NAME_LENGTH));
         }
         this.name = name;
@@ -113,6 +112,9 @@ public class Item {
         return this.id;
     }
     public String getName() {
+        if (Objects.equals(this.name, "")) {
+            return "Untitled item";
+        }
         return this.name;
     }
 
@@ -166,7 +168,7 @@ public class Item {
     public String getDateAsString() {
         return String.format("%s/%s/%s",
                 this.getDate().get(Calendar.YEAR),
-                this.getDate().get(Calendar.MONTH) + 1,
+                this.getDate().get(Calendar.MONTH),
                 this.getDate().get(Calendar.DATE)
         );
     }
@@ -176,7 +178,7 @@ public class Item {
     }
 
     public String getDateMonth() {
-        return String.format("%s", this.getDate().get(Calendar.MONTH) + 1);
+        return String.format("%s", this.getDate().get(Calendar.MONTH));
     }
 
     public String getDateDate() {
@@ -203,7 +205,7 @@ public class Item {
         return pictureURLs;
     }
 
-    public Long getSerial() {
+    public String getSerial() {
         return this.serial;
     }
 
@@ -228,6 +230,13 @@ public class Item {
             return 0.0d;
         }
         return this.value;
+    }
+
+    public String getValueAsString() {
+        if (this.value == null) {
+            return "No value";
+        }
+        return String.format("$%.2f", this.value);
     }
 
     public String getComments() {
@@ -310,6 +319,9 @@ public class Item {
     }
 
     public void setValue(Double value) throws IllegalArgumentException {
+        if (value == null) {
+            value = 0.0d;
+        }
         if (value < 0.0d) {
             throw new IllegalArgumentException(String.format("negative value not allowed for item %s", this.getName()));
         }
@@ -348,7 +360,7 @@ public class Item {
         this.tags.removeAll(tags);
     }
 
-    public void setSerial(Long serial) {
+    public void setSerial(String serial) {
         this.serial = serial;
     }
 
@@ -419,7 +431,7 @@ public class Item {
                     (String) data.get("comments"),
                     tags,
                     pictureURLs,
-                    ((Long) data.get("serial")).longValue(),
+                    data.get("serial").toString(),
                     (String) data.get("owner")
             );
             return out;

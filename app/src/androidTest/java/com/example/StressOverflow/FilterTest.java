@@ -120,7 +120,7 @@ public class FilterTest {
         tagList.add(tag1);
         item1 = new Item("Test1", "make", "model", "this is the first item",
             new GregorianCalendar(2023, 1, 1),5.00,
-            "Comments", tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
+            "Comments", tagList, images, "123456", AppGlobals.getInstance().getOwnerName());
         itemRef.document(item1.getId().toString())
             .set(item1.toFirebaseObject())
             .addOnFailureListener(new OnFailureListener() {
@@ -146,7 +146,7 @@ public class FilterTest {
 
         item2 = new Item("Test2", "make1", "model", "this is the second item",
             new GregorianCalendar(2022, 1, 1), 6.00, "Comments",
-                tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
+                tagList, images, "123456", AppGlobals.getInstance().getOwnerName());
         itemRef.document(item2.getId().toString())
             .set(item2.toFirebaseObject())
             .addOnFailureListener(new OnFailureListener() {
@@ -160,7 +160,7 @@ public class FilterTest {
         tagList.remove(tag1);
         item3 = new Item("Test3", "make2", "model", "this is the second add 1 and last item",
                 new GregorianCalendar(2001, 1, 1),7.00,
-                "Comments", tagList, images, 123456L, AppGlobals.getInstance().getOwnerName());
+                "Comments", tagList, images, "123456", AppGlobals.getInstance().getOwnerName());
         itemRef.document(item3.getId().toString())
                 .set(item3.toFirebaseObject())
                 .addOnFailureListener(new OnFailureListener() {
@@ -264,7 +264,7 @@ public class FilterTest {
             .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$13.00")));
     }
 
     /**
@@ -296,7 +296,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$13.00")));
     }
 
     /**
@@ -321,7 +321,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("7.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$7.00")));
     }
 
     /**
@@ -344,7 +344,7 @@ public class FilterTest {
             .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
             .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("5.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$5.00")));
     }
 
     /**
@@ -371,7 +371,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$13.00")));
     }
 
     /**
@@ -401,7 +401,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("6.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$6.00")));
     }
 
     /**
@@ -420,7 +420,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("5.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$5.00")));
     }
 
     /**
@@ -443,7 +443,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("11.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$11.00")));
     }
 
     /**
@@ -462,7 +462,7 @@ public class FilterTest {
                 .check(matches(isDisplayed()));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(1)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("6.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$6.00")));
     }
 
     /**
@@ -492,7 +492,7 @@ public class FilterTest {
                 .check(matches(withText("Test1")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -523,7 +523,7 @@ public class FilterTest {
                 .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -553,7 +553,7 @@ public class FilterTest {
                 .check(matches(withText("Test1")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -584,7 +584,7 @@ public class FilterTest {
                 .check(matches(withText("Test2")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -614,7 +614,7 @@ public class FilterTest {
                 .check(matches(withText("Test1")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -645,7 +645,7 @@ public class FilterTest {
                 .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -675,7 +675,7 @@ public class FilterTest {
                 .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -707,7 +707,7 @@ public class FilterTest {
                 .check(matches(withText("Test1")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -727,7 +727,7 @@ public class FilterTest {
                 .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -748,7 +748,7 @@ public class FilterTest {
                 .check(matches(withText("Test3")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -763,14 +763,14 @@ public class FilterTest {
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$13.00")));
 
         // un-filter
         onView(withId(R.id.activity__item__list__filter__item__button)).perform(click());
         onView(withText("Filter/Sort")).inRoot(isDialog()).perform(click());
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(3)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("18.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$18.00")));
     }
 
     /**
@@ -801,7 +801,7 @@ public class FilterTest {
                 .check(matches(withText("Test2")));
         onView(withId(R.id.activity__item__list__item__list))
                 .check(matches(withItemCount(2)));
-        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("13.0")));
+        onView(withId(R.id.activity__item__list__cost__sum__text)).check(matches(withText("$13.00")));
     }
 
     private static Matcher<Object> withItemText(String expectedText) {
