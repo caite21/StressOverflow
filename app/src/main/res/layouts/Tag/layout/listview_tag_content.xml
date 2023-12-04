@@ -15,10 +15,10 @@
             android:id="@+id/listview_tag_content_textView"
             android:layout_width="288dp"
             android:layout_height="56dp"
-            android:text="Tag"
-            android:textSize="34sp"
             android:paddingLeft="8sp"
-            android:textAlignment="center" />
+            android:text="@string/listview_tag_content"
+            android:textAlignment="center"
+            android:textSize="34sp" />
 
         <Button
             android:id="@+id/listview_delete_tag_button"

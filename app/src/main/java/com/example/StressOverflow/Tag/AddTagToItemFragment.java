@@ -85,7 +85,6 @@ public class AddTagToItemFragment extends DialogFragment{
 
         makeNewTag.setOnClickListener(openTagList);
         chipGroup = view.findViewById(R.id.fragment_add_tag_to_item_tag_chipGroup);
-
         allTags = AppGlobals.getInstance().getAllTags();
         addTagsToChipGroup();
         refreshTag.setOnClickListener(new View.OnClickListener() {

@@ -82,12 +82,17 @@ public class ListActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_item_list);
+
+        //initialize firebase
         mAuth = FirebaseAuth.getInstance();
         this.loginIntent = getIntent();
         this.db = FirebaseFirestore.getInstance();
         this.itemRef = this.db.collection("items");
-        setContentView(R.layout.activity_item_list);
+        this.tagRef = this.db.collection("tags");
+        this.ownerName =  AppGlobals.getInstance().getOwnerName();
 
+        //initialize views
         this.itemList = findViewById(R.id.activity__item__list__item__list);
         this.editButton = findViewById(R.id.activity__item__list__edit__item__button);
         this.filterButton = findViewById(R.id.activity__item__list__filter__item__button);
@@ -96,15 +101,21 @@ public class ListActivity extends AppCompatActivity implements
         this.sumOfItemCosts = findViewById(R.id.activity__item__list__cost__sum__text);
         this.showTagListButton = findViewById(R.id.activity_item_list_show_tags_button);
         this.logoutButton = findViewById(R.id.logoutButton);
-        this.addTagButton.setOnClickListener(openTagFragment);
+
         addTagButton.setAlpha(0f);
         deleteItemButton.setAlpha(0f);
+        this.addTagButton.setOnClickListener(openTagFragment);
         this.deleteItemButton.setOnClickListener(deleteSelectedItems);
         this.showTagListButton.setOnClickListener(showList);
         itemList.setOnItemLongClickListener(selectItems);
-        this.tagRef = this.db.collection("tags");
 
-        this.ownerName =  AppGlobals.getInstance().getOwnerName();
+        this.itemListAdapter = new ItemListAdapter(this, items);
+        this.itemList.setAdapter(this.itemListAdapter);
+
+        //display welcome message to user
+        Util.showShortToast(getBaseContext(), "Welcome " + this.ownerName);
+
+        //Get all tags that belong to the user
         this.db.collection("tags")
             .whereEqualTo("ownerName", ownerName)
             .get()
@@ -123,23 +134,21 @@ public class ListActivity extends AppCompatActivity implements
                 });
         AppGlobals.getInstance().setAllTags(allTags);
 
+        //OnClickListener when an item is clicked
         this.itemList.setOnItemClickListener((parent, view, position, id) -> {
             this.selected = position;
             Item selected = this.itemListAdapter.getItem(position);
             resetPictureVars();
             new EditItemFragment(position, selected).show(getSupportFragmentManager(), "EDIT ITEM");
         });
+
+        //OnclickListener when edit button is clicked
         this.editButton.setOnClickListener((v) -> {
             resetPictureVars();
             new AddItemFragment(this.ownerName).show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
-        this.itemListAdapter = new ItemListAdapter(this, items);
-        this.itemList.setAdapter(this.itemListAdapter);
-
-//        this.sumOfItemCosts.setText(this.ownerName);
-        Util.showShortToast(getBaseContext(), "Welcome " + this.ownerName);
-
+        //Makes sure no items are selected on startup
         if(itemListAdapter.getItemListSize()==0){
             exitSelectionMode();
         }
@@ -147,11 +156,13 @@ public class ListActivity extends AppCompatActivity implements
         this.filterButton.setOnClickListener(v -> {
             new FilterItemsFragment(this.itemList, this.itemListAdapter).show(getSupportFragmentManager(), "FILTER");
         });
+
         this.logoutButton.setOnClickListener(v -> {
             mAuth.signOut();
             Intent i = new Intent(ListActivity.this, SignInActivity.class);
             startActivity(i);
         });
+        
         this.itemRef
                 .whereEqualTo("owner",this.ownerName)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -223,9 +234,8 @@ public class ListActivity extends AppCompatActivity implements
     }
 
     /**
-     * Lol
-     *
-     *
+     * Deletes item after long selecting and pressing delete button
+     * @param item item to delete
      */
     public void onSubmitDelete(Item item) {
         try {
@@ -261,6 +271,11 @@ public class ListActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Allows user to edit item details when clicking
+     * @param position position of item in array adapter
+     * @param item item to be edited
+     */
     public void editItem(int position, Item item) {
         try {
             this.itemListAdapter.editItem(position, item);
@@ -311,9 +326,8 @@ public class ListActivity extends AppCompatActivity implements
         resetPictureVars();
     }
 
-    @SuppressLint("SetTextI18n") // ?? man
     /**
-     *
+     * Displays the sum of items
      */
     public void setSumOfItemCosts() {
         ItemListAdapter adapter = (ItemListAdapter) this.itemList.getAdapter();
@@ -376,6 +390,9 @@ public class ListActivity extends AppCompatActivity implements
         deleteItemButton.setVisibility(View.GONE);
     }
 
+    /**
+     * Directs user to add tags fragment
+     */
     private View.OnClickListener openTagFragment = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -391,7 +408,10 @@ public class ListActivity extends AppCompatActivity implements
      */
     @Override
     public void addTagPressed(ArrayList<Tag> tagsToAdd) {
+        // get the current adapter
         ItemListAdapter adapter = (ItemListAdapter) itemList.getAdapter();
+
+        //initialize list of tags to add
         ArrayList<Tag> collector = new ArrayList<>();
         for (Item i: adapter.getSelectedItems()){
             ArrayList <Tag> currentTags = i.getTags();

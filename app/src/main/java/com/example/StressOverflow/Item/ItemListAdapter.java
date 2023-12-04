@@ -62,10 +62,6 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         this.itemRef = db.collection("items");
     }
 
-    public void clearItems(){
-        this.items.clear();
-    }
-
     @NonNull
     @Override
     public View getView(int pos, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -115,7 +111,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
      * @param enabled the selection mode to be set to
      */
     public void setSelectionMode(boolean enabled) {
-        if (enabled == false){
+        if (!enabled){
             selectedItems.clear();
         }
         inSelectionMode = enabled;
@@ -164,6 +160,10 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         return String.format("$%.2f", cum);
     }
 
+    /**
+     * Adds an item to the database
+     * @param item to be added
+     */
     public void addItem(Item item) {
         this.items.add(item);
         UUID uuid = item.getId();
@@ -216,6 +216,8 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         for (Tag t: tags){
             if (tagCounter!=3){
                 Chip chip = new Chip(this.context);
+
+                //styling
                 chip.setChipBackgroundColorResource(R.color.lavender);
                 chip.setTextColor(Color.BLACK);
                 chip.setText(t.getTagName());
@@ -224,6 +226,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
                 chip.setLongClickable(false);
                 chip.setEnabled(false);
                 tagChipGroup.addView(chip);
+
                 tagCounter++;
             }else{
                 break;
